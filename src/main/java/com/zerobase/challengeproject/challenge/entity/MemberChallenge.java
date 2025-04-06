@@ -3,12 +3,16 @@ package com.zerobase.challengeproject.challenge.entity;
 
 import com.zerobase.challengeproject.member.entity.Member;
 import jakarta.persistence.*;
-import lombok.Getter;
-import lombok.Setter;
+import lombok.*;
+
+import java.time.LocalDateTime;
 
 @Entity
 @Getter
 @Setter
+@NoArgsConstructor
+@AllArgsConstructor
+@Builder
 public class MemberChallenge {
 
     @Id
@@ -22,4 +26,10 @@ public class MemberChallenge {
     @ManyToOne
     @JoinColumn(name = "member_id", nullable = false)
     private Member member;
+
+    private LocalDateTime entered_at;
+
+    private Long memberDeposit;
+
+
 }

@@ -1,8 +1,11 @@
 package com.zerobase.challengeproject.challenge.entity;
 
-import com.zerobase.challengeproject.challenge.domain.form.ChallengeForm;
+import com.zerobase.challengeproject.challenge.domain.form.CreateChallengeForm;
+import com.zerobase.challengeproject.challenge.domain.form.UpdateChallengeForm;
+import com.zerobase.challengeproject.comment.entity.CoteChallenge;
+import com.zerobase.challengeproject.comment.entity.DietChallenge;
 import com.zerobase.challengeproject.member.entity.Member;
-import com.zerobase.challengeproject.type.Category;
+import com.zerobase.challengeproject.type.CategoryType;
 import jakarta.persistence.*;
 import jakarta.validation.constraints.NotNull;
 import lombok.*;
@@ -27,7 +30,7 @@ public class Challenge {
     private Member member;
 
     @OneToMany(mappedBy = "challenge")
-    private List<MemberChallenge> challengeMembers;
+    private List<MemberChallenge> memberChallenges;
 
     @Column(nullable = false)
     private String title;
@@ -37,19 +40,22 @@ public class Challenge {
     @Enumerated(EnumType.STRING)
     @Column(nullable = false)
     @NotNull
-    private Category category;
+    private CategoryType categoryType;
 
     @Column(nullable = false)
-    private Integer participant;
+    private Long maxParticipant;
+
+    @Column
+    private Long currentParticipant = 0L;
 
     @Column(nullable = false)
     private String description;
 
     @Column(nullable = false)
-    private Integer min_deposit;
+    private Long minDeposit;
 
     @Column(nullable = false)
-    private Integer max_deposit;
+    private Long maxDeposit;
 
     @Column(nullable = false)
     private String standard;
@@ -60,69 +66,48 @@ public class Challenge {
     @Column(nullable = false)
     private LocalDateTime endDate;
 
-//    @OneToMany(mappedBy = "challenge", fetch = FetchType.LAZY)
+    @OneToMany(mappedBy = "challenge", fetch = FetchType.LAZY, cascade = CascadeType.REMOVE, orphanRemoval = true)
+    private List<CoteChallenge> coteChallenges;
 //    @OneToMany(mappedBy = "callenge", fetch = FetchType.LAZY)
 //    List<DrinkingComment> drinkingComments;
-//    @OneToMany(mappedBy = "callenge", fetch = FetchType.LAZY)
-//    List<DietComment> dietComments;
+    @OneToMany(mappedBy = "challenge", fetch = FetchType.LAZY, cascade = CascadeType.REMOVE, orphanRemoval = true)
+    private List<DietChallenge> dietChallenges;
 
     private LocalDateTime createAt;
     
     private LocalDateTime updateAt;
 
-
-    /**
-     * 클라이언트로부터 받은 정보로 챌린지 생성
-     * @param dto
-     */
-    public Challenge(ChallengeForm dto, Member member) {
-
-        this.title = dto.getTitle();
+    public Challenge(CreateChallengeForm form, Member member) {
+        this.currentParticipant = 1L;
+        this.title = form.getTitle();
         this.member = member;
-        this.category = dto.getCategory();
-        this.img = dto.getImg();
-        this.participant = dto.getParticipant();
-        this.max_deposit = dto.getMax_deposit();
-        this.standard = dto.getStandard();
-        this.min_deposit = dto.getMin_deposit();
-        this.description = dto.getDescription();
-        this.startDate = dto.getStartDate();
-        this.endDate = dto.getEndDate();
+        this.categoryType = form.getCategoryType();
+        this.img = form.getImg();
+        this.maxParticipant = form.getMaxParticipant();
+        this.maxDeposit = form.getMaxDeposit();
+        this.standard = form.getStandard();
+        this.minDeposit = form.getMinDeposit();
+        this.description = form.getDescription();
+        this.startDate = form.getStartDate();
+        this.endDate = form.getEndDate();
         this.createAt = LocalDateTime.now();
     }
 
-    public Challenge(ChallengeForm dto) {
+    public void update(UpdateChallengeForm form) {
 
-        this.title = dto.getTitle();
-        this.img = dto.getImg();
-        this.category = dto.getCategory();
-        this.participant = dto.getParticipant();
-        this.max_deposit = dto.getMax_deposit();
-        this.standard = dto.getStandard();
-        this.min_deposit = dto.getMin_deposit();
-        this.description = dto.getDescription();
-        this.startDate = dto.getStartDate();
-        this.endDate = dto.getEndDate();
-        this.createAt = LocalDateTime.now();
-    }
-
-
-    /**
-     * 클라이언트로부터 받은 정보로 챌린지 수정
-     * @param dto
-     */
-    public void update(ChallengeForm dto) {
-        this.title = dto.getTitle();
-        this.img = dto.getImg();
-        this.description = dto.getDescription();
-        this.max_deposit = dto.getMax_deposit();
-        this.min_deposit = dto.getMin_deposit();
-        this.standard = dto.getStandard();
-        this.participant = dto.getParticipant();
-        this.startDate = dto.getStartDate();
-        this.endDate = dto.getEndDate();
+        if (form.getTitle() != null) this.setTitle(form.getTitle());
+        if (form.getCategoryType() != null) this.setCategoryType(form.getCategoryType());
+        if (form.getStandard() != null) this.setStandard(form.getStandard());
+        if (form.getImg() != null) this.setImg(form.getImg());
+        if (form.getMaxParticipant() != null) this.setMaxParticipant(form.getMaxParticipant());
+        if (form.getDescription() != null) this.setDescription(form.getDescription());
+        if (form.getMinDeposit() != null) this.setMinDeposit(form.getMinDeposit());
+        if (form.getMaxDeposit() != null) this.setMaxDeposit(form.getMaxDeposit());
+        if (form.getStartDate() != null) this.setStartDate(form.getStartDate());
+        if (form.getEndDate() != null) this.setEndDate(form.getEndDate());
         this.updateAt = LocalDateTime.now();
     }
-
-
+    public void registration(){
+        this.setCurrentParticipant(this.getCurrentParticipant() + 1);
+    }
 }

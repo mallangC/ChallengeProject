@@ -15,6 +15,7 @@ import com.zerobase.challengeproject.member.repository.MemberRepository;
 import com.zerobase.challengeproject.account.repository.RefundRepository;
 import com.zerobase.challengeproject.exception.CustomException;
 import com.zerobase.challengeproject.member.entity.Member;
+import com.zerobase.challengeproject.type.AccountType;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
@@ -66,7 +67,7 @@ class AccountServiceTest {
           .accountDetails(List.of(AccountDetail.builder()
                   .id(1L)
                   .amount(5000L)
-                  .isCharge(true)
+                  .accountType(AccountType.CHARGE)
                   .isRefunded(false)
                   .build()))
           .build();
@@ -98,7 +99,7 @@ class AccountServiceTest {
     assertEquals(10000L, responseDto.getData().getPreAmount());
     assertEquals(15000L, responseDto.getData().getCurAmount());
     assertEquals(5000L, responseDto.getData().getAmount());
-    assertTrue(responseDto.getData().isCharge());
+    assertEquals(AccountType.CHARGE, responseDto.getData().getAccountType());
     assertFalse(responseDto.getData().isRefunded());
     verify(accountDetailRepository, times(1)).save(any());
   }
@@ -126,7 +127,7 @@ class AccountServiceTest {
     //given
     given(refundRepository.existsByAccountDetail_Id(anyLong()))
             .willReturn(false);
-    given(memberRepository.searchByEmailAndAccountDetailId(anyString(), anyLong()))
+    given(memberRepository.searchByLoginIdAndAccountDetailId(anyString(), anyLong()))
             .willReturn(memberSearch);
 
     //when
@@ -284,7 +285,7 @@ class AccountServiceTest {
                     .accountDetail(memberSearch.getAccountDetails().get(0))
                     .build());
 
-    given(memberRepository.searchByEmailAndAccountDetailsToDate(anyString(), any()))
+    given(memberRepository.searchByLoginIdAndAccountDetailsToDate(anyString(), any()))
             .willReturn(memberSearch);
 
     RefundUpdateForm refundUpdateForm = RefundUpdateForm.builder()
@@ -357,7 +358,7 @@ class AccountServiceTest {
                     .member(memberSearch)
                     .accountDetail(AccountDetail.builder()
                             .id(1L)
-                            .isCharge(false)
+                            .accountType(AccountType.REFUND)
                             .build())
                     .build());
 

@@ -91,7 +91,7 @@ public class AccountController {
    * 관리자가 환불 내역 확인
    */
 //  @PreAuthorize("hasRole('ROLE_ADMIN')")
-  @Secured("ROLE_ADMIN")
+  @Secured("ADMIN")
   @GetMapping("/refund/admin")
   public ResponseEntity<BaseResponseDto<PageDto<RefundDto>>> getAllRefund(
           @RequestParam @Min(1) int page,

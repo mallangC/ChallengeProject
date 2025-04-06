@@ -2,8 +2,6 @@ package com.zerobase.challengeproject.account.service;
 
 import com.zerobase.challengeproject.BaseResponseDto;
 import com.zerobase.challengeproject.account.domain.dto.AccountDetailDto;
-import com.zerobase.challengeproject.member.components.jwt.UserDetailsImpl;
-import com.zerobase.challengeproject.member.domain.dto.MemberDto;
 import com.zerobase.challengeproject.account.domain.dto.PageDto;
 import com.zerobase.challengeproject.account.domain.dto.RefundDto;
 import com.zerobase.challengeproject.account.domain.form.AccountAddForm;
@@ -11,21 +9,21 @@ import com.zerobase.challengeproject.account.domain.form.RefundAddForm;
 import com.zerobase.challengeproject.account.domain.form.RefundSearchForm;
 import com.zerobase.challengeproject.account.domain.form.RefundUpdateForm;
 import com.zerobase.challengeproject.account.entity.AccountDetail;
-import com.zerobase.challengeproject.member.entity.Member;
 import com.zerobase.challengeproject.account.entity.Refund;
 import com.zerobase.challengeproject.account.repository.AccountDetailRepository;
-import com.zerobase.challengeproject.member.repository.MemberRepository;
 import com.zerobase.challengeproject.account.repository.RefundRepository;
 import com.zerobase.challengeproject.exception.CustomException;
 import com.zerobase.challengeproject.exception.ErrorCode;
+import com.zerobase.challengeproject.member.components.jwt.UserDetailsImpl;
+import com.zerobase.challengeproject.member.domain.dto.MemberDto;
+import com.zerobase.challengeproject.member.entity.Member;
+import com.zerobase.challengeproject.member.repository.MemberRepository;
+import com.zerobase.challengeproject.type.AccountType;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
 import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
-
-import java.time.LocalDateTime;
-import java.time.format.DateTimeFormatter;
 
 @Service
 @RequiredArgsConstructor
@@ -72,7 +70,7 @@ public class AccountService {
     accountDetailRepository.save(detail);
 
     member.chargeAccount(amount);
-    return new BaseResponseDto<AccountDetailDto>(
+    return new BaseResponseDto<>(
             AccountDetailDto.from(detail),
             amount + "원 충전을 성공했습니다.",
             HttpStatus.OK);
@@ -91,12 +89,12 @@ public class AccountService {
     if (isExist) {
       throw new CustomException(ErrorCode.ALREADY_REFUND_REQUEST);
     }
-    Member member = memberRepository.searchByEmailAndAccountDetailId(userId, form.getAccountId());
+    Member member = memberRepository.searchByLoginIdAndAccountDetailId(userId, form.getAccountId());
 
     Refund refund = Refund.from(form.getContent(), member);
     refundRepository.save(refund);
 
-    return new BaseResponseDto<RefundDto>(RefundDto.from(refund),
+    return new BaseResponseDto<>(RefundDto.from(refund),
             "환불 신청을 성공했습니다.",
             HttpStatus.OK);
   }
@@ -127,7 +125,7 @@ public class AccountService {
     }
 
     refundRepository.delete(refund);
-    return new BaseResponseDto<RefundDto>(RefundDto.from(refund),
+    return new BaseResponseDto<>(RefundDto.from(refund),
             "환불 신청을 취소했습니다.",
             HttpStatus.OK);
   }
@@ -137,16 +135,11 @@ public class AccountService {
    * 환불 신청 내역을 찾을 수 없는 경우 빈 페이지로 반환
    *
    * @param page 페이지 넘버
-   * @param form 검색 기준이 되는 날짜(문자열), 두개의 boolean
+   * @param form 검색 기준이 되는 날짜(문자열 예- 2025-03-31 00), 두개의 boolean
    * @return paging된 검색 기준에 맞는 Refund 정보
    */
   public BaseResponseDto<PageDto<RefundDto>> getAllRefund(int page, RefundSearchForm form) {
-    DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd HH");
-    LocalDateTime startAt = null;
-    if (form.getStartAtStr() != null) {
-      startAt = LocalDateTime.parse(form.getStartAtStr(), formatter);
-    }
-    Page<RefundDto> paging = refundRepository.searchAllRefund(page - 1, startAt, form.getDone(), form.getRefunded());
+    Page<RefundDto> paging = refundRepository.searchAllRefund(page - 1, form.getStartAtStr(), form.getDone(), form.getRefunded());
     return new BaseResponseDto<>(PageDto.from(paging)
             , "환불 신청 조회에 성공했습니다.(" + page + "페이지)"
             , HttpStatus.OK);
@@ -172,22 +165,22 @@ public class AccountService {
   public BaseResponseDto<RefundDto> refundDecision(boolean approval, RefundUpdateForm form) {
     Refund refund = refundRepository.searchRefundById(form.getRefundId());
     AccountDetail accountDetail = refund.getAccountDetail();
-    if (!accountDetail.isCharge()) {
+    if (accountDetail.getAccountType() != AccountType.CHARGE) {
       throw new CustomException(ErrorCode.NOT_CHARGE_DETAIL);
     }
     if (approval) {
-      Member member = memberRepository.searchByEmailAndAccountDetailsToDate(
+      Member member = memberRepository.searchByLoginIdAndAccountDetailsToDate(
               refund.getMember().getLoginId(),
               accountDetail.getCreatedAt());
       AccountDetail refundDetail = AccountDetail.refund(member, accountDetail.getAmount());
       accountDetailRepository.save(refundDetail);
       member.refundAccount(accountDetail, refund);
-      return new BaseResponseDto<RefundDto>(RefundDto.from(refund),
+      return new BaseResponseDto<>(RefundDto.from(refund),
               "환불 승인을 성공했습니다.",
               HttpStatus.OK);
     }
     refund.refundFalse(form);
-    return new BaseResponseDto<RefundDto>(RefundDto.from(refund),
+    return new BaseResponseDto<>(RefundDto.from(refund),
             "환불 비승인을 성공했습니다.",
             HttpStatus.OK);
   }
