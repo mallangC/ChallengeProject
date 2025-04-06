@@ -34,13 +34,11 @@ public enum ErrorCode {
   NOT_FOUND_CHALLENGES(HttpStatus.BAD_REQUEST, "챌린지를 찾을 수 없습니다."),
   NOT_FOUND_CHALLENGE(HttpStatus.BAD_REQUEST, "챌린지를 조회할 수 없습니다."),
   ALREADY_ENTERED_CHALLENGE(HttpStatus.BAD_REQUEST, "이미 참여한 챌린지입니다."),
-
   INVALID_DEPOSIT_AMOUNT(HttpStatus.BAD_REQUEST, "최소보증금이 최대보증금보다 작아야 합니다."),
   INVALID_PARTICIPANT_NUMBER(HttpStatus.BAD_REQUEST, "최소참여인원은 1명이상이어야 합니다."),
   INVALID_DATE_RANGE(HttpStatus.BAD_REQUEST, "시작날짜는 종료날짜보다 먼저이어야 합니다."),
   FORBIDDEN_UPDATE_CHALLENGE(HttpStatus.BAD_REQUEST, "챌린지를 생성한 아이디와 다릅니다." ),
   FORBIDDEN_DELETE_CHALLENGE(HttpStatus.BAD_REQUEST, "챌린지를 생성한 유저만 삭제가 가능합니다." ),
-  INSUFFICIENT_DEPOSIT(HttpStatus.BAD_REQUEST, "보증금이 부족합니다." ),
   CHALLENGE_ALREADY_ENDED(HttpStatus.BAD_REQUEST, "이미 종료된 챌린지입니다." ),
 
   NOT_FOUND_COTE_CHALLENGE(HttpStatus.BAD_REQUEST, "코테 챌린지를 찾을 수 없습니다."),
@@ -51,11 +49,15 @@ public enum ErrorCode {
   NOT_OWNER_OF_CHALLENGE(HttpStatus.BAD_REQUEST, "챌린지를 만든 회원이 아닙니다."),
   CANNOT_DELETE_HAVE_COMMENT(HttpStatus.BAD_REQUEST, "인증 댓글이 있으면 코테 챌린지를 삭제할 수 없습니다."),
   NOT_OWNER_OF_COMMENT(HttpStatus.BAD_REQUEST, "댓글을 작성한 회원이 아닙니다."),
+  NOT_DEPOSIT_DETAIL(HttpStatus.BAD_REQUEST, "보증금 내역이 아닙니다."),
 
+  NOT_ENOUGH_MONEY(HttpStatus.BAD_REQUEST, "보증금이 부족합니다." ),
+  CHALLENGE_FULL(HttpStatus.BAD_REQUEST, "챌린지의 인원이 가득 찼습니다."),
+  NOT_FOUND_PARTICIPATION(HttpStatus.BAD_REQUEST, "참여한 유저가 아닙니다." ),
+  ALREADY_STARTED_CHALLENGE(HttpStatus.BAD_REQUEST, "이미 시작한 챌린지입니다. 취소가 불가능합니다."),
+  CANNOT_DELETE_HAS_PARTICIPANTS(HttpStatus.BAD_REQUEST, "참여중인 유저가 있으므로 삭제가 불가능합니다." );
 
-  ;
-
-
+;
   private final HttpStatus httpStatus;
   private final String message;
 }

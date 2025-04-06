@@ -35,7 +35,7 @@ public class SearchService {
      * 카테고리로 챌린지 검색
      */
     public ResponseEntity<BaseResponseDto<Page<GetChallengeDto>>> searchByCategory(CategoryType categoryType, Pageable pageable) {
-        Page<Challenge> challenges = challengeRepository.findByCategory(categoryType, pageable);
+        Page<Challenge> challenges = challengeRepository.findByCategoryType(categoryType, pageable);
 
         Page<GetChallengeDto> searchResult = challenges.map(challenge -> new GetChallengeDto(challenge));
 

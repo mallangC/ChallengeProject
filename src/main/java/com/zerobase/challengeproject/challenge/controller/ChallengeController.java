@@ -1,22 +1,35 @@
 package com.zerobase.challengeproject.challenge.controller;
 
 
+import com.zerobase.challengeproject.account.entity.AccountDetail;
+import com.zerobase.challengeproject.account.repository.AccountDetailRepository;
+import com.zerobase.challengeproject.account.service.AccountService;
 import com.zerobase.challengeproject.challenge.domain.dto.EnterChallengeDto;
 import com.zerobase.challengeproject.challenge.domain.form.RegistrationChallengeForm;
 import com.zerobase.challengeproject.challenge.domain.form.UpdateChallengeForm;
+import com.zerobase.challengeproject.challenge.entity.Challenge;
+import com.zerobase.challengeproject.challenge.repository.ChallengeRepository;
 import com.zerobase.challengeproject.challenge.service.ChallengeService;
 import com.zerobase.challengeproject.challenge.domain.dto.BaseResponseDto;
 import com.zerobase.challengeproject.challenge.domain.dto.GetChallengeDto;
 import com.zerobase.challengeproject.challenge.domain.dto.ParticipationChallengeDto;
 import com.zerobase.challengeproject.challenge.domain.form.CreateChallengeForm;
+import com.zerobase.challengeproject.exception.CustomException;
+import com.zerobase.challengeproject.exception.ErrorCode;
 import com.zerobase.challengeproject.member.components.jwt.UserDetailsImpl;
+import com.zerobase.challengeproject.member.entity.Member;
+import com.zerobase.challengeproject.type.CategoryType;
 import jakarta.validation.Valid;
 import lombok.AllArgsConstructor;
 import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageImpl;
 import org.springframework.data.domain.Pageable;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.web.bind.annotation.*;
+
+import java.util.List;
 
 @RestController
 @RequestMapping("/api/challenge")
@@ -24,14 +37,22 @@ import org.springframework.web.bind.annotation.*;
 public class ChallengeController {
 
     private final ChallengeService challengeService;
+    private final ChallengeRepository challengeRepository;
+    private final AccountDetailRepository accountDetailRepository;
 
     /**
      * 챌린지 전체 조회
      */
     @GetMapping
     public ResponseEntity<BaseResponseDto<Page<GetChallengeDto>>> getAllChallenge(Pageable pageable) {
-        
-        return challengeService.getAllChallenges(pageable);
+        List<GetChallengeDto> challengeList = challengeService.getAllChallenges(pageable);
+
+        Page<GetChallengeDto> challengePage = new PageImpl<>(
+                challengeList,
+                pageable,
+                challengeList.size()
+        );
+        return ResponseEntity.ok(new BaseResponseDto<>(challengePage, "전체 챌린지 조회 성공", HttpStatus.OK));
     }
 
     /**
@@ -68,6 +89,18 @@ public class ChallengeController {
     public ResponseEntity<BaseResponseDto<EnterChallengeDto>> enterChallenge(@PathVariable Long challengeId, @Valid @RequestBody RegistrationChallengeForm registrationChallengeForm, @AuthenticationPrincipal UserDetailsImpl userDetails){
 
         return challengeService.enterChallenge(challengeId, registrationChallengeForm, userDetails);
+    }
+
+
+    /**
+     * 참여자가 챌린지참여 취소
+     *
+     */
+    @DeleteMapping("/cancel/{challengeId}")
+    public ResponseEntity<BaseResponseDto<GetChallengeDto>> cancelChallenge(@PathVariable Long challengeId, @AuthenticationPrincipal UserDetailsImpl userDetails ){
+
+
+        return challengeService.cancelChallenge(challengeId, userDetails);
     }
 
     /**

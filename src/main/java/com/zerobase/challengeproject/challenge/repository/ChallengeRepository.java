@@ -20,7 +20,7 @@ public interface ChallengeRepository extends JpaRepository<Challenge, Long>, Cha
 
   Page<Challenge> findByTitleContaining(String title, Pageable pageable);
 
-    Page<Challenge> findByCategory(CategoryType categoryType, Pageable pageable);
+    Page<Challenge> findByCategoryType(CategoryType categoryType, Pageable pageable);
 
 
     /**

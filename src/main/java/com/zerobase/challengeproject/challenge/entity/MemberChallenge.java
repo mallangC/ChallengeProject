@@ -29,7 +29,7 @@ public class MemberChallenge {
 
     private LocalDateTime entered_at;
 
-    private Integer memberDeposit;
+    private Long memberDeposit;
 
 
 }
