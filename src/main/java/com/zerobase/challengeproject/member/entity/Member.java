@@ -18,7 +18,6 @@ import java.util.List;
 @Entity
 @Builder
 @Getter
-@Setter
 @NoArgsConstructor
 @AllArgsConstructor
 public class Member {
@@ -96,6 +95,22 @@ public class Member {
         this.account += amount;
     }
 
+    public void depositAccount(Long amount) {
+        if (this.account < amount) {
+            throw new CustomException(ErrorCode.NOT_ENOUGH_MONEY);
+        }
+        this.account -= amount;
+    }
+
+    public void depositBack(AccountDetail detail) {
+        if (detail.getAccountType() != AccountType.DEPOSIT) {
+            throw new CustomException(ErrorCode.NOT_DEPOSIT_DETAIL);
+        } else if (detail.isRefunded()) {
+            throw new CustomException(ErrorCode.ALREADY_REFUNDED);
+        }
+        this.account += detail.getAmount();
+    }
+
     public void refundAccount(AccountDetail detail, Refund refund) {
         if (this.account < detail.getAmount()) {
             throw new CustomException(ErrorCode.NOT_ENOUGH_MONEY_TO_REFUND);
@@ -107,22 +122,6 @@ public class Member {
         detail.refundTrue();
         refund.refundTrue();
         this.account -= detail.getAmount();
-    }
-
-    public void depositAccount(Long amount) {
-        if (this.account < amount) {
-            throw new CustomException(ErrorCode.NOT_ENOUGH_MONEY);
-        }
-        this.account -= amount;
-    }
-
-    public void depositBack(AccountDetail detail) {
-         if (detail.getAccountType() != AccountType.DEPOSIT) {
-            throw new CustomException(ErrorCode.NOT_DEPOSIT_DETAIL);
-        } else if (detail.isRefunded()) {
-            throw new CustomException(ErrorCode.ALREADY_REFUNDED);
-        }
-        this.account += detail.getAmount();
     }
 
     public void changePassword(String newPassword) {

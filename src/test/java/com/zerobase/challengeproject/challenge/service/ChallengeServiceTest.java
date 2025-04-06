@@ -71,7 +71,7 @@ public class ChallengeServiceTest {
                 .member(member)
                 .img(null)
                 .categoryType(CategoryType.DIET)
-                .participant(10)
+                .maxParticipant(10)
                 .description("설명")
                 .minDeposit(1000)
                 .maxDeposit(5000)
@@ -103,7 +103,7 @@ public class ChallengeServiceTest {
                 .categoryType(CategoryType.DIET)
                 .standard("업데이트된 인증 기준")
                 .img("https://example.com/updated-image.jpg")
-                .participant(20)
+                .maxParticipant(20)
                 .description("업데이트된 챌린지 설명")
                 .minDeposit(5000)
                 .maxDeposit(10000)
@@ -117,7 +117,7 @@ public class ChallengeServiceTest {
                 .categoryType(CategoryType.DIET)
                 .standard("업데이트된 인증 기준")
                 .img("https://example.com/updated-image.jpg")
-                .participant(20)
+                .maxParticipant(20)
                 .description("업데이트된 챌린지 설명")
                 .minDeposit(5000)
                 .maxDeposit(10000)
@@ -302,7 +302,7 @@ public class ChallengeServiceTest {
         UserDetailsImpl userDetails = new UserDetailsImpl(member);
         Challenge challenge = createChallenge(challengeId, "기존 챌린지");
         given(challengeRepository.findById(challengeId)).willReturn(Optional.of(challenge));
-        updateChallengeForm.setParticipant(0);
+        updateChallengeForm.setMaxParticipant(0);
 
         // When & Then
         assertThatThrownBy(() -> challengeService.updateChallenge(challengeId, updateChallengeForm, userDetails))

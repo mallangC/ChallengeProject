@@ -2,6 +2,7 @@ package com.zerobase.challengeproject.challenge.service;
 
 
 import com.zerobase.challengeproject.account.entity.AccountDetail;
+import com.zerobase.challengeproject.account.repository.AccountDetailRepository;
 import com.zerobase.challengeproject.challenge.domain.dto.BaseResponseDto;
 import com.zerobase.challengeproject.challenge.domain.dto.EnterChallengeDto;
 import com.zerobase.challengeproject.challenge.domain.dto.GetChallengeDto;
@@ -18,8 +19,10 @@ import com.zerobase.challengeproject.exception.CustomException;
 import com.zerobase.challengeproject.exception.ErrorCode;
 import com.zerobase.challengeproject.member.components.jwt.UserDetailsImpl;
 import com.zerobase.challengeproject.member.entity.Member;
+import com.zerobase.challengeproject.member.repository.MemberRepository;
 import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
+import org.springframework.cache.annotation.Cacheable;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.http.HttpStatus;
@@ -29,6 +32,7 @@ import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestBody;
 
 import java.time.LocalDateTime;
+import java.util.List;
 
 @Service
 @RequiredArgsConstructor
@@ -38,44 +42,40 @@ public class ChallengeService {
   private final ChallengeRepository challengeRepository;
   private final MemberChallengeRepository memberChallengeRepository;
   private final CoteChallengeRepository coteChallengeRepository;
+  private final AccountDetailRepository accountDetailRepository;
+  private final MemberRepository memberRepository;
 
-
-  /**
-   * 전체 챌린지조회
-   */
-  public ResponseEntity<BaseResponseDto<Page<GetChallengeDto>>> getAllChallenges(Pageable pageable) {
-
-    Page<Challenge> allChallenges = challengeRepository.findAll(pageable);
-
-    if (allChallenges.isEmpty()) {
-      throw new CustomException(ErrorCode.NOT_FOUND_CHALLENGES);
+    /**
+     * 전체 챌린지조회
+     */
+    @Cacheable(value = "challenges", key = "#pageable.pageNumber + '-' + #pageable.pageSize")
+    public List<GetChallengeDto> getAllChallenges(Pageable pageable) {
+        Page<Challenge> allChallenges = challengeRepository.findAll(pageable);
+        if (allChallenges.isEmpty()) {
+            throw new CustomException(ErrorCode.NOT_FOUND_CHALLENGES);
+        }
+        return allChallenges.map(GetChallengeDto::new).getContent();
     }
-    Page<GetChallengeDto> challengeDtos = allChallenges.map(allChallenge -> new GetChallengeDto(allChallenge));
 
-    return ResponseEntity.ok(new BaseResponseDto<Page<GetChallengeDto>>(challengeDtos, "전체 챌린지 조회 성공", HttpStatus.OK));
-  }
+    /**
+     *  특정챌린지 상세 조회
+     */
+    public ResponseEntity<BaseResponseDto<GetChallengeDto>> getChallengeDetail(@PathVariable Long challengeId){
 
-  /**
-   * 특정챌린지 상세 조회
-   */
-  public ResponseEntity<BaseResponseDto<GetChallengeDto>> getChallengeDetail(@PathVariable Long challengeId) {
+        Challenge challenge = challengeRepository.findById(challengeId)
+                .orElseThrow(() ->  new CustomException(ErrorCode.NOT_FOUND_CHALLENGE));
+        GetChallengeDto challengeDto = new GetChallengeDto(challenge);
+        return ResponseEntity.ok(new BaseResponseDto<GetChallengeDto>(challengeDto,"챌린지 상제정보 조회 성공", HttpStatus.OK));
+    }
 
-    Challenge challenge = challengeRepository.findById(challengeId)
-            .orElseThrow(() -> new CustomException(ErrorCode.NOT_FOUND_CHALLENGE));
+    /**
+     * 사용자가 만든 챌린지 조회
+     */
+    public ResponseEntity<BaseResponseDto<Page<GetChallengeDto>>> getChallengesMadeByUser(Pageable pageable, UserDetailsImpl userDetails){
 
-    GetChallengeDto challengeDto = new GetChallengeDto(challenge);
-    return ResponseEntity.ok(new BaseResponseDto<GetChallengeDto>(challengeDto, "챌린지 상제정보 조회 성공", HttpStatus.OK));
-  }
-
-  /**
-   * 사용자가 만든 챌린지 조회
-   */
-  public ResponseEntity<BaseResponseDto<Page<GetChallengeDto>>> getChallengesMadeByUser(Pageable pageable, UserDetailsImpl userDetails) {
-
-    Long memberId = userDetails.getMember().getId();
-    Page<Challenge> userChallenges = challengeRepository.findByMemberId(memberId, pageable);
-
-    Page<GetChallengeDto> challengeDtos = userChallenges.map(userChallenge -> new GetChallengeDto(userChallenge));
+        Long memberId = userDetails.getMember().getId();
+        Page<Challenge> userChallenges = challengeRepository.findByMemberId(memberId, pageable);
+        Page<GetChallengeDto> challengeDtos = userChallenges.map(userChallenge -> new GetChallengeDto(userChallenge));
 
             if (challengeDtos.isEmpty()) {
                 throw new CustomException(ErrorCode.NOT_FOUND_CHALLENGES);
@@ -88,11 +88,8 @@ public class ChallengeService {
      */
     public ResponseEntity<BaseResponseDto<Page<ParticipationChallengeDto>>> getOngoingChallenges(Pageable pageable, UserDetailsImpl userDetails) {
 
-    /** 로그인시에만 가능
-     */
-    Long memberId = userDetails.getMember().getId();
-    Page<MemberChallenge> memberChallenges = memberChallengeRepository.findByMemberId(memberId, pageable);
-
+        Long memberId = userDetails.getMember().getId();
+        Page<MemberChallenge> memberChallenges = memberChallengeRepository.findByMemberId(memberId, pageable);
         Page<ParticipationChallengeDto> challengeDtos = memberChallenges.map(memberChallenge -> new ParticipationChallengeDto(memberChallenge.getChallenge()));
         return ResponseEntity.ok(new BaseResponseDto<Page<ParticipationChallengeDto>>(challengeDtos, "유저가 참여중인 챌린지 조회 성공", HttpStatus.OK));
     }
@@ -102,19 +99,19 @@ public class ChallengeService {
      */
     public ResponseEntity<BaseResponseDto<EnterChallengeDto>> enterChallenge(Long challengeId, RegistrationChallengeForm form, UserDetailsImpl userDetails){
 
-    Challenge challenge = challengeRepository.findById(challengeId)
-            .orElseThrow(() -> new CustomException(ErrorCode.NOT_FOUND_CHALLENGE));
+        Challenge challenge = challengeRepository.findById(challengeId)
+                .orElseThrow(() -> new CustomException(ErrorCode.NOT_FOUND_CHALLENGE));
 
+        form.validate(challenge);
         Member member = userDetails.getMember();
+        EnterChallengeDto enterChallengeDto = new EnterChallengeDto(challenge, form.getMemberDeposit());
 
-        if (member.getAccount() <= form.getMemberDeposit()){
-            throw new CustomException(ErrorCode.INSUFFICIENT_DEPOSIT);
-        }
-        if (form.getMemberDeposit() < challenge.getMinDeposit()){
-            throw new CustomException(ErrorCode.INVALID_DEPOSIT_AMOUNT);
-        }
-        if (LocalDateTime.now().isAfter(challenge.getEndDate())){
-            throw new CustomException(ErrorCode.CHALLENGE_ALREADY_ENDED);
+        /**
+         * 이미 참여한 경우 예외
+         */
+        boolean isAlreadyEntered = memberChallengeRepository.existsByChallengeAndMember(challenge, member);
+        if (isAlreadyEntered) {
+            throw new CustomException(ErrorCode.ALREADY_ENTERED_CHALLENGE);
         }
 
         MemberChallenge memberChallenge = MemberChallenge.builder()
@@ -124,17 +121,43 @@ public class ChallengeService {
                 .member(member)
                 .build();
 
-        member.setAccount(member.getAccount() - form.getMemberDeposit());
         /**
-         * 이미 참여한 챌린지인 경우 예외발생
+         * 보증금차감, 챌린지인원업데이트 및 저장
          */
-        if(member.getId().equals(memberChallenge.getMember().getId())){
-            throw new CustomException(ErrorCode.ALREADY_ENTERED_CHALLENGE);
-        }
-
-        EnterChallengeDto enterChallengeDto = new EnterChallengeDto(challenge, form.getMemberDeposit());
+        member.chargeAccount(100000L);
+        member.depositAccount(form.getMemberDeposit());
+        challenge.registration();
+        memberRepository.save(member);
         memberChallengeRepository.save(memberChallenge);
+        accountDetailRepository.save(AccountDetail.deposit(member, form.getMemberDeposit()));
         return ResponseEntity.ok(new BaseResponseDto<EnterChallengeDto>(enterChallengeDto,"챌린지 참여에 성공했습니다.", HttpStatus.OK));
+    }
+
+
+    /**
+     * 챌린지 참여 취소
+     *
+     */
+    public ResponseEntity<BaseResponseDto<GetChallengeDto>> cancelChallenge(Long challengeId, UserDetailsImpl userDetails){
+
+        Member member = userDetails.getMember();
+        Challenge challenge = challengeRepository.findById(challengeId)
+                .orElseThrow(() -> new CustomException(ErrorCode.NOT_FOUND_CHALLENGE));
+        MemberChallenge memberChallenge = memberChallengeRepository.findByChallengeAndMember(challenge, member)
+                .orElseThrow(() -> new CustomException(ErrorCode.NOT_FOUND_PARTICIPATION));
+
+        // 시작전에만 취소가능
+        if (LocalDateTime.now().isBefore(challenge.getStartDate())) {
+            memberChallengeRepository.delete(memberChallenge);
+            Long refundAmount = memberChallenge.getMemberDeposit();
+            AccountDetail refundRecord = AccountDetail.depositBack(member, refundAmount);
+            member.chargeAccount(refundAmount);
+            accountDetailRepository.save(refundRecord);
+            memberRepository.save(member);
+            return ResponseEntity.ok(new BaseResponseDto<GetChallengeDto>(null, "챌린지참여가 취소되었습니다.", HttpStatus.OK));
+        }else{
+            throw new CustomException(ErrorCode.ALREADY_STARTED_CHALLENGE);
+        }
     }
 
     /**
@@ -142,26 +165,10 @@ public class ChallengeService {
      */
     public ResponseEntity<BaseResponseDto<GetChallengeDto>> createChallenge(@RequestBody CreateChallengeForm form,
                                                                       UserDetailsImpl userDetails){
-
-        if (form.getMinDeposit() > form.getMaxDeposit()) {
-            throw new CustomException(ErrorCode.INVALID_DEPOSIT_AMOUNT);
-        }
-        if (form.getParticipant() <= 0) {
-            throw new CustomException(ErrorCode.INVALID_PARTICIPANT_NUMBER);
-        }
-        if (form.getStartDate().isAfter(form.getEndDate())) {
-            throw new CustomException(ErrorCode.INVALID_DATE_RANGE);
-        }
-        if (form.getMinDeposit() > form.getMemberDeposit()){
-            throw new CustomException(ErrorCode.INVALID_DEPOSIT_AMOUNT);
-        }
-
         Member member = userDetails.getMember();
         Challenge challenge = new Challenge(form, member);
-
-        if(member.getAccount() <= form.getMemberDeposit()){
-            throw new CustomException(ErrorCode.INSUFFICIENT_DEPOSIT);
-        }
+        GetChallengeDto challengeDto = new GetChallengeDto(challenge);
+        form.validate();
 
         /**
          * 생성한 사람은 바로 참여
@@ -172,12 +179,15 @@ public class ChallengeService {
                 .entered_at(LocalDateTime.now())
                 .member(member)
                 .build();
-
-        member.setAccount(member.getAccount() - form.getMemberDeposit());
-
-        GetChallengeDto challengeDto = new GetChallengeDto(challenge);
+        /**
+         * 보증금차감 및 저장
+         */
+        member.chargeAccount(100000L);
+        member.depositAccount(form.getMemberDeposit());
+        memberRepository.save(member);
         challengeRepository.save(challenge);
         memberChallengeRepository.save(memberChallenge);
+        accountDetailRepository.save(AccountDetail.deposit(member, form.getMemberDeposit()));
 
         return ResponseEntity.ok(new BaseResponseDto<GetChallengeDto>(challengeDto, "챌린지 생성 성공", HttpStatus.OK));
     }
@@ -187,50 +197,39 @@ public class ChallengeService {
      */
     public ResponseEntity<BaseResponseDto<GetChallengeDto>> updateChallenge(@PathVariable Long challengeId, @RequestBody UpdateChallengeForm form, UserDetailsImpl userDetails) {
 
-    Challenge challenge = challengeRepository.findById(challengeId)
-            .orElseThrow(() -> new CustomException(ErrorCode.NOT_FOUND_CHALLENGE));
-
+        Challenge challenge = challengeRepository.findById(challengeId)
+                .orElseThrow(() -> new CustomException(ErrorCode.NOT_FOUND_CHALLENGE));
+        form.validate();
         if (!challenge.getMember().getId().equals(userDetails.getMember().getId())) {
             throw new CustomException(ErrorCode.FORBIDDEN_UPDATE_CHALLENGE);
-        }
-
-        /**
-         *  예외 검증 (입력된 값이 있을 때만)
-         */
-        if (form.getMinDeposit() != null && form.getMaxDeposit() != null
-                && form.getMinDeposit() > form.getMaxDeposit()) {
-            throw new CustomException(ErrorCode.INVALID_DEPOSIT_AMOUNT);
-        }
-        if (form.getParticipant() != null && form.getParticipant() <= 0) {
-            throw new CustomException(ErrorCode.INVALID_PARTICIPANT_NUMBER);
-        }
-        if (form.getStartDate() != null && form.getEndDate() != null
-                && form.getStartDate().isAfter(form.getEndDate())) {
-            throw new CustomException(ErrorCode.INVALID_DATE_RANGE);
         }
 
         challenge.update(form);
         GetChallengeDto challengeDto = new GetChallengeDto(challenge);
         challengeRepository.save(challenge);
 
-    return ResponseEntity.ok(new BaseResponseDto<GetChallengeDto>(challengeDto, "챌린지 수정 성공", HttpStatus.OK));
-  }
+        return ResponseEntity.ok(new BaseResponseDto<GetChallengeDto>(challengeDto, "챌린지 수정 성공", HttpStatus.OK));
+    }
 
     /**
      * 챌린지 삭제
      */
     public ResponseEntity<BaseResponseDto<GetChallengeDto>> deleteChallenge(@PathVariable Long challengeId, UserDetailsImpl userDetails){
 
-    Challenge challenge = challengeRepository.findById(challengeId)
-            .orElseThrow(() -> new CustomException(ErrorCode.NOT_FOUND_CHALLENGE));
+        Member member = userDetails.getMember();
+        Challenge challenge = challengeRepository.findById(challengeId)
+                .orElseThrow(() -> new CustomException(ErrorCode.NOT_FOUND_CHALLENGE));
 
         if (!challenge.getMember().getId().equals(userDetails.getMember().getId())) {
             throw new CustomException(ErrorCode.FORBIDDEN_DELETE_CHALLENGE);
         }
 
+        long participantCount = memberChallengeRepository.countByChallengeAndMemberNot(challenge, member);
+        if (participantCount > 0) {
+            throw new CustomException(ErrorCode.CANNOT_DELETE_HAS_PARTICIPANTS);
+        }
+
         challengeRepository.delete(challenge);
-
-    return ResponseEntity.ok(new BaseResponseDto<GetChallengeDto>(null, "챌린지 삭제 성공", HttpStatus.OK));
-  }
-
+        return ResponseEntity.ok(new BaseResponseDto<GetChallengeDto>(null, "챌린지 삭제 성공", HttpStatus.OK));
+    }
 }

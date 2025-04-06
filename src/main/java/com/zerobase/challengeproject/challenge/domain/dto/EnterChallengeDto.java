@@ -10,9 +10,9 @@ public class EnterChallengeDto {
     private Long challengeId;
     private String title;
     private String category;
-    private Integer myDeposit;
+    private Long myDeposit;
 
-    public EnterChallengeDto(Challenge challenge, Integer memberDeposit) {
+    public EnterChallengeDto(Challenge challenge, Long memberDeposit) {
         this.challengeId = challenge.getId();
         this.title = challenge.getTitle();
         this.category = challenge.getCategoryType().toString();
