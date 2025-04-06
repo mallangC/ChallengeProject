@@ -127,7 +127,7 @@ class AccountServiceTest {
     //given
     given(refundRepository.existsByAccountDetail_Id(anyLong()))
             .willReturn(false);
-    given(memberRepository.searchByEmailAndAccountDetailId(anyString(), anyLong()))
+    given(memberRepository.searchByLoginIdAndAccountDetailId(anyString(), anyLong()))
             .willReturn(memberSearch);
 
     //when
@@ -285,7 +285,7 @@ class AccountServiceTest {
                     .accountDetail(memberSearch.getAccountDetails().get(0))
                     .build());
 
-    given(memberRepository.searchByEmailAndAccountDetailsToDate(anyString(), any()))
+    given(memberRepository.searchByLoginIdAndAccountDetailsToDate(anyString(), any()))
             .willReturn(memberSearch);
 
     RefundUpdateForm refundUpdateForm = RefundUpdateForm.builder()

@@ -14,12 +14,19 @@ public class CoteCommentRepositoryCustomImpl implements CoteCommentRepositoryCus
 
   private final JPAQueryFactory queryFactory;
 
+  /**
+   * DB에서 코테 댓글 객체를 호출하는 메서드
+   * 코테 댓글에 연결된 회원을 fetchJoin()으로 즉시 로딩
+   *
+   * @param commentId 댓글 아이디
+   * @return 코테 댓글 객체
+   */
   @Override
-  public CoteComment searchCoteCommentById(Long coteCommentId) {
+  public CoteComment searchCoteCommentById(Long commentId) {
 
     CoteComment findCoteComment = queryFactory.selectFrom(coteComment)
             .join(coteComment.member, member).fetchJoin()
-            .where(coteComment.id.eq(coteCommentId))
+            .where(coteComment.id.eq(commentId))
             .fetchOne();
 
     if (findCoteComment == null) {

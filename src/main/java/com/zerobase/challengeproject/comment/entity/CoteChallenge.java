@@ -23,10 +23,13 @@ public class CoteChallenge {
   @GeneratedValue(strategy = GenerationType.IDENTITY)
   private Long id;
   @ManyToOne
-  @JoinColumn(name = "challenge_id")
+  @JoinColumn(name = "challenge_id", nullable = false)
   private Challenge challenge;
+  @Column(nullable = false)
   private String title;
+  @Column(nullable = false)
   private String question;
+  @Column(nullable = false)
   private LocalDateTime startAt;
   @OneToMany(mappedBy = "coteChallenge", fetch = FetchType.LAZY)
   private List<CoteComment> comments;
