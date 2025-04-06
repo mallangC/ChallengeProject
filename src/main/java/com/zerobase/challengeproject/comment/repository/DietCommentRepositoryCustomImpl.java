@@ -16,6 +16,15 @@ public class DietCommentRepositoryCustomImpl implements DietCommentRepositoryCus
 
   private final JPAQueryFactory queryFactory;
 
+  /**
+   * DB에서 다이어트 댓글 객체를 호출하는 메서드
+   * 다이어트 댓글에 연결된 다이어트 챌린지와 멤버,
+   * 다이어트 챌린지에 연결된 챌린지를 fetchJoin()으로 즉시 로딩
+   *
+   * @param commentId 댓글 아이디
+   * @return 다이어트 댓글 객체
+   */
+
   @Override
   public DietComment searchDietCommentById(Long commentId) {
 

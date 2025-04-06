@@ -23,6 +23,14 @@ public class DietChallengeRepositoryCustomImpl implements DietChallengeRepositor
 
   private final JPAQueryFactory queryFactory;
 
+  /**
+   * DB에서 다이어트 챌린지 객체를 호출하는 메서드
+   * 다이어트 챌린지에 연결된 챌린지, 회원, 다이어트 댓글을 fetchJoin()으로 즉시 로딩
+   *
+   * @param challengeId 챌린지 아이디
+   * @param loginId     로그인 아이디
+   * @return 다이어트 챌린지 정보
+   */
   @Override
   public DietChallenge searchDietChallengeByChallengeIdAndLoginId(Long challengeId, String loginId) {
 
@@ -41,6 +49,14 @@ public class DietChallengeRepositoryCustomImpl implements DietChallengeRepositor
     return findDietChallenge;
   }
 
+  /**
+   * DB에서 다이어트 챌린지 객체를 전부 호출하는 메서드
+   * 다이어트 챌린지에 연결된 챌린지, 회원을 fetchJoin()으로 즉시 로딩
+   *
+   * @param page        페이지 숫자
+   * @param challengeId 챌린지 아이디
+   * @return 페이징된 다이어트 챌린지 정보 (댓글 제외)
+   */
   @Override
   public Page<DietChallengeDto> searchAllDietChallengeByChallengeId(int page, Long challengeId) {
     Pageable pageable = PageRequest.of(page, 20);

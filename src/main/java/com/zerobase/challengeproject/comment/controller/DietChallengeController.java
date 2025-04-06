@@ -24,7 +24,13 @@ public class DietChallengeController {
 
   private final DietChallengeService dietChallengeService;
 
-  //다이어트 챌린지 추가(참여할 때 작성)
+  /**
+   * 다이어트 챌린지 추가 컨트롤러 메서드(참여할 때 작성)
+   *
+   * @param form        챌린지아이디, 이미지 주소, 목표 몸무게, 현재 몸무게
+   * @param userDetails 회원 정보
+   * @return 다이어트 챌린지 정보
+   */
   @PostMapping
   public ResponseEntity<BaseResponseDto<DietChallengeDto>> addDietChallenge(
           @RequestBody @Valid DietChallengeAddForm form,
@@ -32,7 +38,13 @@ public class DietChallengeController {
     return ResponseEntity.ok(dietChallengeService.addDietChallenge(form, userDetails));
   }
 
-  //다이어트 챌린지 단건 조회
+  /**
+   * 회원 본인이 작성한 다이어트 챌린지 조회 컨트롤러 메서드
+   *
+   * @param challengeId 챌린지 아이디
+   * @param userDetails 유저 정보
+   * @return 다이어트 챌린지 정보
+   */
   @GetMapping("/{challengeId}")
   public ResponseEntity<BaseResponseDto<DietChallengeDto>> getDietChallenge(
           @PathVariable Long challengeId,
@@ -40,7 +52,13 @@ public class DietChallengeController {
     return ResponseEntity.ok(dietChallengeService.getDietChallenge(challengeId, userDetails));
   }
 
-  //다이어트 챌린지 전체 조회
+  /**
+   * 다이어트 챌린지 전체를 조회 컨트롤러 메서드
+   *
+   * @param page        페이지 번호
+   * @param challengeId 챌린지 아이디
+   * @return 페이징이된 다이어트 챌린지 리스트
+   */
   @GetMapping
   public ResponseEntity<BaseResponseDto<PageDto<DietChallengeDto>>> getAllDietChallenge(
           @RequestParam @Min(1) int page,
@@ -48,7 +66,13 @@ public class DietChallengeController {
     return ResponseEntity.ok(dietChallengeService.getAllDietChallenge(page, challengeId));
   }
 
-  //다이어트 챌린지 수정
+  /**
+   * 다이어트 챌린지 수정 컨트롤러 메서드
+   *
+   * @param form        챌린지 아이디, 목표 몸무게, 현재 몸무게
+   * @param userDetails 회원 정보
+   * @return 수정된 다이어트 챌린지 정보
+   */
   @PatchMapping
   public ResponseEntity<BaseResponseDto<DietChallengeDto>> updateDietChallenge(
           @RequestBody @Valid DietChallengeUpdateForm form,
@@ -57,7 +81,13 @@ public class DietChallengeController {
   }
 
 
-  //다이어트 댓글 추가
+  /**
+   * 다이어트 댓글 추가 컨트롤러 메서드
+   *
+   * @param form        챌린지 아이디, 이미지 주소, 현재 몸무게, 내용
+   * @param userDetails 회원 정보
+   * @return 추가된 다이어트 댓글 정보
+   */
   @PostMapping("/comment")
   public ResponseEntity<BaseResponseDto<DietCommentDto>> addComment(
           @RequestBody @Valid DietCommentAddForm form,
@@ -65,14 +95,25 @@ public class DietChallengeController {
     return ResponseEntity.ok(dietChallengeService.addDietComment(form, userDetails));
   }
 
-  //다이어트 댓글 단건 확인
+  /**
+   * 다이어트 댓글 단건 조회 컨트롤러 메서드
+   *
+   * @param commentId 댓글 아이디
+   * @return 조회한 다이어트 댓글 정보
+   */
   @GetMapping("/comment/{commentId}")
   public ResponseEntity<BaseResponseDto<DietCommentDto>> getComment(
           @PathVariable Long commentId) {
     return ResponseEntity.ok(dietChallengeService.getDietComment(commentId));
   }
 
-  //다이어트 댓글 수정
+  /**
+   * 다이어트 댓글 수정 컨트롤러 메서드
+   *
+   * @param form        댓글 아이디, 이미지 주소, 현재 몸무게, 내용
+   * @param userDetails 회원 정보
+   * @return 수정한 다이어트 댓글 정보
+   */
   @PatchMapping("/comment")
   public ResponseEntity<BaseResponseDto<DietCommentDto>> updateComment(
           @RequestBody @Valid DietCommentUpdateForm form,
@@ -81,7 +122,13 @@ public class DietChallengeController {
   }
 
 
-  //다이어트 댓글 삭제
+  /**
+   * 다이어트 댓글 삭제 컨트롤러 메서드
+   *
+   * @param commentId   댓글 아이디
+   * @param userDetails 회원 정보
+   * @return 삭제된 다이어트 댓글 정보
+   */
   @DeleteMapping("/comment/{commentId}")
   public ResponseEntity<BaseResponseDto<DietCommentDto>> deleteComment(
           @PathVariable Long commentId,

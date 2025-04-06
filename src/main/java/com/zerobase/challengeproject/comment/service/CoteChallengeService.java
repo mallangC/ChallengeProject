@@ -37,6 +37,7 @@ public class CoteChallengeService {
   private final ChallengeRepository challengeRepository;
   private final MemberRepository memberRepository;
 
+  //DB호출 횟수에서 제일 처음 회원호출은 언제나 호출되기 때문에 제외
 
   /**
    * 날짜를 기준으로 코테 문제를 추가하는 서비스 메서드
@@ -44,8 +45,9 @@ public class CoteChallengeService {
    * 추가 하려는 회원이 챌린지를 만든 회원이 아닐 때 예외발생
    * (DB호출 2회) 호출 1, 저장 1
    *
-   * @param form 챌린지 아이디, 코테 제목, 코테 문제링크, 문제가 시작되는 날짜
-   * @return 코테 챌린지 정보
+   * @param form        챌린지 아이디, 제목, 문제 링크, 날짜
+   * @param userDetails 회원 정보
+   * @return 추가한 코테 챌린지 정보
    */
   public BaseResponseDto<CoteChallengeDto> addCoteChallenge(
           CoteChallengeForm form,

@@ -22,13 +22,13 @@ public class MemberRepositoryCustomImpl implements MemberRepositoryCustom {
   private final JPAQueryFactory queryFactory;
 
   /**
-   * 로그인 아이디와 searchByDate로 계좌 내역을 검색
-   * searchByDate에서 검색하는 시간까지 내역을 검색
-   * 계좌 내역을 Fetch Join
+   * DB에서 회원 객체를 호출하는 메서드
+   * searchByDate에서 검색하는 시간(LocalDateTime.now())까지 내역을 검색
+   * 계좌 내역을 fetchJoin()으로 즉시 로딩
    *
-   * @param loginId 로그인 아이디
-   * @param searchByDate 검색에 기준이 되는 LocalDateTime
-   * @return 멤버 객체
+   * @param loginId      로그인 아이디
+   * @param searchByDate 검색 시작 날짜
+   * @return 회원 객체
    */
   @Override
   public Member searchByLoginIdAndAccountDetailsToDate(String loginId, LocalDateTime searchByDate) {
@@ -60,7 +60,14 @@ public class MemberRepositoryCustomImpl implements MemberRepositoryCustom {
     return findMember;
   }
 
-
+  /**
+   * DB에서 회원 객체를 호출하는 메서드
+   * 회원에 연결된 계좌 내역을 fetchJoin()으로 즉시 로딩
+   *
+   * @param longinId  로그인 아이디
+   * @param accountId 거래 내역 아이디
+   * @return 회원 객체
+   */
   @Override
   public Member searchByLoginIdAndAccountDetailId(String longinId, Long accountId) {
     Member findMember = queryFactory.selectFrom(member)
@@ -77,7 +84,13 @@ public class MemberRepositoryCustomImpl implements MemberRepositoryCustom {
     return findMember;
   }
 
-
+  /**
+   * DB에서 회원 객체를 호출하는 메서드
+   * 회원에 연결된 계좌 내역, 챌린지를 fetchJoin()으로 즉시 로딩
+   *
+   * @param loginId 로그인 아이디
+   * @return 회원 객체
+   */
   @Override
   public Member searchByLoginId(String loginId) {
     Member findMember = queryFactory.selectFrom(member)

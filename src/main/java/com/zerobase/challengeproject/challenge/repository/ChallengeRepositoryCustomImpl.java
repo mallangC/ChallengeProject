@@ -16,6 +16,13 @@ public class ChallengeRepositoryCustomImpl implements ChallengeRepositoryCustom 
 
   private final JPAQueryFactory queryFactory;
 
+  /**
+   * DB에서 챌린지 객체를 호출하는 메서드
+   * 챌린지에 연결된 멤버, 코테 챌린지를 fetchJoin()으로 즉시 로딩
+   *
+   * @param challengeId 챌린지 아이디
+   * @return 챌린지 객체
+   */
   @Override
   public Challenge searchChallengeWithCoteChallengeById(Long challengeId) {
     Challenge findChallenge = queryFactory.selectFrom(challenge)
@@ -30,6 +37,13 @@ public class ChallengeRepositoryCustomImpl implements ChallengeRepositoryCustom 
     return findChallenge;
   }
 
+  /**
+   * DB에서 챌린지 객체를 호출하는 메서드
+   * 챌린지에 연결된 멤버, 다이어트 챌린지를 fetchJoin()으로 즉시 로딩
+   *
+   * @param challengeId 챌린지 아이디
+   * @return 챌린지 객체
+   */
   @Override
   public Challenge searchChallengeWithDietChallengeById(Long challengeId) {
     Challenge findChallenge = queryFactory.selectFrom(challenge)
