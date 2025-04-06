@@ -22,7 +22,7 @@ public class MemberRepositoryCustomImpl implements MemberRepositoryCustom {
   public Member searchByEmailAndAccountDetailsToDate(String email, LocalDateTime searchByDate) {
     Member findMember = queryFactory.selectFrom(member)
             .leftJoin(member.accountDetails, accountDetail).fetchJoin()
-            .where(member.memberId.eq(email)
+            .where(member.loginId.eq(email)
                     .and(accountDetail.isCharge.eq(true))
                     .and(accountDetail.isRefunded.eq(false))
                     .and(accountDetail.createdAt.between(searchByDate, LocalDateTime.now())))
@@ -52,7 +52,7 @@ public class MemberRepositoryCustomImpl implements MemberRepositoryCustom {
   public Member searchByEmailAndAccountDetailId(String email, Long accountId) {
     Member findMember = queryFactory.selectFrom(member)
             .join(member.accountDetails, accountDetail).fetchJoin()
-            .where(member.memberId.eq(email)
+            .where(member.loginId.eq(email)
                     .and(accountDetail.id.eq(accountId)))
             .fetchOne();
     if (findMember == null) {

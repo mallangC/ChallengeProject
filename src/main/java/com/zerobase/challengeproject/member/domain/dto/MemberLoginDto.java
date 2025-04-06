@@ -6,9 +6,9 @@ import lombok.NoArgsConstructor;
 @Getter
 @NoArgsConstructor
 public class MemberLoginDto {
-    private String memberId;
+    private String loginId;
 
     public MemberLoginDto(String memberId) {
-        this.memberId = memberId;
+        this.loginId = memberId;
     }
 }

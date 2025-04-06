@@ -32,13 +32,13 @@ public class JwtUtil {
     }
     /**
      * 액세스 토큰 생성
-     * @param memberId 사용자 이름
+     * @param loginId 사용자 이름
      * @param role 사용자 역할
      * @return 생성된 JWT 액세스 토큰
      */
-    public String generateAccessToken(String memberId, MemberType role) {
+    public String generateAccessToken(String loginId, MemberType role) {
         return Jwts.builder()
-                .setSubject(memberId)
+                .setSubject(loginId)
                 .claim("role", role.getAuthority())
                 .setIssuedAt(new Date())
                 .setExpiration(new Date(System.currentTimeMillis() + ACCESS_TOKEN_EXPIRATION))
@@ -47,13 +47,13 @@ public class JwtUtil {
     }
     /**
      * 리프레시 토큰 생성
-     * @param memberId 사용자 이름
+     * @param loginId 사용자 이름
      * @param role 사용자 역할
      * @return 생성된 JWT 리프레시 토큰
      */
-    public String generateRefreshToken(String memberId, MemberType role) {
+    public String generateRefreshToken(String loginId, MemberType role) {
         return Jwts.builder()
-                .setSubject(memberId)
+                .setSubject(loginId)
                 .claim("role", role.getAuthority())
                 .setIssuedAt(new Date())
                 .setExpiration(new Date(System.currentTimeMillis() + REFRESH_TOKEN_EXPIRATION))
@@ -65,7 +65,7 @@ public class JwtUtil {
      * @param token JWT 토큰
      * @return 사용자 이름
      */
-    public String extractMemberId(String token) {
+    public String extractLoginId(String token) {
         return Jwts.parserBuilder()
                 .setSigningKey(secretKey)
                 .build()

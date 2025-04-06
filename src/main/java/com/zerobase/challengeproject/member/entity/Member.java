@@ -27,7 +27,7 @@ public class Member {
     @Column(nullable = false)
     private Long id;
     @Column(length = 50, nullable = false)
-    private String memberId;
+    private String loginId;
     @Column(length = 50, nullable = false)
     private String memberName;
     @Column(length = 150, nullable = false)
@@ -74,7 +74,7 @@ public class Member {
 
     public static Member from(MemberSignupForm form, String password, String emailAuthKey) {
         return Member.builder()
-                .memberId(form.getMemberId())
+                .loginId(form.getLoginId())
                 .memberName(form.getMemberName())
                 .password(password)
                 .nickname(form.getNickname())

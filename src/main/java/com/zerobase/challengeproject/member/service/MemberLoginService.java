@@ -34,25 +34,25 @@ public class MemberLoginService {
      * @return 토큰, 유저 아이디
      */
     public MemberLoginResponse login(MemberLoginForm form) {
-        Member member = memberRepository.findByMemberId(form.getMemberId())
+        Member member = memberRepository.findByLoginId(form.getLoginId())
                 .orElseThrow(()-> new CustomException(ErrorCode.NOT_FOUND_MEMBER));
         if(!passwordEncoder.matches(form.getPassword(), member.getPassword())) {
             throw new CustomException(ErrorCode.INCORRECT_PASSWORD);
         }
-        String accessToken = jwtUtil.generateAccessToken(form.getMemberId(), member.getMemberType());
-        String refreshToken = jwtUtil.generateRefreshToken(form.getMemberId(), member.getMemberType());
+        String accessToken = jwtUtil.generateAccessToken(form.getLoginId(), member.getMemberType());
+        String refreshToken = jwtUtil.generateRefreshToken(form.getLoginId(), member.getMemberType());
 
         //리프레시 토큰이 존재시 한명의 유저가 여러 개의 리프레시토큰을 가질 수 있어 그것을 방지하고 자 만듦
-        Optional<RefreshToken> existingToken = refreshTokenRepository.findByMemberId(form.getMemberId());
-        existingToken.ifPresent(token -> refreshTokenRepository.deleteByMemberId(token.getMemberId()));
+        Optional<RefreshToken> existingToken = refreshTokenRepository.findByLoginId(form.getLoginId());
+        existingToken.ifPresent(token -> refreshTokenRepository.deleteByMemberId(token.getLoginId()));
 
-        RefreshToken refreshTokenEntity = new RefreshToken(null, form.getMemberId(), refreshToken, Instant.now()
+        RefreshToken refreshTokenEntity = new RefreshToken(null, form.getLoginId(), refreshToken, Instant.now()
                 .plusMillis(7 * 24 * 60 * 60 * 1000));
         refreshTokenRepository.save(refreshTokenEntity);
 
         ResponseCookie responseCookie = jwtUtil.createRefreshTokenCookie(refreshToken, 7);
 
-        return new MemberLoginResponse(accessToken, responseCookie, member.getMemberId());
+        return new MemberLoginResponse(accessToken, responseCookie, member.getLoginId());
     }
     /**
      * 로그아웃 처리 서비스
@@ -66,7 +66,7 @@ public class MemberLoginService {
      */
     public MemberLogoutDto logout(String token, String refreshToken) {
         token = token.substring(7);
-        String memberId = jwtUtil.extractMemberId(token);
+        String memberId = jwtUtil.extractLoginId(token);
         if (refreshToken == null) {
             throw new CustomException(ErrorCode.TOKEN_NOT_PROVIDED);
         }
@@ -89,14 +89,14 @@ public class MemberLoginService {
             throw new CustomException(ErrorCode.TOKEN_IS_INVALID_OR_EXPIRED);
         }
 
-        String memberId = jwtUtil.extractMemberId(refreshToken);
-        Member member = memberRepository.findByMemberId(memberId)
+        String loginId = jwtUtil.extractLoginId(refreshToken);
+        Member member = memberRepository.findByLoginId(loginId)
                 .orElseThrow(()-> new CustomException(ErrorCode.NOT_FOUND_MEMBER));
 
         Optional<RefreshToken> storedToken = refreshTokenRepository.findByToken(refreshToken);
 
-        if (storedToken.isPresent() && storedToken.get().getMemberId().equals(memberId)) {
-            String newAccessToken = jwtUtil.generateAccessToken(memberId, member.getMemberType());
+        if (storedToken.isPresent() && storedToken.get().getLoginId().equals(loginId)) {
+            String newAccessToken = jwtUtil.generateAccessToken(loginId, member.getMemberType());
             return new RefreshTokenDto(refreshToken, newAccessToken);
         } else {
             throw new CustomException(ErrorCode.EXPIRED_TOKEN);

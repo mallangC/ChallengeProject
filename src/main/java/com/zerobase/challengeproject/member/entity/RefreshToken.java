@@ -20,7 +20,7 @@ public class RefreshToken  {
     private Long id;
 
     @Column(nullable = false, unique = true)
-    private String memberId;
+    private String loginId;
 
     @Column(nullable = false, unique = true, length = 500)
     private String token;

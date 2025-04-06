@@ -54,14 +54,14 @@ class AccountServiceTest {
 
   Member memberBase = Member.builder()
           .id(1L)
-          .memberId("test@company.com")
+          .loginId("test@company.com")
           .account(10000L)
           .accountDetails(List.of())
           .build();
 
   Member memberSearch = Member.builder()
           .id(1L)
-          .memberId("test@company.com")
+          .loginId("test@company.com")
           .account(10000L)
           .accountDetails(List.of(AccountDetail.builder()
                   .id(1L)
@@ -86,7 +86,7 @@ class AccountServiceTest {
   @DisplayName("금액 충전 성공")
   void addAmount() {
     //given
-    given(memberRepository.findByMemberId(anyString()))
+    given(memberRepository.findByLoginId(anyString()))
             .willReturn(Optional.of(memberBase));
 
     //when
@@ -108,7 +108,7 @@ class AccountServiceTest {
   @DisplayName("금액 충전 실패(회원을 찾을 수 없음)")
   void addAmountFailure() {
     //given
-    given(memberRepository.findByMemberId(anyString()))
+    given(memberRepository.findByLoginId(anyString()))
             .willReturn(Optional.empty());
     try {
       //when

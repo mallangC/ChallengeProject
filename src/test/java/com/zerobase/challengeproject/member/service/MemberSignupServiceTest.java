@@ -51,7 +51,7 @@ class MemberSignupServiceTest {
     void signup() {
         //given
         MemberSignupForm memberSignupForm = MemberSignupForm.builder()
-                .memberId("testId")
+                .loginId("testId")
                 .memberName("testName")
                 .nickname("testNickname")
                 .email("testEmail@email.com")
@@ -70,7 +70,7 @@ class MemberSignupServiceTest {
         verify(memberRepository, times(1)).save(any(Member.class));
         verify(mailComponents, times(1)).send(eq(memberSignupForm.getEmail()), anyString(), anyString());
         assertNotNull(dto);
-        assertEquals(dto.getMemberId(), memberSignupForm.getMemberId());
+        assertEquals(dto.getLoginId(), memberSignupForm.getLoginId());
         assertEquals(dto.getMemberName(), memberSignupForm.getMemberName());
         assertEquals(dto.getEmail(), memberSignupForm.getEmail());
         assertEquals(dto.getPhoneNum(), memberSignupForm.getPhoneNum());
@@ -81,7 +81,7 @@ class MemberSignupServiceTest {
     void signupFailure() {
         // given
         MemberSignupForm memberSignupForm = MemberSignupForm.builder()
-                .memberId("testId")
+                .loginId("testId")
                 .memberName("testName")
                 .nickname("testNickname")
                 .email("testEmail@email.com")
@@ -160,11 +160,11 @@ class MemberSignupServiceTest {
                 .phoneNum("01011112222")
                 .build();
         UserDetailsImpl userDetails = mock(UserDetailsImpl.class);
-        when(userDetails.getUsername()).thenReturn(member.getMemberId());
+        when(userDetails.getUsername()).thenReturn(member.getLoginId());
         ResponseCookie mockCookie = ResponseCookie.from("refreshToken", "")
                 .maxAge(0)
                 .build();
-        when(memberRepository.findByMemberId(member.getMemberId())).thenReturn(Optional.of(member));
+        when(memberRepository.findByLoginId(member.getLoginId())).thenReturn(Optional.of(member));
         when(jwtUtil.createRefreshTokenCookie("", 0)).thenReturn(mockCookie);
 
         // when
@@ -174,7 +174,7 @@ class MemberSignupServiceTest {
         assertNotNull(responseCookie);
         assertEquals("", responseCookie.getValue());
         assertEquals(0, responseCookie.getMaxAge().getSeconds());
-        verify(refreshTokenRepository, times(1)).deleteByMemberId(member.getMemberId());
+        verify(refreshTokenRepository, times(1)).deleteByMemberId(member.getLoginId());
         verify(memberRepository, times(1)).delete(member);
     }
 
@@ -185,7 +185,7 @@ class MemberSignupServiceTest {
         String memberId = "nonExistentUser";
         UserDetailsImpl userDetails = mock(UserDetailsImpl.class);
         when(userDetails.getUsername()).thenReturn(memberId);
-        when(memberRepository.findByMemberId(memberId)).thenReturn(Optional.empty());
+        when(memberRepository.findByLoginId(memberId)).thenReturn(Optional.empty());
 
         //when & then
         CustomException exception = assertThrows(CustomException.class, () -> {

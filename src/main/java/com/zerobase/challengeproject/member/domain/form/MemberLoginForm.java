@@ -9,7 +9,7 @@ import lombok.Getter;
 @Builder
 public class MemberLoginForm {
     @NotBlank
-    private String memberId;
+    private String loginId;
     @NotBlank
     @Pattern(
             regexp = "^(?=.*[A-Za-z])(?=.*\\d)(?=.*[@$!%*#?&])[A-Za-z\\d@$!%*#?&]{8,15}$",

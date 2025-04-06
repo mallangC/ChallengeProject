@@ -7,11 +7,11 @@ import org.springframework.http.ResponseCookie;
 @Getter
 @NoArgsConstructor
 public class MemberLogoutDto {
-    private String memberId;
+    private String loginId;
     private ResponseCookie responseCookie;
 
     public MemberLogoutDto(String memberId, ResponseCookie responseCookie) {
-        this.memberId = memberId;
+        this.loginId = memberId;
         this.responseCookie = responseCookie;
     }
 }
