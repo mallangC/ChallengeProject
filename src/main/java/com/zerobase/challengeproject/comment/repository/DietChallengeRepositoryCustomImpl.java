@@ -42,7 +42,7 @@ public class DietChallengeRepositoryCustomImpl implements DietChallengeRepositor
   }
 
   @Override
-  public Page<DietChallengeDto> searchDietChallengeByChallengeId(int page, Long challengeId) {
+  public Page<DietChallengeDto> searchAllDietChallengeByChallengeId(int page, Long challengeId) {
     Pageable pageable = PageRequest.of(page, 20);
 
     Long total = queryFactory.select(dietChallenge.count())

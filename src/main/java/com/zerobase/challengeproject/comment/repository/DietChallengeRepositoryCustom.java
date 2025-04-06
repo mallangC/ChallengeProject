@@ -7,5 +7,6 @@ import org.springframework.data.domain.Page;
 public interface DietChallengeRepositoryCustom {
 
   DietChallenge searchDietChallengeByChallengeIdAndLoginId(Long challengeId, String loginId);
-  Page<DietChallengeDto> searchDietChallengeByChallengeId(int page, Long challengeId);
+
+  Page<DietChallengeDto> searchAllDietChallengeByChallengeId(int page, Long challengeId);
 }

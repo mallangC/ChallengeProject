@@ -50,7 +50,7 @@ public class CoteChallengeService {
   public BaseResponseDto<CoteChallengeDto> addCoteChallenge(
           CoteChallengeForm form,
           UserDetailsImpl userDetails) {
-    Challenge challenge = challengeRepository.searchChallengeById(form.getChallengeId());
+    Challenge challenge = challengeRepository.searchChallengeWithCoteChallengeById(form.getChallengeId());
     if (challenge.getCategoryType() != CategoryType.COTE) {
       throw new CustomException(ErrorCode.NOT_COTE_CHALLENGE);
     }

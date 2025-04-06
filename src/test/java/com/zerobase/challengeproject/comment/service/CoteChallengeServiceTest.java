@@ -122,14 +122,13 @@ class CoteChallengeServiceTest {
           .content("정말 어려웠다")
           .build();
 
-
   UserDetailsImpl userDetailsBase = new UserDetailsImpl(memberBase);
 
   @Test
   @DisplayName("코테 챌린지 추가 성공")
   void accCoteChallenge() {
     //given
-    given(challengeRepository.searchChallengeById(anyLong()))
+    given(challengeRepository.searchChallengeWithCoteChallengeById(anyLong()))
             .willReturn(challengeBase);
 
     CoteChallengeForm form = CoteChallengeForm.builder()
@@ -154,7 +153,7 @@ class CoteChallengeServiceTest {
   @DisplayName("코테 챌린지 추가 실패(내가 만든 챌린지가 아님)")
   void accCoteChallengeFailure1() {
     //given
-    given(challengeRepository.searchChallengeById(anyLong()))
+    given(challengeRepository.searchChallengeWithCoteChallengeById(anyLong()))
             .willReturn(badChallenge);
 
     CoteChallengeForm form = CoteChallengeForm.builder()
@@ -176,7 +175,7 @@ class CoteChallengeServiceTest {
   @DisplayName("코테 챌린지 추가 실패(이미 코테챌린지가 추가됨)")
   void accCoteChallengeFailure2() {
     //given
-    given(challengeRepository.searchChallengeById(anyLong()))
+    given(challengeRepository.searchChallengeWithCoteChallengeById(anyLong()))
             .willReturn(Challenge.builder()
                     .id(1L)
                     .title("challengeTitle")
