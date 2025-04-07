@@ -55,7 +55,7 @@ class MemberLoginServiceTest {
         // Mock Member 생성
         mockMember = Member.builder()
                 .id(1L)
-                .memberId("testId")
+                .loginId("testId")
                 .memberName("testName")
                 .nickname("testNickname")
                 .email("testEmail@email.com")
@@ -69,7 +69,7 @@ class MemberLoginServiceTest {
                 .id(1L)
                 .token(mockRefreshToken)
                 .expireDate(Instant.now().plusSeconds(60 * 60 * 24 * 7))
-                .memberId(mockMember.getLoginId())
+                .loginId(mockMember.getLoginId())
                 .build();
     }
 

@@ -12,6 +12,7 @@ import org.springframework.stereotype.Component;
 
 import javax.crypto.SecretKey;
 import java.nio.charset.StandardCharsets;
+import java.time.Duration;
 import java.util.Date;
 
 /**
@@ -123,7 +124,7 @@ public class JwtUtil {
                 .httpOnly(true)
                 .secure(isSecure)
                 .path("/")
-                .maxAge((long) expiresIn * 24 * 60 * 60)
+                .maxAge(Duration.ofDays(expiresIn))
                 .build();
     }
 

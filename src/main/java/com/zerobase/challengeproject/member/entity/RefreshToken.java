@@ -27,4 +27,9 @@ public class RefreshToken  {
 
     @Column(nullable = false)
     private Instant expireDate;
+
+    public void tokenRenewal(String newToken, Instant expiresAt) {
+        this.token = newToken;
+        this.expireDate = expiresAt;
+    }
 }

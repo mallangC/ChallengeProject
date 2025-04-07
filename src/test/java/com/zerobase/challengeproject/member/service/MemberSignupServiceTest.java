@@ -153,7 +153,7 @@ class MemberSignupServiceTest {
     void unregister_Success() {
         // given
         Member member = Member.builder()
-                .memberId("testId")
+                .loginId("testId")
                 .memberName("testName")
                 .nickname("testNickname")
                 .email("testEmail@email.com")
