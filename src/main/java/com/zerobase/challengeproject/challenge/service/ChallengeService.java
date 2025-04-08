@@ -140,7 +140,7 @@ public class ChallengeService {
         /**
          * 보증금차감, 챌린지인원업데이트 및 저장
          */
-        member.chargeAccount(100000L);
+        //임시 보증금 member.chargeAccount(100000L);
         challenge.registration();
         member.depositAccount(form.getMemberDeposit());
         memberRepository.save(member);
@@ -208,7 +208,7 @@ public class ChallengeService {
          * 보증금차감 및 저장
          */
         AccountDetail depositDetail = AccountDetail.deposit(member, form.getMemberDeposit());
-        member.chargeAccount(100000L);
+        //임시 보증금 member.chargeAccount(100000L);
         member.depositAccount(form.getMemberDeposit());
         memberRepository.save(member);
         challengeRepository.save(challenge);
@@ -277,7 +277,7 @@ public class ChallengeService {
             List<Long> coteChallengeIds = coteChallenges.stream()
                     .map(CoteChallenge::getId)
                     .toList();
-            // 코멘트 조회 (코테챌린지ID 리스트 + 로그인한 사용자 ID 기준)
+            // 코멘트 조회 (코테챌린지id 리스트 + 로그인한 사용자 ID 기준)
             List<CoteComment> coteComments = coteCommentRepository
                     .findAllByCoteChallengeIdInAndMemberId(coteChallengeIds, member.getId());
             int matchedCount = 0;
