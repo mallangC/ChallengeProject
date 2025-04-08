@@ -12,7 +12,7 @@ import lombok.NoArgsConstructor;
 @Builder
 @NoArgsConstructor
 @AllArgsConstructor
-public class WaterChallengeAddForm {
+public class WaterChallengeForm {
  @NotNull(message = "챌린지 아이디를 입력해주세요")
  private Long challengeId;
  @NotNull(message = "하루 목표 섭취량을 입력해주세요")
