@@ -2,9 +2,11 @@ package com.zerobase.challengeproject.member.domain.form;
 
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.Pattern;
-import lombok.Builder;
-import lombok.Getter;
+import lombok.*;
 
+@NoArgsConstructor
+@AllArgsConstructor
+@Setter
 @Getter
 @Builder
 public class MemberLoginForm {

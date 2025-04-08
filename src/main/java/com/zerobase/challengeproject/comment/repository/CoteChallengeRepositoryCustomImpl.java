@@ -11,6 +11,7 @@ import org.springframework.data.domain.PageImpl;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 
+import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.util.List;
 
@@ -37,12 +38,15 @@ public class CoteChallengeRepositoryCustomImpl implements CoteChallengeRepositor
 
   @Override
   public CoteChallenge searchCoteChallengeByStartAt(Long challengeId, String loginId, LocalDateTime findAt) {
+    LocalDate date = findAt.toLocalDate();
     CoteChallenge findCoteChallenge = queryFactory.selectFrom(coteChallenge)
             .leftJoin(coteChallenge.comments, coteComment).fetchJoin()
             .join(coteChallenge.challenge, challenge).fetchJoin()
+
             .where(coteChallenge.challenge.id.eq(challengeId)
-                    .and(coteChallenge.startAt.eq(findAt)))
-            .fetchOne();
+                    .and(coteChallenge.startAt.between(
+                            date.atStartOfDay(), date.plusDays(1).atStartOfDay().minusNanos(1)))) // 날짜만 비교
+            .fetchFirst();
 
     if (findCoteChallenge == null) {
       throw new CustomException(ErrorCode.NOT_FOUND_COTE_CHALLENGE);
