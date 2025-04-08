@@ -18,7 +18,7 @@ import com.zerobase.challengeproject.exception.CustomException;
 import com.zerobase.challengeproject.member.components.jwt.UserDetailsImpl;
 import com.zerobase.challengeproject.member.entity.Member;
 import com.zerobase.challengeproject.member.repository.MemberRepository;
-import com.zerobase.challengeproject.type.Category;
+import com.zerobase.challengeproject.type.CategoryType;
 import com.zerobase.challengeproject.type.MemberType;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
@@ -79,11 +79,11 @@ class CommentServiceTest {
           .id(1L)
           .title("challengeTitle")
           .img("challengeImg")
-          .category(Category.COTE)
-          .participant(50)
+          .categoryType(CategoryType.COTE)
+          .maxParticipant(50L)
           .description("challengeDescription")
-          .min_deposit(10)
-          .max_deposit(50)
+          .minDeposit(10L)
+          .maxDeposit(50L)
           .standard("challengeStandard")
           .member(memberBase)
           .coteChallenge(new ArrayList<>())
@@ -102,11 +102,11 @@ class CommentServiceTest {
           .id(1L)
           .title("challengeTitle")
           .img("challengeImg")
-          .category(Category.COTE)
-          .participant(50)
+          .categoryType(CategoryType.COTE)
+          .maxParticipant(50L)
           .description("challengeDescription")
-          .min_deposit(10)
-          .max_deposit(50)
+          .minDeposit(10L)
+          .maxDeposit(50L)
           .standard("challengeStandard")
           .member(Member.builder()
                   .memberId("틀리다")
@@ -181,11 +181,11 @@ class CommentServiceTest {
                     .id(1L)
                     .title("challengeTitle")
                     .img("challengeImg")
-                    .category(Category.COTE)
-                    .participant(50)
+                    .categoryType(CategoryType.COTE)
+                    .maxParticipant(50L)
                     .description("challengeDescription")
-                    .min_deposit(10)
-                    .max_deposit(50)
+                    .minDeposit(10L)
+                    .maxDeposit(50L)
                     .standard("challengeStandard")
                     .member(memberBase)
                     .coteChallenge(List.of(coteChallengeBase))

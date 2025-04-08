@@ -1,11 +1,14 @@
 package com.zerobase.challengeproject.challenge.entity;
 
 
+import com.zerobase.challengeproject.account.entity.AccountDetail;
 import com.zerobase.challengeproject.member.entity.Member;
 import jakarta.persistence.*;
 import lombok.*;
 
 import java.time.LocalDateTime;
+import java.util.ArrayList;
+import java.util.List;
 
 @Entity
 @Getter
@@ -30,6 +33,8 @@ public class MemberChallenge {
     private LocalDateTime entered_at;
 
     private Long memberDeposit;
+
+    private boolean isDepositBack = false;
 
 
 }

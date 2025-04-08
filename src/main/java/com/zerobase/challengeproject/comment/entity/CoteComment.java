@@ -10,6 +10,8 @@ import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 
+import java.time.LocalDateTime;
+
 @Entity
 @Getter
 @Builder
@@ -27,6 +29,7 @@ public class CoteComment extends BaseEntity {
   private CoteChallenge coteChallenge;
   private String image;
   private String content;
+  private LocalDateTime createAt;
 
   public static CoteComment from(CoteCommentForm form,
                                  Member member,
@@ -36,6 +39,7 @@ public class CoteComment extends BaseEntity {
             .coteChallenge(coteChallenge)
             .image(form.getImage())
             .content(form.getContent())
+            .createAt(LocalDateTime.now())
             .build();
   }
 

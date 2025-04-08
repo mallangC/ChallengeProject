@@ -3,21 +3,24 @@ package com.zerobase.challengeproject.challenge.controller;
 
 import com.zerobase.challengeproject.account.entity.AccountDetail;
 import com.zerobase.challengeproject.account.repository.AccountDetailRepository;
-import com.zerobase.challengeproject.account.service.AccountService;
-import com.zerobase.challengeproject.challenge.domain.dto.EnterChallengeDto;
+import com.zerobase.challengeproject.challenge.domain.dto.*;
 import com.zerobase.challengeproject.challenge.domain.form.RegistrationChallengeForm;
 import com.zerobase.challengeproject.challenge.domain.form.UpdateChallengeForm;
 import com.zerobase.challengeproject.challenge.entity.Challenge;
+import com.zerobase.challengeproject.challenge.entity.MemberChallenge;
 import com.zerobase.challengeproject.challenge.repository.ChallengeRepository;
+import com.zerobase.challengeproject.challenge.repository.MemberChallengeRepository;
 import com.zerobase.challengeproject.challenge.service.ChallengeService;
-import com.zerobase.challengeproject.challenge.domain.dto.BaseResponseDto;
-import com.zerobase.challengeproject.challenge.domain.dto.GetChallengeDto;
-import com.zerobase.challengeproject.challenge.domain.dto.ParticipationChallengeDto;
 import com.zerobase.challengeproject.challenge.domain.form.CreateChallengeForm;
+import com.zerobase.challengeproject.comment.entity.CoteChallenge;
+import com.zerobase.challengeproject.comment.entity.CoteComment;
+import com.zerobase.challengeproject.comment.repository.CoteChallengeRepository;
+import com.zerobase.challengeproject.comment.repository.CoteCommentRepository;
 import com.zerobase.challengeproject.exception.CustomException;
 import com.zerobase.challengeproject.exception.ErrorCode;
 import com.zerobase.challengeproject.member.components.jwt.UserDetailsImpl;
 import com.zerobase.challengeproject.member.entity.Member;
+import com.zerobase.challengeproject.member.repository.MemberRepository;
 import com.zerobase.challengeproject.type.CategoryType;
 import jakarta.validation.Valid;
 import lombok.AllArgsConstructor;
@@ -29,6 +32,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.web.bind.annotation.*;
 
+import java.time.LocalDate;
 import java.util.List;
 
 @RestController
@@ -39,7 +43,10 @@ public class ChallengeController {
     private final ChallengeService challengeService;
     private final ChallengeRepository challengeRepository;
     private final AccountDetailRepository accountDetailRepository;
-
+    private final CoteChallengeRepository coteChallengeRepository;
+    private final CoteCommentRepository coteCommentRepository;
+    private final MemberChallengeRepository memberChallengeRepository;
+    private final MemberRepository memberRepository;
     /**
      * 챌린지 전체 조회
      */
@@ -91,7 +98,6 @@ public class ChallengeController {
         return challengeService.enterChallenge(challengeId, registrationChallengeForm, userDetails);
     }
 
-
     /**
      * 참여자가 챌린지참여 취소
      *
@@ -130,4 +136,12 @@ public class ChallengeController {
         return challengeService.deleteChallenge(challengeId, userDetails);
     }
 
+    /**
+     * 챌린지 환급
+     */
+    @PostMapping("/{challengeId}")
+    public ResponseEntity<BaseResponseDto<DepositBackDto>> challengeDepositBack(@PathVariable Long challengeId, @AuthenticationPrincipal UserDetailsImpl userDetails){
+
+        return challengeService.challengeDepositBack(challengeId, userDetails);
+    }
 }

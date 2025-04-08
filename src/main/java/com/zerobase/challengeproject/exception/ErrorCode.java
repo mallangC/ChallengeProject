@@ -2,6 +2,7 @@ package com.zerobase.challengeproject.exception;
 
 import lombok.Getter;
 import lombok.RequiredArgsConstructor;
+import org.json.HTTP;
 import org.springframework.http.HttpStatus;
 
 @Getter
@@ -55,7 +56,9 @@ public enum ErrorCode {
   CHALLENGE_FULL(HttpStatus.BAD_REQUEST, "챌린지의 인원이 가득 찼습니다."),
   NOT_FOUND_PARTICIPATION(HttpStatus.BAD_REQUEST, "참여한 유저가 아닙니다." ),
   ALREADY_STARTED_CHALLENGE(HttpStatus.BAD_REQUEST, "이미 시작한 챌린지입니다. 취소가 불가능합니다."),
-  CANNOT_DELETE_HAS_PARTICIPANTS(HttpStatus.BAD_REQUEST, "참여중인 유저가 있으므로 삭제가 불가능합니다." );
+  CANNOT_DELETE_HAS_PARTICIPANTS(HttpStatus.BAD_REQUEST, "참여중인 유저가 있으므로 삭제가 불가능합니다." ),
+  CHALLENGE_FAIL(HttpStatus.BAD_REQUEST, "챌린지 달성에 실패했습니다." ),
+  CHALLENGE_NOT_ENDED(HttpStatus.BAD_REQUEST, "챌린지가 아직 종료되지 않았습니다." );
 
 ;
   private final HttpStatus httpStatus;

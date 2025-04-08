@@ -6,6 +6,7 @@ import com.zerobase.challengeproject.exception.CustomException;
 import com.zerobase.challengeproject.exception.ErrorCode;
 import lombok.RequiredArgsConstructor;
 
+import java.time.LocalDate;
 import java.time.LocalDateTime;
 
 import static com.zerobase.challengeproject.challenge.entity.QChallenge.challenge;
@@ -21,12 +22,25 @@ public class CoteChallengeRepositoryCustomImpl implements CoteChallengeRepositor
 
   @Override
   public CoteChallenge searchCoteChallengeByStartAt(Long challengeId, String memberId, LocalDateTime startAt) {
+    LocalDate date = startAt.toLocalDate();
+
+    /*
     CoteChallenge findCoteChallenge = queryFactory.selectFrom(coteChallenge)
             .leftJoin(coteChallenge.comments, coteComment).fetchJoin()
             .join(coteChallenge.challenge, challenge).fetchJoin()
             .where(coteChallenge.challenge.id.eq(challengeId)
-                    .and(coteChallenge.startAt.eq(startAt)))
+                    .and(coteChallenge.startAt.toLocalDate().eq(date)))
             .fetchOne();
+
+     */
+    CoteChallenge findCoteChallenge = queryFactory.selectFrom(coteChallenge)
+            .leftJoin(coteChallenge.comments, coteComment).fetchJoin()
+            .join(coteChallenge.challenge, challenge).fetchJoin()
+
+            .where(coteChallenge.challenge.id.eq(challengeId)
+                    .and(coteChallenge.startAt.between(
+                            date.atStartOfDay(), date.plusDays(1).atStartOfDay().minusNanos(1)))) // 날짜만 비교
+            .fetchFirst();
 
     if (findCoteChallenge == null) {
       throw new CustomException(ErrorCode.NOT_FOUND_COTE_CHALLENGE);

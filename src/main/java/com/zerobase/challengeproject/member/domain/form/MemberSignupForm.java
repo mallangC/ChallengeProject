@@ -3,11 +3,13 @@ package com.zerobase.challengeproject.member.domain.form;
 import jakarta.validation.constraints.Email;
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.Pattern;
-import lombok.Builder;
-import lombok.Getter;
+import lombok.*;
 
 @Getter
+@Setter
 @Builder
+@AllArgsConstructor
+@NoArgsConstructor
 public class MemberSignupForm {
     @NotBlank
     private String memberId;
