@@ -1,6 +1,7 @@
 package com.zerobase.challengeproject.comment.service;
 
 import com.zerobase.challengeproject.BaseResponseDto;
+import com.zerobase.challengeproject.account.domain.dto.PageDto;
 import com.zerobase.challengeproject.challenge.entity.Challenge;
 import com.zerobase.challengeproject.challenge.repository.ChallengeRepository;
 import com.zerobase.challengeproject.comment.domain.dto.WaterChallengeDto;
@@ -19,6 +20,7 @@ import com.zerobase.challengeproject.member.entity.Member;
 import com.zerobase.challengeproject.type.CategoryType;
 import com.zerobase.challengeproject.type.MemberType;
 import lombok.RequiredArgsConstructor;
+import org.springframework.data.domain.Page;
 import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -32,6 +34,8 @@ public class WaterChallengeService {
   private final ChallengeRepository challengeRepository;
   private final WaterChallengeRepository waterChallengeRepository;
   private final WaterCommentRepository waterCommentRepository;
+
+  //DB호출 횟수에서 제일 처음 회원호출은 언제나 호출되기 때문에 제외
 
   //물마시기 챌린지 추가(form, userDetails) (DB호출 2회) 호출 1, 저장 1
   //챌린지 참여할 때 작성한 목표 섭취량이 매일 목표 섭취량의 기준이됨
@@ -69,8 +73,21 @@ public class WaterChallengeService {
             , HttpStatus.OK);
   }
 
-  //관리자가 확인할수 있는 방향
-  //물마시기 챌린지 전체 확인(challengeId, userDetails) -> 필요한가?
+
+  //물마시기 챌린지 전체 확인(관리자)(challengeId, userDetails) (DB호출 2회) 호출 2
+  public BaseResponseDto<PageDto<WaterChallengeDto>> getAllWaterChallenge(int page,
+                                                                          Long challengeId,
+                                                                          Boolean isPass,
+                                                                          UserDetailsImpl userDetails) {
+    Member member = userDetails.getMember();
+    checkAdminByMemberType(member);
+    Page<WaterChallengeDto> waterChallenges =
+            waterChallengeRepository.searchAllWaterChallengeByChallengeId(
+                    page - 1, challengeId, isPass);
+    return new BaseResponseDto<>(PageDto.from(waterChallenges),
+            "물마시기 챌린지 수정을 성공했습니다."
+            , HttpStatus.OK);
+  }
 
   //물마시기 챌린지 수정(form, userDetails) -> 챌린지가 시작한경우 불가능 (DB호출 2회) 호출 1, 수정 1
   @Transactional
@@ -131,15 +148,19 @@ public class WaterChallengeService {
   public BaseResponseDto<WaterCommentDto> deleteWaterComment(Long commentId,
                                                              UserDetailsImpl userDetails) {
     Member member = userDetails.getMember();
-    if (member.getMemberType() != MemberType.ADMIN) {
-      throw new CustomException(ErrorCode.NOT_MEMBER_TYPE_ADMIN);
-    }
+    checkAdminByMemberType(member);
     WaterComment waterComment = waterCommentRepository.searchWaterCommentById(commentId);
     waterComment.getWaterChallenge().updateCurrentMl(-waterComment.getDrinkingMl());
     waterCommentRepository.delete(waterComment);
     return new BaseResponseDto<>(WaterCommentDto.from(waterComment),
             "물마시기 댓글 삭제를 성공했습니다."
             , HttpStatus.OK);
+  }
+
+  private void checkAdminByMemberType(Member member) {
+    if (member.getMemberType() != MemberType.ADMIN) {
+      throw new CustomException(ErrorCode.NOT_MEMBER_TYPE_ADMIN);
+    }
   }
 
 
