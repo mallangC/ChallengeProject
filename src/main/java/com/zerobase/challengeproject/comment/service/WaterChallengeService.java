@@ -17,6 +17,7 @@ import com.zerobase.challengeproject.exception.ErrorCode;
 import com.zerobase.challengeproject.member.components.jwt.UserDetailsImpl;
 import com.zerobase.challengeproject.member.entity.Member;
 import com.zerobase.challengeproject.type.CategoryType;
+import com.zerobase.challengeproject.type.MemberType;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
@@ -125,7 +126,21 @@ public class WaterChallengeService {
             , HttpStatus.OK);
   }
 
-  //물마시기 댓글 삭제(commentId, userDetails) 섭취량이 변하진 않음
+  //물마시기 댓글 삭제(관리자)(commentId, userDetails) (DB호출 3회) 호출 1, 수정 1, 삭제 1
+  @Transactional
+  public BaseResponseDto<WaterCommentDto> deleteWaterComment(Long commentId,
+                                                             UserDetailsImpl userDetails) {
+    Member member = userDetails.getMember();
+    if (member.getMemberType() != MemberType.ADMIN) {
+      throw new CustomException(ErrorCode.NOT_MEMBER_TYPE_ADMIN);
+    }
+    WaterComment waterComment = waterCommentRepository.searchWaterCommentById(commentId);
+    waterComment.getWaterChallenge().updateCurrentMl(-waterComment.getDrinkingMl());
+    waterCommentRepository.delete(waterComment);
+    return new BaseResponseDto<>(WaterCommentDto.from(waterComment),
+            "물마시기 댓글 삭제를 성공했습니다."
+            , HttpStatus.OK);
+  }
 
 
 }
