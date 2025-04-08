@@ -265,7 +265,7 @@ public class ChallengeService {
                 .orElseThrow(() -> new CustomException(ErrorCode.NOT_FOUND_CHALLENGE));
         DepositBackDto depositBackDto = new DepositBackDto();
 
-        validateChallengeEnded(challenge);
+        //validateChallengeEnded(challenge);
 
         if(challenge.getCategoryType().equals(CategoryType.COTE)){
             List<CoteChallenge> coteChallenges = coteChallengeRepository.findAllByChallengeId(challengeId);
@@ -347,8 +347,11 @@ public class ChallengeService {
     private Long depositBackProcess(MemberChallenge memberChallenge, Member member) {
         memberChallenge.setDepositBack(true);
         Long refundAmount = memberChallenge.getMemberDeposit() * 2;
-        accountDetailRepository.save(AccountDetail.depositBack(member, refundAmount));
         member.chargeAccount(refundAmount);
+        accountDetailRepository.save(AccountDetail.depositBack(member, refundAmount));
+        memberRepository.save(member);
+        memberChallengeRepository.save(memberChallenge);
+
         return refundAmount;
     }
 }
