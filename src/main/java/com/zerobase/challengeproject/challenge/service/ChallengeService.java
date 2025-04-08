@@ -49,8 +49,6 @@ import java.util.List;
 @EnableCaching
 public class ChallengeService {
 
-
-
   private final AccountDetailRepository accountDetailRepository;
   private final ChallengeRepository challengeRepository;
   private final MemberChallengeRepository memberChallengeRepository;
@@ -180,7 +178,6 @@ public class ChallengeService {
         accountDetailRepository.save(refundRecord);
         memberRepository.save(member);
         return ResponseEntity.ok(new BaseResponseDto<GetChallengeDto>(null, "챌린지참여가 취소되었습니다.", HttpStatus.OK));
-
     }
 
     /**
@@ -294,20 +291,19 @@ public class ChallengeService {
             }
             // 성공 여부 판단, 매일 올라온 코테챌린지날짜와 인증작성날짜가 모두 매칭되면 인증성공
             boolean isSuccess = matchedCount == coteChallenges.size();
-            if(isSuccess){
-                MemberChallenge memberChallenge = memberChallengeRepository.findByChallengeAndMember(challenge, member)
-                        .orElseThrow(() -> new CustomException(ErrorCode.NOT_FOUND_CHALLENGE));
-                // 한번 환급받으면 더 이상 환급 불가
-                if(memberChallenge.isDepositBack()){
-                    throw new CustomException(ErrorCode.ALREADY_REFUNDED);
-                }else{
-                    memberChallenge.setDepositBack(true);
-                }
-                Long depositBackAmount = depositBackProcess(memberChallenge, member);
-                depositBackDto.setDepositBackDto(challengeId, depositBackAmount, member.getAccount());
-            }else{
+
+            if(!isSuccess){
                 throw new CustomException(ErrorCode.CHALLENGE_FAIL);
             }
+            MemberChallenge memberChallenge = memberChallengeRepository.findByChallengeAndMember(challenge, member)
+                    .orElseThrow(() -> new CustomException(ErrorCode.NOT_FOUND_CHALLENGE));
+            // 한번 환급받으면 더 이상 환급 불가
+            if(memberChallenge.isDepositBack()){
+                throw new CustomException(ErrorCode.ALREADY_REFUNDED);
+            }
+            Long depositBackAmount = depositBackProcess(memberChallenge, member);
+            depositBackDto.setDepositBackDto(challengeId, depositBackAmount, member.getAccount());
+
 
         }else if (challenge.getCategoryType().equals(CategoryType.DIET)) {
 
@@ -326,17 +322,17 @@ public class ChallengeService {
             Float targetWeight = dietChallenge.getGoalWeight();  // 목표 몸무게
 
             boolean isSuccess = finalWeight <= targetWeight;
-            if (isSuccess) {
-                MemberChallenge memberChallenge = memberChallengeRepository.findByChallengeAndMember(challenge, member)
-                        .orElseThrow(() -> new CustomException(ErrorCode.NOT_FOUND_CHALLENGE));
-                if (memberChallenge.isDepositBack()) {
-                    throw new CustomException(ErrorCode.ALREADY_REFUNDED);
-                }
-                Long depositBackAmount = depositBackProcess(memberChallenge, member);
-                depositBackDto.setDepositBackDto(challengeId, depositBackAmount, member.getAccount());
-            } else {
+            if (!isSuccess) {
                 throw new CustomException(ErrorCode.CHALLENGE_FAIL);
             }
+            MemberChallenge memberChallenge = memberChallengeRepository.findByChallengeAndMember(challenge, member)
+                    .orElseThrow(() -> new CustomException(ErrorCode.NOT_FOUND_CHALLENGE));
+            if (memberChallenge.isDepositBack()) {
+                throw new CustomException(ErrorCode.ALREADY_REFUNDED);
+            }
+            Long depositBackAmount = depositBackProcess(memberChallenge, member);
+            depositBackDto.setDepositBackDto(challengeId, depositBackAmount, member.getAccount());
+
         }
 
         return ResponseEntity.ok(new BaseResponseDto<DepositBackDto>(depositBackDto, "챌린지 환급 성공", HttpStatus.OK));
@@ -353,8 +349,6 @@ public class ChallengeService {
         Long refundAmount = memberChallenge.getMemberDeposit() * 2;
         accountDetailRepository.save(AccountDetail.depositBack(member, refundAmount));
         member.chargeAccount(refundAmount);
-        memberRepository.save(member);
-
         return refundAmount;
     }
 }

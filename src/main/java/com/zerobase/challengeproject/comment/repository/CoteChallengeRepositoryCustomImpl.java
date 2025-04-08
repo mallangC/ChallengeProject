@@ -38,15 +38,6 @@ public class CoteChallengeRepositoryCustomImpl implements CoteChallengeRepositor
 
   @Override
   public CoteChallenge searchCoteChallengeByStartAt(Long challengeId, String loginId, LocalDateTime findAt) {
-    /*
-    CoteChallenge findCoteChallenge = queryFactory.selectFrom(coteChallenge)
-            .leftJoin(coteChallenge.comments, coteComment).fetchJoin()
-            .join(coteChallenge.challenge, challenge).fetchJoin()
-            .where(coteChallenge.challenge.id.eq(challengeId)
-                    .and(coteChallenge.startAt.eq(findAt)))
-            .fetchOne();
-
-     */
     LocalDate date = findAt.toLocalDate();
     CoteChallenge findCoteChallenge = queryFactory.selectFrom(coteChallenge)
             .leftJoin(coteChallenge.comments, coteComment).fetchJoin()
