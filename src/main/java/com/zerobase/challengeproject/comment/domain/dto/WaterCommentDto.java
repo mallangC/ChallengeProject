@@ -8,7 +8,7 @@ import lombok.Getter;
 @Builder
 public class WaterCommentDto {
   private Long id;
-  private Long waterChallengeId;
+  private Long challengeId;
   private String longinId;
   private Integer drinkingMl;
   private String image;
@@ -16,7 +16,7 @@ public class WaterCommentDto {
   public static WaterCommentDto from(WaterComment waterComment) {
     return WaterCommentDto.builder()
             .id(waterComment.getId())
-            .waterChallengeId(waterComment.getWaterChallenge().getId())
+            .challengeId(waterComment.getWaterChallenge().getChallenge().getId())
             .longinId(waterComment.getMember().getMemberId())
             .drinkingMl(waterComment.getDrinkingMl())
             .image(waterComment.getImage())

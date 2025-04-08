@@ -46,9 +46,16 @@ public class WaterChallenge extends BaseEntity {
   public void updateGoalMl(Integer goalMl) {
     if (goalMl == null) {
       throw new IllegalArgumentException("목표 섭취량을 입력해주세요.");
-    }else if (goalMl < 1000 || goalMl > 2000) {
+    } else if (goalMl < 1000 || goalMl > 2000) {
       throw new IllegalArgumentException("목표 섭취량은 1000ml이상, 2000ml이하로 입력해주세요.");
     }
     this.goalMl = goalMl;
+  }
+
+  public void updateCurrentMl(Integer currentMl) {
+    if (currentMl == null) {
+      throw new IllegalArgumentException("현재 섭취량을 입력해주세요.");
+    }
+    this.currentMl = currentMl;
   }
 }

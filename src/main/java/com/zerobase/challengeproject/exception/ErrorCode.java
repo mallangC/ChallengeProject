@@ -72,6 +72,7 @@ public enum ErrorCode {
   NOT_WATER_CHALLENGE(HttpStatus.BAD_REQUEST, "물마시기 챌린지가 아닙니다."),
   NOT_FOUND_WATER_CHALLENGE(HttpStatus.BAD_REQUEST, "물마시기 챌린지를 찾을 수 없습니다."),
   ALREADY_ADDED_WATER_CHALLENGE(HttpStatus.BAD_REQUEST, "이미 물마시기 챌린지를 추가했습니다."),
+  NOT_FOUND_WATER_COMMENT(HttpStatus.BAD_REQUEST, "물마시기 댓글을 찾을 수 없습니다."),
 
   ;
   private final HttpStatus httpStatus;

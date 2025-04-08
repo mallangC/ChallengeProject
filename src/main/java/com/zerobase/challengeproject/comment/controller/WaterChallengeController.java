@@ -2,7 +2,9 @@ package com.zerobase.challengeproject.comment.controller;
 
 import com.zerobase.challengeproject.BaseResponseDto;
 import com.zerobase.challengeproject.comment.domain.dto.WaterChallengeDto;
+import com.zerobase.challengeproject.comment.domain.dto.WaterCommentDto;
 import com.zerobase.challengeproject.comment.domain.form.WaterChallengeForm;
+import com.zerobase.challengeproject.comment.domain.form.WaterCommentAddForm;
 import com.zerobase.challengeproject.comment.service.WaterChallengeService;
 import com.zerobase.challengeproject.member.components.jwt.UserDetailsImpl;
 import jakarta.validation.Valid;
@@ -40,6 +42,21 @@ public class WaterChallengeController {
           @RequestBody @Valid WaterChallengeForm form,
           @AuthenticationPrincipal UserDetailsImpl userDetails) {
     return ResponseEntity.ok(waterChallengeService.updateWaterChallenge(form, userDetails));
+  }
+
+  //물마시기 댓글 추가
+  @PostMapping("/comment")
+  public ResponseEntity<BaseResponseDto<WaterCommentDto>> addWaterComment(
+          @RequestBody @Valid WaterCommentAddForm form,
+          @AuthenticationPrincipal UserDetailsImpl userDetails) {
+    return ResponseEntity.ok(waterChallengeService.addWaterComment(form, userDetails));
+  }
+
+  //물마시기 댓글 단건 확인
+  @GetMapping("/comment/{commentId}")
+  public ResponseEntity<BaseResponseDto<WaterCommentDto>> getWaterComment(
+          @PathVariable Long commentId) {
+    return ResponseEntity.ok(waterChallengeService.getWaterComment(commentId));
   }
 
 }

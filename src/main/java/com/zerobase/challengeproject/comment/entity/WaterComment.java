@@ -1,6 +1,7 @@
 package com.zerobase.challengeproject.comment.entity;
 
 import com.zerobase.challengeproject.account.entity.BaseEntity;
+import com.zerobase.challengeproject.comment.domain.form.WaterCommentAddForm;
 import com.zerobase.challengeproject.member.entity.Member;
 import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
@@ -27,4 +28,15 @@ public class WaterComment extends BaseEntity {
   private Integer drinkingMl;
   @Column(nullable = false)
   private String image;
+
+  public static WaterComment from(WaterCommentAddForm form,
+                                  WaterChallenge waterChallenge,
+                                  Member member) {
+    return WaterComment.builder()
+            .waterChallenge(waterChallenge)
+            .member(member)
+            .drinkingMl(form.getDrinkingMl())
+            .image(form.getImage())
+            .build();
+  }
 }
