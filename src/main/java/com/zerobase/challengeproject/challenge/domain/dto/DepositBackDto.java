@@ -19,7 +19,6 @@ public class DepositBackDto {
     public void setDepositBackDto(Long challengeId, Long depositBack, Long currentDeposit) {
         this.challengeId = challengeId;
         this.depositBack = depositBack;
-
         // 반환받은 보증금 + 현재계좌금액
         this.currentDeposit = currentDeposit + depositBack;
     }

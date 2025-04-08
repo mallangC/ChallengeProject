@@ -49,6 +49,9 @@ public enum ErrorCode {
   NOT_FOUND_PARTICIPATION(HttpStatus.BAD_REQUEST, "참여한 유저가 아닙니다." ),
   ALREADY_STARTED_CHALLENGE(HttpStatus.BAD_REQUEST, "이미 시작한 챌린지입니다. 취소가 불가능합니다."),
   CANNOT_DELETE_HAS_PARTICIPANTS(HttpStatus.BAD_REQUEST, "참여중인 유저가 있으므로 삭제가 불가능합니다." ),
+  CHALLENGE_FAIL(HttpStatus.BAD_REQUEST, "챌린지 달성에 실패했습니다." ),
+  CHALLENGE_NOT_ENDED(HttpStatus.BAD_REQUEST, "챌린지가 아직 종료되지 않았습니다." ),
+  NO_DIET_COMMENT(HttpStatus.BAD_REQUEST, "몸무게 인증내역이 없습니다." ),
 
   //하위 챌린지
   //코테
@@ -70,10 +73,10 @@ public enum ErrorCode {
   NOT_FOUND_DIET_COMMENT(HttpStatus.BAD_REQUEST, "다이어트 댓글을 찾을 수 없습니다."),
 
 
-  CHALLENGE_FAIL(HttpStatus.BAD_REQUEST, "챌린지 달성에 실패했습니다." ),
-  CHALLENGE_NOT_ENDED(HttpStatus.BAD_REQUEST, "챌린지가 아직 종료되지 않았습니다." )
 
-;
+
+
+  ;
   private final HttpStatus httpStatus;
   private final String message;
 }

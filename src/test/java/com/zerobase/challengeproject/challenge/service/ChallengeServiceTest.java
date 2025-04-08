@@ -21,6 +21,7 @@ import com.zerobase.challengeproject.exception.ErrorCode;
 import com.zerobase.challengeproject.member.components.jwt.UserDetailsImpl;
 import com.zerobase.challengeproject.member.entity.Member;
 import com.zerobase.challengeproject.member.repository.MemberRepository;
+import org.apache.catalina.User;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
@@ -425,13 +426,12 @@ public class ChallengeServiceTest {
     @DisplayName("챌린지 종료날짜가 지나지 않았을 때 예외 발생")
     void challengeDepositBackFailure1() {
         // Given
-
+        UserDetailsImpl userDetails = new UserDetailsImpl(member);
         Challenge challenge = new Challenge();
         challenge.setCategoryType(CategoryType.COTE);
         challenge.setEndDate(LocalDateTime.now().plusDays(7));  // 챌린지가 아직 끝나지 않음
 
-        when(challengeRepository.findById(challengeId)).thenReturn(Optional.of(challenge));
-
+        given(challengeRepository.findById(challengeId)).willReturn(Optional.of(challenge));
         // When
         assertThatThrownBy(() -> challengeService.challengeDepositBack(challengeId, userDetails))
                 .isInstanceOf(CustomException.class)

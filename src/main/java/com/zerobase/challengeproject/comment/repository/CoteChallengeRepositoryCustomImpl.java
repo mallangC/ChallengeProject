@@ -47,6 +47,7 @@ public class CoteChallengeRepositoryCustomImpl implements CoteChallengeRepositor
             .fetchOne();
 
      */
+    LocalDate date = findAt.toLocalDate();
     CoteChallenge findCoteChallenge = queryFactory.selectFrom(coteChallenge)
             .leftJoin(coteChallenge.comments, coteComment).fetchJoin()
             .join(coteChallenge.challenge, challenge).fetchJoin()

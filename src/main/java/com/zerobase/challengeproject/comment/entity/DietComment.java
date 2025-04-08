@@ -10,6 +10,8 @@ import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 
+import java.time.LocalDateTime;
+
 @Entity
 @Getter
 @Builder
@@ -29,13 +31,19 @@ public class DietComment extends BaseEntity {
   private String image;
   @Column(nullable = false)
   private String content;
+  @Column(nullable = false)
+  private Float currentWeight;
+  @Column(nullable = false)
+  private LocalDateTime createdAt;
 
   public static DietComment from(DietCommentAddForm form, DietChallenge dietChallenge, Member member) {
     return DietComment.builder()
             .dietChallenge(dietChallenge)
             .member(member)
+            .currentWeight(form.getCurrentWeight())
             .image(form.getImage())
             .content(form.getContent())
+            .createdAt(LocalDateTime.now())
             .build();
   }
 

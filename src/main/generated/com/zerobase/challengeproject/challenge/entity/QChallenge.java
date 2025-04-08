@@ -24,13 +24,15 @@ public class QChallenge extends EntityPathBase<Challenge> {
 
     public final EnumPath<com.zerobase.challengeproject.type.CategoryType> categoryType = createEnum("categoryType", com.zerobase.challengeproject.type.CategoryType.class);
 
-    public final ListPath<com.zerobase.challengeproject.comment.entity.CoteChallenge, com.zerobase.challengeproject.comment.entity.QCoteChallenge> coteChallenge = this.<com.zerobase.challengeproject.comment.entity.CoteChallenge, com.zerobase.challengeproject.comment.entity.QCoteChallenge>createList("coteChallenge", com.zerobase.challengeproject.comment.entity.CoteChallenge.class, com.zerobase.challengeproject.comment.entity.QCoteChallenge.class, PathInits.DIRECT2);
+    public final ListPath<com.zerobase.challengeproject.comment.entity.CoteChallenge, com.zerobase.challengeproject.comment.entity.QCoteChallenge> coteChallenges = this.<com.zerobase.challengeproject.comment.entity.CoteChallenge, com.zerobase.challengeproject.comment.entity.QCoteChallenge>createList("coteChallenges", com.zerobase.challengeproject.comment.entity.CoteChallenge.class, com.zerobase.challengeproject.comment.entity.QCoteChallenge.class, PathInits.DIRECT2);
 
     public final DateTimePath<java.time.LocalDateTime> createAt = createDateTime("createAt", java.time.LocalDateTime.class);
 
     public final NumberPath<Long> currentParticipant = createNumber("currentParticipant", Long.class);
 
     public final StringPath description = createString("description");
+
+    public final ListPath<com.zerobase.challengeproject.comment.entity.DietChallenge, com.zerobase.challengeproject.comment.entity.QDietChallenge> dietChallenges = this.<com.zerobase.challengeproject.comment.entity.DietChallenge, com.zerobase.challengeproject.comment.entity.QDietChallenge>createList("dietChallenges", com.zerobase.challengeproject.comment.entity.DietChallenge.class, com.zerobase.challengeproject.comment.entity.QDietChallenge.class, PathInits.DIRECT2);
 
     public final DateTimePath<java.time.LocalDateTime> endDate = createDateTime("endDate", java.time.LocalDateTime.class);
 
