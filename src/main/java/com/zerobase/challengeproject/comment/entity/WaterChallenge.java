@@ -56,6 +56,6 @@ public class WaterChallenge extends BaseEntity {
     if (currentMl == null) {
       throw new IllegalArgumentException("현재 섭취량을 입력해주세요.");
     }
-    this.currentMl = currentMl;
+    this.currentMl += currentMl;
   }
 }

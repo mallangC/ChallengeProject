@@ -7,6 +7,7 @@ import com.zerobase.challengeproject.comment.domain.dto.WaterChallengeDto;
 import com.zerobase.challengeproject.comment.domain.dto.WaterCommentDto;
 import com.zerobase.challengeproject.comment.domain.form.WaterChallengeForm;
 import com.zerobase.challengeproject.comment.domain.form.WaterCommentAddForm;
+import com.zerobase.challengeproject.comment.domain.form.WaterCommentUpdateForm;
 import com.zerobase.challengeproject.comment.entity.WaterChallenge;
 import com.zerobase.challengeproject.comment.entity.WaterComment;
 import com.zerobase.challengeproject.comment.repository.WaterChallengeRepository;
@@ -87,7 +88,7 @@ public class WaterChallengeService {
             , HttpStatus.OK);
   }
 
-  //물마시기 코멘트 추가(form, userDetails) (DB호출 2회) 호출 1, 추가 1
+  //물마시기 댓글 추가(form, userDetails) (DB호출 2회) 호출 1, 추가 1
   public BaseResponseDto<WaterCommentDto> addWaterComment(WaterCommentAddForm form,
                                                           UserDetailsImpl userDetails) {
     Member member = userDetails.getMember();
@@ -101,15 +102,30 @@ public class WaterChallengeService {
             , HttpStatus.OK);
   }
 
-  //물마시기 코멘트 조회(commentId) (DB호출 1회) 호출 1
+  //물마시기 댓글 단건 조회(commentId) (DB호출 1회) 호출 1
   public BaseResponseDto<WaterCommentDto> getWaterComment(Long commentId) {
     WaterComment waterComment = waterCommentRepository.searchWaterCommentById(commentId);
     return new BaseResponseDto<>(WaterCommentDto.from(waterComment),
             "물마시기 댓글 단건 조회를 성공했습니다."
             , HttpStatus.OK);
   }
-  //물마시기 코멘트 수정(form, userDetails)
-  //물마시기 코멘트 삭제(commentId, userDetails) 섭취량이 변하진 않음
+
+  //물마시기 댓글 수정(form, userDetails) (DB호출 3회) 호출 1, 수정 2
+  @Transactional
+  public BaseResponseDto<WaterCommentDto> updateWaterComment(WaterCommentUpdateForm form,
+                                                             UserDetailsImpl userDetails) {
+    Member member = userDetails.getMember();
+    WaterComment waterComment = waterCommentRepository.searchWaterCommentById(form.getCommentId());
+    if (!waterComment.getMember().getMemberId().equals(member.getMemberId())) {
+      throw new CustomException(ErrorCode.NOT_OWNER_OF_COMMENT);
+    }
+    waterComment.update(form);
+    return new BaseResponseDto<>(WaterCommentDto.from(waterComment),
+            "물마시기 댓글 수정을 성공했습니다."
+            , HttpStatus.OK);
+  }
+
+  //물마시기 댓글 삭제(commentId, userDetails) 섭취량이 변하진 않음
 
 
 }
