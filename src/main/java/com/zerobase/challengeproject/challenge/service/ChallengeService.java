@@ -149,7 +149,6 @@ public class ChallengeService {
         return ResponseEntity.ok(new BaseResponseDto<EnterChallengeDto>(enterChallengeDto,"챌린지 참여에 성공했습니다.", HttpStatus.OK));
     }
 
-
     /**
      * 챌린지 참여 취소
      *
