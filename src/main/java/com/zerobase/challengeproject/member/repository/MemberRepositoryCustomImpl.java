@@ -21,11 +21,20 @@ public class MemberRepositoryCustomImpl implements MemberRepositoryCustom {
 
   private final JPAQueryFactory queryFactory;
 
+  /**
+   * DB에서 회원 객체를 호출하는 메서드
+   * searchByDate에서 검색하는 시간(LocalDateTime.now())까지 내역을 검색
+   * 계좌 내역을 fetchJoin()으로 즉시 로딩
+   *
+   * @param loginId      로그인 아이디
+   * @param searchByDate 검색 시작 날짜
+   * @return 회원 객체
+   */
   @Override
-  public Member searchByEmailAndAccountDetailsToDate(String email, LocalDateTime searchByDate) {
+  public Member searchByLoginIdAndAccountDetailsToDate(String loginId, LocalDateTime searchByDate) {
     Member findMember = queryFactory.selectFrom(member)
             .leftJoin(member.accountDetails, accountDetail).fetchJoin()
-            .where(member.memberId.eq(email)
+            .where(member.memberId.eq(loginId)
                     .and(accountDetail.accountType.eq(AccountType.CHARGE))
                     .and(accountDetail.isRefunded.eq(false))
                     .and(accountDetail.createdAt.between(searchByDate, LocalDateTime.now())))
@@ -51,11 +60,19 @@ public class MemberRepositoryCustomImpl implements MemberRepositoryCustom {
     return findMember;
   }
 
+  /**
+   * DB에서 회원 객체를 호출하는 메서드
+   * 회원에 연결된 계좌 내역을 fetchJoin()으로 즉시 로딩
+   *
+   * @param longinId  로그인 아이디
+   * @param accountId 거래 내역 아이디
+   * @return 회원 객체
+   */
   @Override
-  public Member searchByEmailAndAccountDetailId(String email, Long accountId) {
+  public Member searchByLoginIdAndAccountDetailId(String longinId, Long accountId) {
     Member findMember = queryFactory.selectFrom(member)
             .join(member.accountDetails, accountDetail).fetchJoin()
-            .where(member.memberId.eq(email)
+            .where(member.memberId.eq(longinId)
                     .and(accountDetail.id.eq(accountId)))
             .fetchOne();
     if (findMember == null) {
@@ -67,13 +84,19 @@ public class MemberRepositoryCustomImpl implements MemberRepositoryCustom {
     return findMember;
   }
 
-
+  /**
+   * DB에서 회원 객체를 호출하는 메서드
+   * 회원에 연결된 계좌 내역, 챌린지를 fetchJoin()으로 즉시 로딩
+   *
+   * @param loginId 로그인 아이디
+   * @return 회원 객체
+   */
   @Override
-  public Member searchByEmail(String email) {
+  public Member searchByLoginId(String loginId) {
     Member findMember = queryFactory.selectFrom(member)
             .leftJoin(member.memberChallenges, memberChallenge).fetchJoin()
             .leftJoin(memberChallenge.challenge, challenge).fetchJoin()
-            .where(member.memberId.eq(email))
+            .where(member.memberId.eq(loginId))
             .fetchOne();
 
     if (findMember == null) {

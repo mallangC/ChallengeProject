@@ -4,5 +4,7 @@ import com.zerobase.challengeproject.challenge.entity.Challenge;
 
 public interface ChallengeRepositoryCustom {
 
-  Challenge searchChallengeById(Long challengeId);
+  Challenge searchChallengeWithCoteChallengeById(Long challengeId);
+
+  Challenge searchChallengeWithDietChallengeById(Long challengeId);
 }

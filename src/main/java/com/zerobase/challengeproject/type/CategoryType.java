@@ -5,14 +5,13 @@ import lombok.Getter;
 @Getter
 public enum CategoryType {
 
-    COTE("COTE"),
-    DRINKING("DRINKING"),
-    DIET("DIET")
-    ;
+  COTE("COTE"),
+  DRINKING("DRINKING"),
+  DIET("DIET");
 
-    private final String description;
+  private final String description;
 
-    CategoryType(String description) {
-        this.description = description;
-    }
+  CategoryType(String description) {
+    this.description = description;
+  }
 }

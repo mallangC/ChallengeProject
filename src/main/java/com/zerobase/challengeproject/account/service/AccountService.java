@@ -70,7 +70,7 @@ public class AccountService {
     accountDetailRepository.save(detail);
 
     member.chargeAccount(amount);
-    return new BaseResponseDto<AccountDetailDto>(
+    return new BaseResponseDto<>(
             AccountDetailDto.from(detail),
             amount + "원 충전을 성공했습니다.",
             HttpStatus.OK);
@@ -89,12 +89,12 @@ public class AccountService {
     if (isExist) {
       throw new CustomException(ErrorCode.ALREADY_REFUND_REQUEST);
     }
-    Member member = memberRepository.searchByEmailAndAccountDetailId(userId, form.getAccountId());
+    Member member = memberRepository.searchByLoginIdAndAccountDetailId(userId, form.getAccountId());
 
     Refund refund = Refund.from(form.getContent(), member);
     refundRepository.save(refund);
 
-    return new BaseResponseDto<RefundDto>(RefundDto.from(refund),
+    return new BaseResponseDto<>(RefundDto.from(refund),
             "환불 신청을 성공했습니다.",
             HttpStatus.OK);
   }
@@ -125,7 +125,7 @@ public class AccountService {
     }
 
     refundRepository.delete(refund);
-    return new BaseResponseDto<RefundDto>(RefundDto.from(refund),
+    return new BaseResponseDto<>(RefundDto.from(refund),
             "환불 신청을 취소했습니다.",
             HttpStatus.OK);
   }
@@ -169,18 +169,18 @@ public class AccountService {
       throw new CustomException(ErrorCode.NOT_CHARGE_DETAIL);
     }
     if (approval) {
-      Member member = memberRepository.searchByEmailAndAccountDetailsToDate(
+      Member member = memberRepository.searchByLoginIdAndAccountDetailsToDate(
               refund.getMember().getMemberId(),
               accountDetail.getCreatedAt());
       AccountDetail refundDetail = AccountDetail.refund(member, accountDetail.getAmount());
       accountDetailRepository.save(refundDetail);
       member.refundAccount(accountDetail, refund);
-      return new BaseResponseDto<RefundDto>(RefundDto.from(refund),
+      return new BaseResponseDto<>(RefundDto.from(refund),
               "환불 승인을 성공했습니다.",
               HttpStatus.OK);
     }
     refund.refundFalse(form);
-    return new BaseResponseDto<RefundDto>(RefundDto.from(refund),
+    return new BaseResponseDto<>(RefundDto.from(refund),
             "환불 비승인을 성공했습니다.",
             HttpStatus.OK);
   }
