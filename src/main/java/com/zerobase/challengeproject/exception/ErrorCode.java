@@ -44,11 +44,11 @@ public enum ErrorCode {
   INSUFFICIENT_DEPOSIT(HttpStatus.BAD_REQUEST, "보증금이 부족합니다."),
   CHALLENGE_ALREADY_ENDED(HttpStatus.BAD_REQUEST, "이미 종료된 챌린지입니다."),
   NOT_DEPOSIT_DETAIL(HttpStatus.BAD_REQUEST, "보증금 내역이 아닙니다."),
-  NOT_ENOUGH_MONEY(HttpStatus.BAD_REQUEST, "계좌에 돈이 부족합니다." ),
+  NOT_ENOUGH_MONEY(HttpStatus.BAD_REQUEST, "계좌에 돈이 부족합니다."),
   CHALLENGE_FULL(HttpStatus.BAD_REQUEST, "챌린지의 인원이 가득 찼습니다."),
-  NOT_FOUND_PARTICIPATION(HttpStatus.BAD_REQUEST, "참여한 유저가 아닙니다." ),
+  NOT_FOUND_PARTICIPATION(HttpStatus.BAD_REQUEST, "참여한 유저가 아닙니다."),
   ALREADY_STARTED_CHALLENGE(HttpStatus.BAD_REQUEST, "이미 시작한 챌린지입니다. 취소가 불가능합니다."),
-  CANNOT_DELETE_HAS_PARTICIPANTS(HttpStatus.BAD_REQUEST, "참여중인 유저가 있으므로 삭제가 불가능합니다." ),
+  CANNOT_DELETE_HAS_PARTICIPANTS(HttpStatus.BAD_REQUEST, "참여중인 유저가 있으므로 삭제가 불가능합니다."),
 
   //하위 챌린지
   //코테
@@ -68,9 +68,12 @@ public enum ErrorCode {
   DIFFERENCE_MORE_THEN_5KG(HttpStatus.BAD_REQUEST, "현재 몸무게와 목표 몸무게의 차이가 5kg이상 되어야 합니다."),
   CANNOT_UPDATE_AFTER_START_CHALLENGE(HttpStatus.BAD_REQUEST, "챌린지가 시작하면 다이어트 챌린지를 수정할 수 없습니다."),
   NOT_FOUND_DIET_COMMENT(HttpStatus.BAD_REQUEST, "다이어트 댓글을 찾을 수 없습니다."),
+  //물마시기
+  NOT_WATER_CHALLENGE(HttpStatus.BAD_REQUEST, "물마시기 챌린지가 아닙니다."),
+  NOT_FOUND_WATER_CHALLENGE(HttpStatus.BAD_REQUEST, "물마시기 챌린지를 찾을 수 없습니다."),
+  ALREADY_ADDED_WATER_CHALLENGE(HttpStatus.BAD_REQUEST, "이미 물마시기 챌린지를 추가했습니다."),
 
-
-;
+  ;
   private final HttpStatus httpStatus;
   private final String message;
 }

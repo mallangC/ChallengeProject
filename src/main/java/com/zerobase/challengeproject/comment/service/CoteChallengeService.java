@@ -281,7 +281,8 @@ public class CoteChallengeService {
 
   private LocalDateTime parseToday() {
     LocalDateTime now = LocalDateTime.now();
-    return LocalDateTime.parse(String.format("%04d-%02d-%02dT00:00:00", now.getYear(), now.getMonthValue(), now.getDayOfMonth()));
+    return LocalDateTime.of(
+            now.getYear(), now.getMonthValue(), now.getDayOfMonth(), 0, 0, 0);
   }
 
 }
