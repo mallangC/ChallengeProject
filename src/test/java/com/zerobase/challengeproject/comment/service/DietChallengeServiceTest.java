@@ -57,7 +57,7 @@ class DietChallengeServiceTest {
 
   Member memberBase = Member.builder()
           .id(1L)
-          .memberId("test")
+          .loginId("test")
           .memberType(MemberType.USER)
           .memberName("testName")
           .nickname("testNickname")
@@ -70,7 +70,7 @@ class DietChallengeServiceTest {
 
   Member memberBad = Member.builder()
           .id(1L)
-          .memberId("testBad")
+          .loginId("testBad")
           .memberType(MemberType.USER)
           .memberName("testName")
           .nickname("testNickname")

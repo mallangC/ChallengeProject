@@ -63,7 +63,7 @@ class CoteChallengeServiceTest {
 
   Member memberBase = Member.builder()
           .id(1L)
-          .memberId("test")
+          .loginId("test")
           .memberType(MemberType.USER)
           .memberName("testName")
           .nickname("testNickname")
@@ -111,7 +111,7 @@ class CoteChallengeServiceTest {
           .maxDeposit(50L)
           .standard("challengeStandard")
           .member(Member.builder()
-                  .memberId("틀리다")
+                  .loginId("틀리다")
                   .build())
           .coteChallenges(new ArrayList<>())
           .build();
@@ -368,7 +368,7 @@ class CoteChallengeServiceTest {
     given(memberRepository.searchByLoginId(anyString()))
             .willReturn(Member.builder()
                     .id(1L)
-                    .memberId("인증댓글추가멤버아이디")
+                    .loginId("인증댓글추가멤버아이디")
                     .memberChallenges(List.of(MemberChallenge.builder()
                             .id(1L)
                             .challenge(challengeBase)
@@ -404,7 +404,7 @@ class CoteChallengeServiceTest {
     given(memberRepository.searchByLoginId(anyString()))
             .willReturn(Member.builder()
                     .id(1L)
-                    .memberId("인증댓글추가멤버아이디")
+                    .loginId("인증댓글추가멤버아이디")
                     .memberChallenges(new ArrayList<>())
                     .build());
     given(coteChallengeRepository.searchCoteChallengeByStartAt(anyLong(), anyString(), any()))
@@ -477,7 +477,7 @@ class CoteChallengeServiceTest {
                     .id(1L)
                     .member(Member.builder()
                             .id(1L)
-                            .memberId("실패멤버아이디")
+                            .loginId("실패멤버아이디")
                             .build())
                     .build());
     CoteCommentUpdateForm form = CoteCommentUpdateForm.builder()
@@ -520,7 +520,7 @@ class CoteChallengeServiceTest {
                     .id(1L)
                     .member(Member.builder()
                             .id(1L)
-                            .memberId("실패멤버아이디")
+                            .loginId("실패멤버아이디")
                             .build())
                     .build());
     //when

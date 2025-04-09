@@ -143,7 +143,7 @@ public class ChallengeServiceTest {
 
         member = Member.builder()
                 .id(loginId)  // id를 설정
-                .memberId("member123")
+                .loginId("member123")
                 .memberName("user123")
                 .account(1000000L)
                 .phoneNum("123-456-7890")
