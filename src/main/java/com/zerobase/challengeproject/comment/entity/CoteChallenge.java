@@ -48,4 +48,5 @@ public class CoteChallenge {
     this.title = form.getTitle();
     this.question = form.getQuestion();
   }
+
 }

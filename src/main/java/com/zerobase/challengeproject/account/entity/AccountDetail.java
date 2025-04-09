@@ -1,5 +1,6 @@
 package com.zerobase.challengeproject.account.entity;
 
+import com.zerobase.challengeproject.challenge.entity.MemberChallenge;
 import com.zerobase.challengeproject.member.entity.Member;
 import com.zerobase.challengeproject.type.AccountType;
 import jakarta.persistence.*;
