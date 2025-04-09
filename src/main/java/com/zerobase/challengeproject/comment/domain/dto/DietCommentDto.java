@@ -17,7 +17,7 @@ public class DietCommentDto {
     return DietCommentDto.builder()
             .id(dietComment.getId())
             .dietChallengeId(dietComment.getDietChallenge().getId())
-            .loginId(dietComment.getMember().getMemberId())
+            .loginId(dietComment.getMember().getLoginId())
             .image(dietComment.getImage())
             .content(dietComment.getContent())
             .build();

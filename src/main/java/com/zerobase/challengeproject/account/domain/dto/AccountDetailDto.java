@@ -24,7 +24,7 @@ public class AccountDetailDto {
 
   public static AccountDetailDto from(AccountDetail detail) {
     return AccountDetailDto.builder()
-            .memberId(detail.getMember().getMemberId())
+            .memberId(detail.getMember().getLoginId())
             .isRefunded(detail.isRefunded())
             .preAmount(detail.getPreAmount())
             .curAmount(detail.getCurAmount())

@@ -55,7 +55,7 @@ public class DietChallengeService {
     }
 
     boolean isExist = challenge.getDietChallenges().stream()
-            .anyMatch(c -> c.getMember().getMemberId().equals(member.getMemberId()));
+            .anyMatch(c -> c.getMember().getLoginId().equals(member.getLoginId()));
     if (isExist) {
       throw new CustomException(ErrorCode.ALREADY_ADDED_DIET_CHALLENGE);
     }
@@ -148,7 +148,7 @@ public class DietChallengeService {
   public BaseResponseDto<DietCommentDto> addDietComment(DietCommentAddForm form, UserDetailsImpl userDetails) {
     Member member = userDetails.getMember();
     DietChallenge dietChallenge = dietChallengeRepository.
-            searchDietChallengeByChallengeIdAndLoginId(form.getChallengeId(), member.getMemberId());
+            searchDietChallengeByChallengeIdAndLoginId(form.getChallengeId(), member.getLoginId());
     DietComment dietComment = DietComment.from(form, dietChallenge, member);
     dietCommentRepository.save(dietComment);
     dietChallenge.updateWeight(form.getCurrentWeight());
@@ -215,7 +215,7 @@ public class DietChallengeService {
   }
 
   private void checkMemberOwnerOfComment(Member member, DietComment comment) {
-    if (!member.getMemberId().equals(comment.getMember().getMemberId())) {
+    if (!member.getLoginId().equals(comment.getMember().getLoginId())) {
       throw new CustomException(ErrorCode.NOT_OWNER_OF_COMMENT);
     }
   }

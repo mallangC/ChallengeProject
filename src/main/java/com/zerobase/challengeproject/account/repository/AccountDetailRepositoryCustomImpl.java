@@ -24,7 +24,7 @@ public class AccountDetailRepositoryCustomImpl implements AccountDetailRepositor
 
     Long total = queryFactory.select(accountDetail.count())
             .from(accountDetail)
-            .where(accountDetail.member.memberId.eq(userId))
+            .where(accountDetail.member.loginId.eq(userId))
             .fetchOne();
 
     if (total == null) {
@@ -32,7 +32,7 @@ public class AccountDetailRepositoryCustomImpl implements AccountDetailRepositor
     }
 
     List<AccountDetail> findAccountDetails = queryFactory.selectFrom(accountDetail)
-            .where(accountDetail.member.memberId.eq(userId))
+            .where(accountDetail.member.loginId.eq(userId))
             .orderBy(accountDetail.createdAt.desc())
             .limit(pageable.getPageSize())
             .offset(pageable.getOffset())

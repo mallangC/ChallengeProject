@@ -170,7 +170,7 @@ public class AccountService {
     }
     if (approval) {
       Member member = memberRepository.searchByLoginIdAndAccountDetailsToDate(
-              refund.getMember().getMemberId(),
+              refund.getMember().getLoginId(),
               accountDetail.getCreatedAt());
       AccountDetail refundDetail = AccountDetail.refund(member, accountDetail.getAmount());
       accountDetailRepository.save(refundDetail);
@@ -186,7 +186,7 @@ public class AccountService {
   }
 
   private Member searchMember(String userId) {
-    return memberRepository.findByMemberId(userId)
+    return memberRepository.findByLoginId(userId)
             .orElseThrow(() -> new CustomException(ErrorCode.NOT_FOUND_MEMBER));
   }
 }

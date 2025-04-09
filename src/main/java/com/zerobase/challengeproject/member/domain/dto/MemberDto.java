@@ -10,7 +10,7 @@ import java.util.List;
 @Getter
 @Builder
 public class MemberDto {
-  private String memberId;
+  private String loginId;
   private String memberName;
   private String nickName;
   private String phoneNum;
@@ -20,7 +20,7 @@ public class MemberDto {
 
   public static MemberDto from(Member member) {
     return MemberDto.builder()
-            .memberId(member.getMemberId())
+            .loginId(member.getLoginId())
             .memberName(member.getMemberName())
             .nickName(member.getNickname())
             .phoneNum(member.getPhoneNum())
@@ -34,7 +34,7 @@ public class MemberDto {
 
   public static MemberDto fromWithoutAccountDetails(Member member) {
     return MemberDto.builder()
-            .memberId(member.getMemberId())
+            .loginId(member.getLoginId())
             .memberName(member.getMemberName())
             .nickName(member.getNickname())
             .phoneNum(member.getPhoneNum())

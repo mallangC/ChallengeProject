@@ -58,7 +58,7 @@ public class CoteChallengeService {
     if (challenge.getCategoryType() != CategoryType.COTE) {
       throw new CustomException(ErrorCode.NOT_COTE_CHALLENGE);
     }
-    if (!Objects.equals(challenge.getMember().getMemberId(), userDetails.getUsername())) {
+    if (!Objects.equals(challenge.getMember().getLoginId(), userDetails.getUsername())) {
       throw new CustomException(ErrorCode.NOT_OWNER_OF_CHALLENGE);
     }
 
@@ -182,7 +182,7 @@ public class CoteChallengeService {
     Member member = memberRepository.searchByLoginId(userDetails.getUsername());
 
     CoteChallenge coteChallenge = coteChallengeRepository.searchCoteChallengeByStartAt(
-            form.getChallengeId(), member.getMemberId(), parseToday());
+            form.getChallengeId(), member.getLoginId(), parseToday());
 
     boolean isEnter = member.getMemberChallenges().stream()
             .anyMatch(challenge ->
@@ -266,7 +266,7 @@ public class CoteChallengeService {
 
   private CoteComment searchCoteCommentById(Long commentId, String username) {
     CoteComment coteComment = coteCommentRepository.searchCoteCommentById(commentId);
-    if (!coteComment.getMember().getMemberId().equals(username)) {
+    if (!coteComment.getMember().getLoginId().equals(username)) {
       throw new CustomException(ErrorCode.NOT_OWNER_OF_COMMENT);
     }
     return coteComment;
@@ -274,7 +274,7 @@ public class CoteChallengeService {
 
   private CoteChallenge searchCoteChallengeByIdAndOwnerCheck(Long coteChallengeId, String username) {
     CoteChallenge coteChallenge = coteChallengeRepository.searchCoteChallengeById(coteChallengeId);
-    boolean isOwner = coteChallenge.getChallenge().getMember().getMemberId().equals(username);
+    boolean isOwner = coteChallenge.getChallenge().getMember().getLoginId().equals(username);
     if (!isOwner) {
       throw new CustomException(ErrorCode.NOT_OWNER_OF_CHALLENGE);
     }
