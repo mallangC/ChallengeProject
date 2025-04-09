@@ -12,6 +12,7 @@ import static com.zerobase.challengeproject.comment.entity.QDietChallenge.dietCh
 import static com.zerobase.challengeproject.comment.entity.QWaterChallenge.waterChallenge;
 import static com.zerobase.challengeproject.member.entity.QMember.member;
 
+
 @RequiredArgsConstructor
 public class ChallengeRepositoryCustomImpl implements ChallengeRepositoryCustom {
 

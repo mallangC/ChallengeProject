@@ -82,7 +82,7 @@ public class AdminChallengeController {
   public ResponseEntity<BaseResponseDto<WaterCommentDto>> deleteWaterComment(
           @PathVariable Long commentId,
           @AuthenticationPrincipal UserDetailsImpl userDetails) {
-    return ResponseEntity.ok(waterChallengeService.deleteWaterComment(commentId, userDetails));
+    return ResponseEntity.ok(waterChallengeService.adminDeleteWaterComment(commentId, userDetails));
   }
 
 

@@ -9,8 +9,6 @@ import lombok.*;
 @Setter
 @Getter
 @Builder
-@NoArgsConstructor
-@AllArgsConstructor
 public class MemberLoginForm {
     @NotBlank
     private String memberId;

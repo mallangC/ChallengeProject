@@ -609,4 +609,38 @@ class CoteChallengeServiceTest {
     assertEquals(NOT_OWNER_OF_COMMENT, exception.getErrorCode());
   }
 
+  @Test
+  @DisplayName("코테 댓글 삭제 성공 (관리자)")
+  void adminDeleteComment() {
+    //given
+    given(coteCommentRepository.findById(anyLong())).willReturn(Optional.ofNullable(commentBase));
+
+    UserDetailsImpl userDetails = new UserDetailsImpl(Member.builder()
+            .id(1L)
+            .memberType(MemberType.ADMIN)
+            .build());
+    //when
+    BaseResponseDto<CoteCommentDto> result = coteChallengeService.adminDeleteComment(1L, userDetails);
+    //then
+    assertEquals(HttpStatus.OK, result.getStatus());
+    assertEquals("관리자 권한으로 인증 댓글 삭제를 성공했습니다.", result.getMessage());
+    assertEquals("test", result.getData().getUserId());
+    assertEquals("인증 댓글 이미지 링크", result.getData().getImage());
+    assertEquals("정말 어려웠다", result.getData().getContent());
+    assertEquals(1L, result.getData().getCoteChallengeId());
+  }
+
+  @Test
+  @DisplayName("코테 댓글 삭제 실패 (관리자가 아님)")
+  void adminDeleteCommentFailure() {
+    //given
+    given(coteCommentRepository.findById(anyLong())).willReturn(Optional.ofNullable(commentBase));
+
+    //when
+    CustomException exception = assertThrows(CustomException.class, () ->
+            coteChallengeService.adminDeleteComment(1L, userDetailsBase));
+    //then
+    assertEquals(NOT_MEMBER_TYPE_ADMIN, exception.getErrorCode());
+  }
+
 }

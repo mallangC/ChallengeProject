@@ -47,6 +47,7 @@ public class Challenge {
   private Long maxParticipant;
 
   @Column
+  @Builder.Default
   private Long currentParticipant = 0L;
 
   @Column(nullable = false)

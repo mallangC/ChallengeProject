@@ -85,7 +85,7 @@ public class WaterChallengeService {
             waterChallengeRepository.searchAllWaterChallengeByChallengeId(
                     page - 1, challengeId, isPass);
     return new BaseResponseDto<>(PageDto.from(waterChallenges),
-            "물마시기 챌린지 수정을 성공했습니다."
+            "물마시기 챌린지 전체 조회를 성공했습니다."
             , HttpStatus.OK);
   }
 
@@ -145,8 +145,8 @@ public class WaterChallengeService {
 
   //물마시기 댓글 삭제(관리자)(commentId, userDetails) (DB호출 3회) 호출 1, 수정 1, 삭제 1
   @Transactional
-  public BaseResponseDto<WaterCommentDto> deleteWaterComment(Long commentId,
-                                                             UserDetailsImpl userDetails) {
+  public BaseResponseDto<WaterCommentDto> adminDeleteWaterComment(Long commentId,
+                                                                  UserDetailsImpl userDetails) {
     Member member = userDetails.getMember();
     checkAdminByMemberType(member);
     WaterComment waterComment = waterCommentRepository.searchWaterCommentById(commentId);

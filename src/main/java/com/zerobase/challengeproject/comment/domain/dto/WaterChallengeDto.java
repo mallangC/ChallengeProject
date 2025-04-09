@@ -34,7 +34,7 @@ public class WaterChallengeDto {
     return WaterChallengeDto.builder()
             .id(waterChallenge.getId())
             .loginId(waterChallenge.getMember().getMemberId())
-            .challengeId(waterChallenge.getId())
+            .challengeId(waterChallenge.getChallenge().getId())
             .goalMl(waterChallenge.getGoalMl())
             .currentMl(waterChallenge.getCurrentMl())
             .comments(new ArrayList<>())

@@ -11,8 +11,6 @@ import lombok.NoArgsConstructor;
 @NoArgsConstructor
 @AllArgsConstructor
 @Builder
-@NoArgsConstructor
-@AllArgsConstructor
 public class CoteCommentForm {
   @NotNull(message = "챌린지 아이디를 입력해주세요")
   private Long challengeId;
