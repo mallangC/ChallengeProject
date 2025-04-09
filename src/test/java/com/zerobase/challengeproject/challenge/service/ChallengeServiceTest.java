@@ -1,11 +1,18 @@
 package com.zerobase.challengeproject.challenge.service;
 
 
+import com.zerobase.challengeproject.account.repository.AccountDetailRepository;
 import com.zerobase.challengeproject.challenge.domain.dto.BaseResponseDto;
+import com.zerobase.challengeproject.challenge.domain.dto.DepositBackDto;
 import com.zerobase.challengeproject.challenge.domain.dto.GetChallengeDto;
 import com.zerobase.challengeproject.challenge.domain.form.CreateChallengeForm;
 import com.zerobase.challengeproject.challenge.domain.form.UpdateChallengeForm;
+import com.zerobase.challengeproject.challenge.entity.MemberChallenge;
 import com.zerobase.challengeproject.challenge.repository.MemberChallengeRepository;
+import com.zerobase.challengeproject.comment.entity.CoteChallenge;
+import com.zerobase.challengeproject.comment.entity.CoteComment;
+import com.zerobase.challengeproject.comment.repository.CoteChallengeRepository;
+import com.zerobase.challengeproject.comment.repository.CoteCommentRepository;
 import com.zerobase.challengeproject.type.CategoryType;
 import com.zerobase.challengeproject.challenge.entity.Challenge;
 import com.zerobase.challengeproject.challenge.repository.ChallengeRepository;
@@ -14,6 +21,7 @@ import com.zerobase.challengeproject.exception.ErrorCode;
 import com.zerobase.challengeproject.member.components.jwt.UserDetailsImpl;
 import com.zerobase.challengeproject.member.entity.Member;
 import com.zerobase.challengeproject.member.repository.MemberRepository;
+import org.apache.catalina.User;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
@@ -34,8 +42,10 @@ import java.util.Optional;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
-import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.ArgumentMatchers.*;
 import static org.mockito.BDDMockito.given;
+import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.when;
 
 
 @ExtendWith(MockitoExtension.class)
@@ -45,7 +55,16 @@ public class ChallengeServiceTest {
     private ChallengeRepository challengeRepository;
 
     @Mock
+    private AccountDetailRepository accountDetailRepository;
+
+    @Mock
     private MemberRepository memberRepository;
+
+    @Mock
+    private CoteCommentRepository coteCommentRepository;
+
+    @Mock
+    private CoteChallengeRepository coteChallengeRepository;
 
     @Mock
     private MemberChallengeRepository memberChallengeRepository;
@@ -61,7 +80,7 @@ public class ChallengeServiceTest {
     private UpdateChallengeForm updateChallengeForm;
     private Long challengeId;
     private Member member;
-    private Long memberId;
+    private Long loginId;
 
     // Challenge 객체 생성 메서드
     private Challenge createChallenge(Long id, String title) {
@@ -71,10 +90,11 @@ public class ChallengeServiceTest {
                 .member(member)
                 .img(null)
                 .categoryType(CategoryType.DIET)
-                .maxParticipant(10)
+                .maxParticipant(10L)
                 .description("설명")
-                .minDeposit(1000)
-                .maxDeposit(5000)
+                .maxDeposit(3000L)
+                .minDeposit(1000L)
+                .maxDeposit(5000L)
                 .standard("기준")
                 .startDate(LocalDateTime.now())
                 .endDate(LocalDateTime.now().plusDays(7))
@@ -89,38 +109,25 @@ public class ChallengeServiceTest {
                 .categoryType(CategoryType.COTE)
                 .description("설명")
                 .standard("기준")
-                .memberDeposit(2000)
-                .participant(5)
-                .minDeposit(1000)
-                .maxDeposit(5000)
+                .memberDeposit(2000L)
+                .maxParticipant(10L)
+                .minDeposit(1000L)
+                .maxDeposit(5000L)
                 .startDate(LocalDateTime.now())
                 .endDate(LocalDateTime.now().plusDays(7))
                 .build();
     }
-    private UpdateChallengeForm updateChallengeForm(String title, String description){
-        return UpdateChallengeForm.builder()
-                .title("업데이트된 챌린지 제목")
-                .categoryType(CategoryType.DIET)
-                .standard("업데이트된 인증 기준")
-                .img("https://example.com/updated-image.jpg")
-                .maxParticipant(20)
-                .description("업데이트된 챌린지 설명")
-                .minDeposit(5000)
-                .maxDeposit(10000)
-                .startDate(LocalDateTime.now().plusDays(1))
-                .endDate(LocalDateTime.now().plusDays(10))
-                .build();
-    }
+
     private UpdateChallengeForm updateChallengeForm(){
         return UpdateChallengeForm.builder()
                 .title("업데이트된 챌린지 제목")
                 .categoryType(CategoryType.DIET)
                 .standard("업데이트된 인증 기준")
                 .img("https://example.com/updated-image.jpg")
-                .maxParticipant(20)
+                .maxParticipant(20L)
                 .description("업데이트된 챌린지 설명")
-                .minDeposit(5000)
-                .maxDeposit(10000)
+                .minDeposit(5000L)
+                .maxDeposit(10000L)
                 .startDate(LocalDateTime.now().plusDays(1))
                 .endDate(LocalDateTime.now().plusDays(10))
                 .build();
@@ -129,14 +136,16 @@ public class ChallengeServiceTest {
     @BeforeEach
     void setUp() {
 
-        challengeId = 1L;
         createChallengeForm = createChallengeForm();
         updateChallengeForm = updateChallengeForm();
-        memberId = 1L;
+        challengeId = 1L;
+        loginId = 1L;
+
         member = Member.builder()
-                .id(memberId)  // id를 설정
+                .id(loginId)  // id를 설정
                 .memberId("member123")
                 .memberName("user123")
+                .account(1000000L)
                 .phoneNum("123-456-7890")
                 .email("test@example.com")
                 .build();
@@ -154,17 +163,22 @@ public class ChallengeServiceTest {
         );
         Pageable pageable = PageRequest.of(0, 10);
         Page<Challenge> challengePage = new PageImpl<>(challengeList, pageable, challengeList.size());
-
         given(challengeRepository.findAll(pageable)).willReturn(challengePage);
 
         // When
-        ResponseEntity<BaseResponseDto<Page<GetChallengeDto>>> response = challengeService.getAllChallenges(pageable);
+        List<GetChallengeDto> response1 = challengeService.getAllChallenges(pageable);
 
         // Then
-        assertThat(response.getStatusCode()).isEqualTo(HttpStatus.OK);
-        assertThat(response.getBody()).isNotNull();
-        assertThat(response.getBody().getData().getContent()).hasSize(3);
-        assertThat(response.getBody().getData().getContent().get(0).getTitle()).isEqualTo("챌린지 1");
+        List<GetChallengeDto> response2 = challengeService.getAllChallenges(pageable);
+
+        // 캐시 사용
+        assertThat(response1.get(0).getTitle()).isEqualTo(response2.get(0).getTitle());
+        assertThat(response1.get(1).getTitle()).isEqualTo(response2.get(1).getTitle());
+
+        // 데이터 확인
+        assertThat(response1).isNotNull();
+        assertThat(response1).hasSize(3);
+        assertThat(response1.get(0).getTitle()).isEqualTo("챌린지 1");
     }
 
     @Test
@@ -236,9 +250,9 @@ public class ChallengeServiceTest {
     void createChallengeFailure1() {
         // Given
 
-        createChallengeForm.setMinDeposit(6000);
-        createChallengeForm.setMaxDeposit(5000);
-
+        createChallengeForm.setMinDeposit(6000L);
+        createChallengeForm.setMaxDeposit(5000L);
+        UserDetailsImpl userDetails = new UserDetailsImpl(member);
         // When & Then
         assertThatThrownBy(() -> challengeService.createChallenge(createChallengeForm, userDetails))
                 .isInstanceOf(CustomException.class)
@@ -249,16 +263,14 @@ public class ChallengeServiceTest {
     @DisplayName("시작일이 종료일보다 늦을 경우 예외 발생")
     void createChallengeFailure2() {
         // Given
-
         createChallengeForm.setStartDate(LocalDateTime.now().plusDays(10));
         createChallengeForm.setEndDate(LocalDateTime.now().plusDays(5));
-
+        UserDetailsImpl userDetails = new UserDetailsImpl(member);
         // When & Then
         assertThatThrownBy(() -> challengeService.createChallenge(createChallengeForm, userDetails))
                 .isInstanceOf(CustomException.class)
                 .hasMessage(ErrorCode.INVALID_DATE_RANGE.getMessage());
     }
-
 
     @Test
     @DisplayName("챌린지 수정 성공")
@@ -266,9 +278,8 @@ public class ChallengeServiceTest {
         // Given
         Challenge existingChallenge = createChallenge(challengeId, "기존 제목");
         given(challengeRepository.findById(challengeId)).willReturn(Optional.of(existingChallenge));
-
-
         UserDetailsImpl userDetails = new UserDetailsImpl(member);
+
         // When
         ResponseEntity<BaseResponseDto<GetChallengeDto>> response = challengeService.updateChallenge(challengeId, updateChallengeForm, userDetails);
 
@@ -283,11 +294,10 @@ public class ChallengeServiceTest {
     void updateChallengeFailure1() {
 
         // Given
-        UserDetailsImpl userDetails = new UserDetailsImpl(member);
         Challenge challenge = createChallenge(challengeId, "기존 챌린지");
         given(challengeRepository.findById(challengeId)).willReturn(Optional.of(challenge));
-        updateChallengeForm.setMinDeposit(6000);
-        updateChallengeForm.setMaxDeposit(5000);
+        updateChallengeForm.setMinDeposit(6000L);
+        updateChallengeForm.setMaxDeposit(5000L);
 
         // When & Then
         assertThatThrownBy(() -> challengeService.updateChallenge(challengeId, updateChallengeForm, userDetails))
@@ -299,10 +309,9 @@ public class ChallengeServiceTest {
     @DisplayName("참여인원이 0명일 경우 예외 발생")
     void updateChallengeFailure2() {
         // Given
-        UserDetailsImpl userDetails = new UserDetailsImpl(member);
         Challenge challenge = createChallenge(challengeId, "기존 챌린지");
         given(challengeRepository.findById(challengeId)).willReturn(Optional.of(challenge));
-        updateChallengeForm.setMaxParticipant(0);
+        updateChallengeForm.setMaxParticipant(0L);
 
         // When & Then
         assertThatThrownBy(() -> challengeService.updateChallenge(challengeId, updateChallengeForm, userDetails))
@@ -314,7 +323,6 @@ public class ChallengeServiceTest {
     @DisplayName("시작일이 종료일보다 늦을 경우 예외 발생")
     void updateChallengeFailure3() {
         // Given
-        UserDetailsImpl userDetails = new UserDetailsImpl(member);
         Challenge challenge = createChallenge(challengeId, "기존 챌린지");
         given(challengeRepository.findById(challengeId)).willReturn(Optional.of(challenge));
         updateChallengeForm.setStartDate(LocalDateTime.now().plusDays(10));
@@ -329,7 +337,6 @@ public class ChallengeServiceTest {
     @DisplayName("챌린지가 없을 시 예외 발생")
     void updateChallengeFailure4() {
         // Given
-        UserDetailsImpl userDetails = new UserDetailsImpl(member);
         Challenge challenge = createChallenge(challengeId, "기존 챌린지");
         given(challengeRepository.findById(challengeId)).willReturn(Optional.of(challenge));
         given(challengeRepository.findById(challengeId)).willReturn(Optional.empty());
@@ -366,4 +373,92 @@ public class ChallengeServiceTest {
                 .isInstanceOf(CustomException.class)
                 .hasMessage(ErrorCode.NOT_FOUND_CHALLENGE.getMessage());
     }
+
+    @Test
+    @DisplayName("챌린지 환급 성공")
+    void challengeDepositBack() {
+        // Given
+
+        when(userDetails.getMember()).thenReturn(member);
+        // 챌린지 설정: 끝난 상태로 설정
+
+        Challenge challenge = new Challenge();
+        challenge.setCategoryType(CategoryType.COTE);
+        challenge.setEndDate(LocalDateTime.now().minusDays(1));  // 끝난 챌린지
+
+        // CoteChallenge 설정
+        CoteChallenge coteChallenge = CoteChallenge.builder()
+                .id(1L)
+                .startAt(LocalDateTime.now().minusDays(2))
+                .build();
+
+        // Mockito 설정
+        when(challengeRepository.findById(challengeId)).thenReturn(Optional.of(challenge));
+        when(coteChallengeRepository.findAllByChallengeId(challengeId)).thenReturn(List.of(coteChallenge));
+
+        // CoteComment 설정: createAt 필드를 설정해야 함
+        CoteComment coteComment = CoteComment.builder()
+                .coteChallenge(coteChallenge)
+                .createAt(LocalDateTime.now().minusDays(2))  // 유효한 LocalDateTime 값 설정
+                .build();
+        when(coteCommentRepository.findAllByCoteChallengeIdInAndMemberId(anyList(), anyLong()))
+                .thenReturn(List.of(coteComment));  // 코멘트 존재
+
+        // MemberChallenge 설정
+        MemberChallenge memberChallenge = mock(MemberChallenge.class);
+        when(memberChallengeRepository.findByChallengeAndMember(challenge, member))
+                .thenReturn(Optional.of(memberChallenge));
+        when(memberChallenge.isDepositBack()).thenReturn(false); // 아직 환급 안 됨
+        when(memberChallenge.getMemberDeposit()).thenReturn(1000L);
+
+        // When
+        ResponseEntity<BaseResponseDto<DepositBackDto>> response = challengeService.challengeDepositBack(challengeId, userDetails);
+
+        // Then
+        assertThat(response.getStatusCode()).isEqualTo(HttpStatus.OK);
+        assertThat(response.getBody().getMessage()).isEqualTo("챌린지 환급 성공");
+        assertThat(response.getBody().getData()).isNotNull();
+        assertThat(response.getBody().getData().getChallengeId()).isEqualTo(challengeId);
+        assertThat(response.getBody().getData().getDepositBack()).isEqualTo(2000L);  // 보증금 * 2
+    }
+
+    @Test
+    @DisplayName("챌린지 종료날짜가 지나지 않았을 때 예외 발생")
+    void challengeDepositBackFailure1() {
+        // Given
+        UserDetailsImpl userDetails = new UserDetailsImpl(member);
+        Challenge challenge = new Challenge();
+        challenge.setCategoryType(CategoryType.COTE);
+        challenge.setEndDate(LocalDateTime.now().plusDays(7));  // 챌린지가 아직 끝나지 않음
+
+        given(challengeRepository.findById(challengeId)).willReturn(Optional.of(challenge));
+        // When
+        assertThatThrownBy(() -> challengeService.challengeDepositBack(challengeId, userDetails))
+                .isInstanceOf(CustomException.class)
+                .hasMessage(ErrorCode.CHALLENGE_NOT_ENDED.getMessage());
+    }
+
+    @Test
+    @DisplayName("이미 환급 받은 경우 예외 발생")
+    void challengeDepositBackFailure2() {
+        // Given
+        when(userDetails.getMember()).thenReturn(member);
+
+        Challenge challenge = new Challenge();
+        challenge.setCategoryType(CategoryType.COTE);
+        challenge.setEndDate(LocalDateTime.now().minusDays(1));
+
+        MemberChallenge memberChallenge = mock(MemberChallenge.class);
+        when(memberChallengeRepository.findByChallengeAndMember(challenge, member))
+                .thenReturn(Optional.of(memberChallenge));
+        when(memberChallenge.isDepositBack()).thenReturn(true);  // 이미 환급됨
+
+        when(challengeRepository.findById(challengeId)).thenReturn(Optional.of(challenge));
+
+        // When
+        assertThatThrownBy(() -> challengeService.challengeDepositBack(challengeId, userDetails))
+                .isInstanceOf(CustomException.class)
+                .hasMessage(ErrorCode.ALREADY_REFUNDED.getMessage());
+    }
+
 }
