@@ -146,5 +146,4 @@ public class CoteChallengeController {
     return ResponseEntity.ok(coteChallengeService.deleteComment(commentId, userDetails));
   }
 
-
 }

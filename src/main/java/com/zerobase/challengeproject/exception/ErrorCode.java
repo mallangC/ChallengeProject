@@ -54,6 +54,7 @@ public enum ErrorCode {
   //하위 챌린지
   //코테
   NOT_FOUND_COTE_CHALLENGE(HttpStatus.BAD_REQUEST, "코테 챌린지를 찾을 수 없습니다."),
+  NOT_ADDED_COTE_CHALLENGE(HttpStatus.BAD_REQUEST, "코테 챌린지를 추가할 수 없습니다."),
   NOT_COTE_CHALLENGE(HttpStatus.BAD_REQUEST, "코테 챌린지가 아닙니다."),
   NOT_FOUND_COTE_COMMENT(HttpStatus.BAD_REQUEST, "코테 댓글을 찾을 수 없습니다."),
   ALREADY_ADDED_THAT_DATE(HttpStatus.BAD_REQUEST, "입력한 날짜에 이미 문제가 추가되어 있습니다."),

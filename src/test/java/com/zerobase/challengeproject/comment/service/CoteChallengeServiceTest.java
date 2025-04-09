@@ -87,6 +87,8 @@ class CoteChallengeServiceTest {
           .maxDeposit(50L)
           .standard("challengeStandard")
           .member(memberBase)
+          .startDate(startAt)
+          .endDate(LocalDateTime.parse("2025-05-10T00:00:00"))
           .coteChallenges(new ArrayList<>())
           .build();
 
@@ -153,7 +155,7 @@ class CoteChallengeServiceTest {
 
   @Test
   @DisplayName("코테 챌린지 추가 실패(내가 만든 챌린지가 아님)")
-  void accCoteChallengeFailure1() {
+  void accCoteChallengeFailure2() {
     //given
     given(challengeRepository.searchChallengeWithCoteChallengeById(anyLong()))
             .willReturn(badChallenge);
@@ -173,9 +175,47 @@ class CoteChallengeServiceTest {
     verify(coteChallengeRepository, times(0)).save(any());
   }
 
+
   @Test
-  @DisplayName("코테 챌린지 추가 실패(이미 코테챌린지가 추가됨)")
-  void accCoteChallengeFailure2() {
+  @DisplayName("코테 챌린지 추가 실패(코테 챌린지가 아님)")
+  void accCoteChallengeFailure1() {
+    //given
+    given(challengeRepository.searchChallengeWithCoteChallengeById(anyLong()))
+            .willReturn((Challenge.builder()
+                    .id(1L)
+                    .title("challengeTitle")
+                    .img("challengeImg")
+                    .categoryType(CategoryType.DIET)
+                    .maxParticipant(10L)
+                    .currentParticipant(1L)
+                    .description("challengeDescription")
+                    .minDeposit(10L)
+                    .maxDeposit(50L)
+                    .standard("challengeStandard")
+                    .member(memberBase)
+                    .coteChallenges(List.of(coteChallengeBase))
+                    .startDate(startAt)
+                    .endDate(LocalDateTime.parse("2025-05-10T00:00:00"))
+                    .build()));
+
+    CoteChallengeForm form = CoteChallengeForm.builder()
+            .challengeId(1L)
+            .title("문제 제목")
+            .question("코테 문제 링크")
+            .startAt(startAt)
+            .build();
+    //when
+    CustomException exception = assertThrows(CustomException.class, () ->
+            coteChallengeService.addCoteChallenge(form, userDetailsBase));
+
+    //then
+    assertEquals(NOT_COTE_CHALLENGE, exception.getErrorCode());
+    verify(coteChallengeRepository, times(0)).save(any());
+  }
+
+  @Test
+  @DisplayName("코테 챌린지 추가 실패(챌린지 기간이 아님)")
+  void accCoteChallengeFailure3() {
     //given
     given(challengeRepository.searchChallengeWithCoteChallengeById(anyLong()))
             .willReturn(Challenge.builder()
@@ -191,6 +231,45 @@ class CoteChallengeServiceTest {
                     .standard("challengeStandard")
                     .member(memberBase)
                     .coteChallenges(List.of(coteChallengeBase))
+                    .startDate(startAt)
+                    .endDate(LocalDateTime.parse("2025-05-10T00:00:00"))
+                    .build());
+
+    CoteChallengeForm form = CoteChallengeForm.builder()
+            .challengeId(1L)
+            .title("문제 제목")
+            .question("코테 문제 링크")
+            .startAt(LocalDateTime.parse("2025-05-11T00:00:00"))
+            .build();
+    //when
+    CustomException exception = assertThrows(CustomException.class, () ->
+            coteChallengeService.addCoteChallenge(form, userDetailsBase));
+
+    //then
+    assertEquals(NOT_ADDED_COTE_CHALLENGE, exception.getErrorCode());
+    verify(coteChallengeRepository, times(0)).save(any());
+  }
+
+  @Test
+  @DisplayName("코테 챌린지 추가 실패(이미 코테챌린지가 추가됨)")
+  void accCoteChallengeFailure4() {
+    //given
+    given(challengeRepository.searchChallengeWithCoteChallengeById(anyLong()))
+            .willReturn(Challenge.builder()
+                    .id(1L)
+                    .title("challengeTitle")
+                    .img("challengeImg")
+                    .categoryType(CategoryType.COTE)
+                    .maxParticipant(10L)
+                    .currentParticipant(1L)
+                    .description("challengeDescription")
+                    .minDeposit(10L)
+                    .maxDeposit(50L)
+                    .standard("challengeStandard")
+                    .member(memberBase)
+                    .coteChallenges(List.of(coteChallengeBase))
+                    .startDate(startAt)
+                    .endDate(LocalDateTime.parse("2025-05-10T00:00:00"))
                     .build());
 
     CoteChallengeForm form = CoteChallengeForm.builder()

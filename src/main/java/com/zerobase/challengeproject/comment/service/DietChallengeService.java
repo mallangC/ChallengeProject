@@ -19,6 +19,7 @@ import com.zerobase.challengeproject.exception.ErrorCode;
 import com.zerobase.challengeproject.member.components.jwt.UserDetailsImpl;
 import com.zerobase.challengeproject.member.entity.Member;
 import com.zerobase.challengeproject.type.CategoryType;
+import com.zerobase.challengeproject.type.MemberType;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
 import org.springframework.http.HttpStatus;
@@ -94,19 +95,28 @@ public class DietChallengeService {
             HttpStatus.OK);
   }
 
+
   /**
-   * 다이어트 챌린지 전체를 조회 서비스 메서드
+   * 관리자 다이어트 챌린지 전체 조회 서비스 메서드
    * 다이어트 챌린지가 없는 경우 비어있는 리스트 반환
    * (DB호출 1회) 호출 1
    *
    * @param page        페이지 번호
    * @param challengeId 챌린지 아이디
+   * @param isPass      챌린지 성공 여부
+   * @param userDetails 회원 정보
    * @return 페이징이된 다이어트 챌린지 리스트
    */
   public BaseResponseDto<PageDto<DietChallengeDto>> getAllDietChallenge(int page,
-                                                                        Long challengeId) {
+                                                                        Long challengeId,
+                                                                        Boolean isPass,
+                                                                        UserDetailsImpl userDetails) {
+    Member member = userDetails.getMember();
+    if (member.getMemberType() != MemberType.ADMIN) {
+      throw new CustomException(ErrorCode.NOT_MEMBER_TYPE_ADMIN);
+    }
     Page<DietChallengeDto> dietChallengeDtos =
-            dietChallengeRepository.searchAllDietChallengeByChallengeId(page - 1, challengeId);
+            dietChallengeRepository.searchAllDietChallengeByChallengeId(page - 1, challengeId, isPass);
     return new BaseResponseDto<>(PageDto.from(dietChallengeDtos),
             "다이어트 챌린지 전체 조회를 성공했습니다.(" + page + "페이지)",
             HttpStatus.OK);
@@ -211,6 +221,28 @@ public class DietChallengeService {
     dietCommentRepository.delete(dietComment);
     return new BaseResponseDto<>(DietCommentDto.from(dietComment),
             "다이어트 댓글 삭제를 성공했습니다.",
+            HttpStatus.OK);
+  }
+
+  /**
+   * (관리자) 다이어트 댓글 삭제 서비스 메서드
+   * (DB호출 2회) 호출 1, 삭제 1
+   *
+   * @param commentId   댓글 아이디
+   * @param userDetails 회원 정보
+   * @return 삭제된 다이어트 댓글 정보
+   */
+  @Transactional
+  public BaseResponseDto<DietCommentDto> adminDeleteDietComment(Long commentId,
+                                                                UserDetailsImpl userDetails) {
+    Member member = userDetails.getMember();
+    DietComment dietComment = dietCommentRepository.searchDietCommentById(commentId);
+    if (member.getMemberType() != MemberType.ADMIN) {
+      throw new CustomException(ErrorCode.NOT_MEMBER_TYPE_ADMIN);
+    }
+    dietCommentRepository.delete(dietComment);
+    return new BaseResponseDto<>(DietCommentDto.from(dietComment),
+            "관리자 권한으로 다이어트 댓글 삭제를 성공했습니다.",
             HttpStatus.OK);
   }
 

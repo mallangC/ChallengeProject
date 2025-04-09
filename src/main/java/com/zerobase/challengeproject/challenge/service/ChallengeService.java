@@ -124,7 +124,6 @@ public class ChallengeService {
         /**
          * 보증금차감, 챌린지인원업데이트 및 저장
          */
-        member.chargeAccount(100000L);
         member.depositAccount(form.getMemberDeposit());
         challenge.registration();
         memberRepository.save(member);
@@ -182,7 +181,6 @@ public class ChallengeService {
         /**
          * 보증금차감 및 저장
          */
-        member.chargeAccount(100000L);
         member.depositAccount(form.getMemberDeposit());
         memberRepository.save(member);
         challengeRepository.save(challenge);
