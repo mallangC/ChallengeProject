@@ -27,6 +27,14 @@ public class WaterChallengeRepositoryCustomImpl implements WaterChallengeReposit
 
   private final JPAQueryFactory queryFactory;
 
+  /**
+   * DB에서 물마시기 챌린지 객체를 호출하는 메서드
+   * 물마시기 챌린지와 연결된 회원과 챌린지를 fetchJoin()으로 즉시 로딩
+   *
+   * @param challengeId 챌린지 아이디
+   * @param loginId     로그인 아이디
+   * @return 물마시기 챌린지 객체
+   */
   @Override
   public WaterChallenge searchWaterChallengeByChallengeIdAndLoginId(Long challengeId, String loginId) {
     LocalDate today = LocalDate.now();
@@ -45,6 +53,15 @@ public class WaterChallengeRepositoryCustomImpl implements WaterChallengeReposit
     return findWaterChallenge;
   }
 
+  /**
+   * DB에서 페이징된 오늘의 물마시기 챌린지 정보를 호출하는 메서드
+   * 물마시기 챌린지와 연결된 회원과 챌린지를 fetchJoin()으로 즉시 로딩
+   *
+   * @param page        페이지 숫자
+   * @param challengeId 챌린지 아이디
+   * @param isPass      챌린지 성공 여부
+   * @return 페이징된 물마시기 챌린지 정보
+   */
   @Override
   public Page<WaterChallengeDto> searchAllWaterChallengeByChallengeId(int page, Long challengeId, Boolean isPass) {
     LocalDate today = LocalDate.now();

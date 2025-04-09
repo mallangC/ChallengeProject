@@ -37,9 +37,17 @@ public class WaterChallengeService {
 
   //DB호출 횟수에서 제일 처음 회원호출은 언제나 호출되기 때문에 제외
 
-  //물마시기 챌린지 추가(form, userDetails) (DB호출 2회) 호출 1, 저장 1
-  //챌린지 참여할 때 작성한 목표 섭취량이 매일 목표 섭취량의 기준이됨
-  //TODO batch를 사용해서 매일 00시에 그날 물마시기 챌린지가 추가 기능 구현
+
+  /**
+   * 물마시기 챌린지 추가 서비스 메서드
+   * 챌린지 참여할 때 작성한 목표 섭취량이 매일 목표 섭취량의 기준이됨
+   * 물마시기 챌린지가 아닐 때, 이미 물마시기 챌린지를 추가한 경우 예외 발생
+   * (DB호출 2회) 호출 1, 저장 1
+   *
+   * @param form        챌린지 아이디, 하루 목표 섭취량
+   * @param userDetails 회원 정보
+   * @return 추가한 물마시기 챌린지 정보
+   */
   public BaseResponseDto<WaterChallengeDto> addWaterChallenge(WaterChallengeForm form,
                                                               UserDetailsImpl userDetails) {
     Member member = userDetails.getMember();
@@ -51,7 +59,7 @@ public class WaterChallengeService {
     boolean isEntered = challenge.getWaterChallenges().stream()
             .anyMatch(c -> c.getMember().getMemberId().equals(member.getMemberId()));
     if (isEntered) {
-      throw new CustomException(ErrorCode.ALREADY_ADDED_DIET_CHALLENGE);
+      throw new CustomException(ErrorCode.ALREADY_ADDED_WATER_CHALLENGE);
     }
 
     WaterChallenge waterChallenge = WaterChallenge.from(form, challenge, member);
@@ -62,7 +70,17 @@ public class WaterChallengeService {
             , HttpStatus.OK);
   }
 
-  //오늘의 물마시기 챌린지 조회(challengeId, userDetails)(DB호출 1회) 호출 1
+  //TODO batch를 사용해서 매일 00시에 그날 물마시기 챌린지가 추가 기능 구현
+
+  /**
+   * 오늘의 물마시기 챌린지 조회 서비스 메서드
+   * 물마시기 챌린지를 찾을 수 없을 때 예외 발생
+   * (DB호출 1회) 호출 1
+   *
+   * @param challengeId 챌린지 아이디
+   * @param userDetails 회원 정보
+   * @return 물마시기 챌린지 정보
+   */
   public BaseResponseDto<WaterChallengeDto> getWaterChallenge(Long challengeId,
                                                               UserDetailsImpl userDetails) {
     Member member = userDetails.getMember();
@@ -73,7 +91,16 @@ public class WaterChallengeService {
             , HttpStatus.OK);
   }
 
-
+  /**
+   * 관리자 물마시기 챌린지 전체 확인 서비스 메서드
+   * (DB호출 2회) 호출 2
+   *
+   * @param page        페이지 숫자
+   * @param challengeId 챌린지 아이디
+   * @param isPass      챌린지 성공 여부
+   * @param userDetails 회원 정보
+   * @return 페이징된 물마시기 챌린지
+   */
   //물마시기 챌린지 전체 확인(관리자)(challengeId, userDetails) (DB호출 2회) 호출 2
   public BaseResponseDto<PageDto<WaterChallengeDto>> getAllWaterChallenge(int page,
                                                                           Long challengeId,
@@ -89,7 +116,15 @@ public class WaterChallengeService {
             , HttpStatus.OK);
   }
 
-  //물마시기 챌린지 수정(form, userDetails) -> 챌린지가 시작한경우 불가능 (DB호출 2회) 호출 1, 수정 1
+  /**
+   * 물마시기 챌린지 수정 서비스 메서드
+   * 챌린지가 시작한 경우 예외 발생
+   * (DB호출 2회) 호출 1, 수정 1
+   *
+   * @param form        챌린지 아이디, 목표 섭취량
+   * @param userDetails 회원 정보
+   * @return 수정된 물마시기 챌린지 정보
+   */
   @Transactional
   public BaseResponseDto<WaterChallengeDto> updateWaterChallenge(WaterChallengeForm form,
                                                                  UserDetailsImpl userDetails) {
@@ -106,7 +141,15 @@ public class WaterChallengeService {
             , HttpStatus.OK);
   }
 
-  //물마시기 댓글 추가(form, userDetails) (DB호출 2회) 호출 1, 추가 1
+  /**
+   * 물마시기 댓글 추가 서비스 메서드
+   * 챌린지를 찾을 수 없을 때 예외 발생
+   * (DB호출 2회) 호출 1, 추가 1
+   *
+   * @param form        챌린지 아이디, 현재 섭취량, 이미지
+   * @param userDetails 회원 정보
+   * @return 추가된 물마시기 댓글 정보
+   */
   public BaseResponseDto<WaterCommentDto> addWaterComment(WaterCommentAddForm form,
                                                           UserDetailsImpl userDetails) {
     Member member = userDetails.getMember();
@@ -120,7 +163,14 @@ public class WaterChallengeService {
             , HttpStatus.OK);
   }
 
-  //물마시기 댓글 단건 조회(commentId) (DB호출 1회) 호출 1
+  /**
+   * 물마시기 댓글 단건 조회 서비스 메서드
+   * 물마시기 댓글을 찾을 수 없을 때 예외 발생
+   * (DB호출 1회) 호출 1
+   *
+   * @param commentId 댓글 아이디
+   * @return 물마시기 댓글 정보
+   */
   public BaseResponseDto<WaterCommentDto> getWaterComment(Long commentId) {
     WaterComment waterComment = waterCommentRepository.searchWaterCommentById(commentId);
     return new BaseResponseDto<>(WaterCommentDto.from(waterComment),
@@ -128,7 +178,15 @@ public class WaterChallengeService {
             , HttpStatus.OK);
   }
 
-  //물마시기 댓글 수정(form, userDetails) (DB호출 3회) 호출 1, 수정 2
+  /**
+   * 물마시기 댓글 수정 서비스 메서드
+   * 물마시기 댓글을 찾을 수 없을 때, 내가 작성한 댓글이 아닐 때 예외 발생
+   * (DB호출 3회) 호출 1, 수정 2
+   *
+   * @param form        댓글 아이디, 현재 섭취량, 이미지
+   * @param userDetails 회원 정보
+   * @return 수정된 물마시기 댓글 정보
+   */
   @Transactional
   public BaseResponseDto<WaterCommentDto> updateWaterComment(WaterCommentUpdateForm form,
                                                              UserDetailsImpl userDetails) {
@@ -143,7 +201,15 @@ public class WaterChallengeService {
             , HttpStatus.OK);
   }
 
-  //물마시기 댓글 삭제(관리자)(commentId, userDetails) (DB호출 3회) 호출 1, 수정 1, 삭제 1
+  /**
+   * 관리자 물마시기 댓글 삭제 서비스 메서드
+   * 물마시기 댓글을 찾을 수 없을 때, 관리자가 아닐 때 예외 발생
+   * (DB호출 3회) 호출 1, 수정 1, 삭제 1
+   *
+   * @param commentId   댓글 아이디
+   * @param userDetails 회원 정보
+   * @return 삭제된 물마시기 댓글 정보
+   */
   @Transactional
   public BaseResponseDto<WaterCommentDto> adminDeleteWaterComment(Long commentId,
                                                                   UserDetailsImpl userDetails) {

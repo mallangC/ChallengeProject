@@ -16,6 +16,14 @@ public class WaterCommentRepositoryCustomImpl implements WaterCommentRepositoryC
 
   private final JPAQueryFactory queryFactory;
 
+  /**
+   * DB에서 물마시기 댓글 객체를 호출하는 메서드
+   * 물마시기 댓글과 연결된 회원과 물마시기 챌린지,
+   * 물마시기 챌린지와 연결된 챌린지를 fetchJoin()으로 즉시 로딩
+   *
+   * @param commentId 댓글 아이디
+   * @return 물마시기 댓글 객체
+   */
   @Override
   public WaterComment searchWaterCommentById(Long commentId) {
     WaterComment findWaterComment = queryFactory.selectFrom(waterComment)
