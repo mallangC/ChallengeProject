@@ -15,8 +15,8 @@ import org.springframework.web.bind.annotation.*;
 
 @RestController
 @RequiredArgsConstructor
-@RequestMapping("/api/admin")
-public class CommentAdminController {
+@RequestMapping("/api/admin/challenge")
+public class AdminChallengeController {
   private final WaterChallengeService waterChallengeService;
   private final CoteChallengeService coteChallengeService;
   private final DietChallengeService dietChallengeService;
@@ -28,7 +28,7 @@ public class CommentAdminController {
    * @param userDetails 회원 정보
    * @return 삭제된 인증 댓글 정보
    */
-  @DeleteMapping("/challenge/cote/comment/{commentId}")
+  @DeleteMapping("/cote/comment/{commentId}")
   public ResponseEntity<BaseResponseDto<CoteCommentDto>> adminDeleteComment(
           @PathVariable Long commentId,
           @AuthenticationPrincipal UserDetailsImpl userDetails) {
@@ -42,7 +42,7 @@ public class CommentAdminController {
    * @param challengeId 챌린지 아이디
    * @return 페이징이된 다이어트 챌린지 리스트
    */
-  @GetMapping("/challenge/diet/{challengeId}")
+  @GetMapping("/diet/{challengeId}")
   public ResponseEntity<BaseResponseDto<PageDto<DietChallengeDto>>> getAllDietChallenge(
           @RequestParam(defaultValue = "1") @Min(1) int page,
           @RequestParam(required = false, value = "pass") Boolean isPass,
@@ -58,7 +58,7 @@ public class CommentAdminController {
    * @param userDetails 회원 정보
    * @return 삭제된 다이어트 댓글 정보
    */
-  @DeleteMapping("/challenge/diet/comment/{commentId}")
+  @DeleteMapping("/diet/comment/{commentId}")
   public ResponseEntity<BaseResponseDto<DietCommentDto>> deleteComment(
           @PathVariable Long commentId,
           @AuthenticationPrincipal UserDetailsImpl userDetails) {
@@ -67,7 +67,7 @@ public class CommentAdminController {
 
 
   //물마시기 챌린지 전체 조회 (관리자)
-  @GetMapping("/challenge/water/{challengeId}")
+  @GetMapping("/water/{challengeId}")
   public ResponseEntity<BaseResponseDto<PageDto<WaterChallengeDto>>> getAllWaterChallenge(
           @PathVariable Long challengeId,
           @RequestParam(defaultValue = "1") @Min(1) int page,
@@ -78,7 +78,7 @@ public class CommentAdminController {
 
 
   //물마시기 댓글 삭제 (관리자)
-  @DeleteMapping("/challenge/water/comment/{commentId}")
+  @DeleteMapping("/water/comment/{commentId}")
   public ResponseEntity<BaseResponseDto<WaterCommentDto>> deleteWaterComment(
           @PathVariable Long commentId,
           @AuthenticationPrincipal UserDetailsImpl userDetails) {
