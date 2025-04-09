@@ -27,7 +27,9 @@ import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.time.LocalDate;
 import java.time.LocalDateTime;
+import java.time.LocalTime;
 import java.util.Objects;
 
 @Service
@@ -312,5 +314,4 @@ public class CoteChallengeService {
     return LocalDateTime.of(
             now.getYear(), now.getMonthValue(), now.getDayOfMonth(), 0, 0, 0);
   }
-
 }

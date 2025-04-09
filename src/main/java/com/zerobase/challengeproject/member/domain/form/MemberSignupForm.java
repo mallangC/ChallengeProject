@@ -10,8 +10,8 @@ import lombok.NoArgsConstructor;
 
 @Getter
 @Builder
-@NoArgsConstructor
 @AllArgsConstructor
+@NoArgsConstructor
 public class MemberSignupForm {
     @NotBlank
     private String memberId;

@@ -35,7 +35,7 @@ public class DietChallenge extends BaseEntity {
   private Float goalWeight;
   @Column(nullable = false)
   private Float currentWeight;
-  @OneToMany(mappedBy = "dietChallenge", fetch = FetchType.LAZY)
+  @OneToMany(mappedBy = "dietChallenge", cascade = CascadeType.ALL, fetch = FetchType.LAZY)
   private List<DietComment> comments;
 
   public static DietChallenge from(DietChallengeAddForm form, Member member, Challenge challenge) {

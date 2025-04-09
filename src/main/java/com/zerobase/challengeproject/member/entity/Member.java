@@ -57,6 +57,7 @@ public class Member {
 
     private Long account;
 
+
     @OneToMany(mappedBy = "member", fetch = FetchType.LAZY)
     private List<AccountDetail> accountDetails;
 
