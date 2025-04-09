@@ -39,7 +39,7 @@ public class DietChallengeRepositoryCustomImpl implements DietChallengeRepositor
             .join(dietChallenge.member, member).fetchJoin()
             .leftJoin(dietChallenge.comments, dietComment).fetchJoin()
             .where(dietChallenge.challenge.id.eq(challengeId)
-                    .and(dietChallenge.member.loginId.eq(loginId)))
+                    .and(dietChallenge.member.memberId.eq(loginId)))
             .fetchOne();
 
     if (findDietChallenge == null) {

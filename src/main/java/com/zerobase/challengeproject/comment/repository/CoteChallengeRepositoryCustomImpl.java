@@ -54,7 +54,7 @@ public class CoteChallengeRepositoryCustomImpl implements CoteChallengeRepositor
 
     boolean isAlreadyComment = findCoteChallenge.getComments().stream()
             .anyMatch(comment ->
-                    comment.getMember().getLoginId().equals(loginId));
+                    comment.getMember().getMemberId().equals(loginId));
 
     if (isAlreadyComment) {
       throw new CustomException(ErrorCode.ALREADY_ADDED_COMMENT_TODAY);

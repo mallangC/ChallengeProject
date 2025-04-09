@@ -20,16 +20,11 @@ public class RefreshToken  {
     private Long id;
 
     @Column(nullable = false, unique = true)
-    private String loginId;
+    private String memberId;
 
     @Column(nullable = false, unique = true, length = 500)
     private String token;
 
     @Column(nullable = false)
     private Instant expireDate;
-
-    public void tokenRenewal(String newToken, Instant expiresAt) {
-        this.token = newToken;
-        this.expireDate = expiresAt;
-    }
 }

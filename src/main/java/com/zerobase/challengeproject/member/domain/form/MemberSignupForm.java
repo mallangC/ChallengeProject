@@ -12,7 +12,7 @@ import lombok.*;
 @NoArgsConstructor
 public class MemberSignupForm {
     @NotBlank
-    private String loginId;
+    private String memberId;
     @NotBlank
     private String memberName;
     @NotBlank

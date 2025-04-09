@@ -55,7 +55,7 @@ class MemberLoginServiceTest {
         // Mock Member 생성
         mockMember = Member.builder()
                 .id(1L)
-                .loginId("testId")
+                .memberId("testId")
                 .memberName("testName")
                 .nickname("testNickname")
                 .email("testEmail@email.com")
@@ -69,7 +69,7 @@ class MemberLoginServiceTest {
                 .id(1L)
                 .token(mockRefreshToken)
                 .expireDate(Instant.now().plusSeconds(60 * 60 * 24 * 7))
-                .loginId(mockMember.getLoginId())
+                .memberId(mockMember.getMemberId())
                 .build();
     }
 
@@ -78,14 +78,14 @@ class MemberLoginServiceTest {
     void login() {
         // given
         MemberLoginForm loginForm = MemberLoginForm.builder()
-                .loginId("testId")
+                .memberId("testId")
                 .password("testPassword1!")
                 .build();
-        when(memberRepository.findByLoginId(loginForm.getLoginId())).thenReturn(Optional.of(mockMember));
+        when(memberRepository.findByMemberId(loginForm.getMemberId())).thenReturn(Optional.of(mockMember));
         when(passwordEncoder.matches(loginForm.getPassword(), mockMember.getPassword())).thenReturn(true);
-        when(jwtUtil.generateAccessToken(loginForm.getLoginId(), mockMember.getMemberType())).thenReturn(mockAccessToken);
-        when(jwtUtil.generateRefreshToken(loginForm.getLoginId(), mockMember.getMemberType())).thenReturn(mockRefreshToken);
-        when(refreshTokenRepository.findByLoginId(loginForm.getLoginId())).thenReturn(Optional.of(existingRefreshToken));
+        when(jwtUtil.generateAccessToken(loginForm.getMemberId(), mockMember.getMemberType())).thenReturn(mockAccessToken);
+        when(jwtUtil.generateRefreshToken(loginForm.getMemberId(), mockMember.getMemberType())).thenReturn(mockRefreshToken);
+        when(refreshTokenRepository.findByMemberId(loginForm.getMemberId())).thenReturn(Optional.of(existingRefreshToken));
 
         // when
         MemberLoginResponse result = memberLoginService.login(loginForm);
@@ -93,8 +93,8 @@ class MemberLoginServiceTest {
         // then
         assertNotNull(result);
         assertEquals(mockAccessToken, result.getAccessToken());
-        assertEquals(mockMember.getLoginId(), result.getLoginId());
-        verify(refreshTokenRepository, times(1)).deleteByMemberId(existingRefreshToken.getLoginId());
+        assertEquals(mockMember.getMemberId(), result.getMemberId());
+        verify(refreshTokenRepository, times(1)).deleteByMemberId(existingRefreshToken.getMemberId());
         verify(refreshTokenRepository, times(1)).save(any(RefreshToken.class));
     }
 
@@ -103,10 +103,10 @@ class MemberLoginServiceTest {
     void loginFailure1() {
         // given
         MemberLoginForm loginForm = MemberLoginForm.builder()
-                .loginId("testId")
+                .memberId("testId")
                 .password("testPassword1!")
                 .build();
-        when(memberRepository.findByLoginId(loginForm.getLoginId())).thenReturn(Optional.empty());
+        when(memberRepository.findByMemberId(loginForm.getMemberId())).thenReturn(Optional.empty());
 
         // when & then
         CustomException exception = assertThrows(CustomException.class, () -> memberLoginService.login(loginForm));
@@ -117,11 +117,11 @@ class MemberLoginServiceTest {
     @DisplayName("로그인 실패 - 비밀번호 불일치")
     void loginFailure2() {
         MemberLoginForm loginForm = MemberLoginForm.builder()
-                .loginId("testId")
+                .memberId("testId")
                 .password("testPassword1!")
                 .build();
         // given
-        when(memberRepository.findByLoginId(loginForm.getLoginId())).thenReturn(Optional.of(mockMember));
+        when(memberRepository.findByMemberId(loginForm.getMemberId())).thenReturn(Optional.of(mockMember));
         when(passwordEncoder.matches(loginForm.getPassword(), mockMember.getPassword())).thenReturn(false);
 
         // when & then
@@ -135,14 +135,14 @@ class MemberLoginServiceTest {
         //given
         String accessToken = "Bearer " + mockAccessToken;
 
-        when(jwtUtil.extractLoginId(mockAccessToken)).thenReturn(mockMember.getLoginId());
+        when(jwtUtil.extractMemberId(mockAccessToken)).thenReturn(mockMember.getMemberId());
         when(jwtUtil.isTokenValid(mockRefreshToken)).thenReturn(true);
         //when
         MemberLogoutDto result = memberLoginService.logout(accessToken, mockRefreshToken);
         //then
         assertNotNull(result);
-        assertEquals(mockMember.getLoginId(), result.getLoginId());
-        verify(refreshTokenRepository, times(1)).deleteByMemberId(mockMember.getLoginId());
+        assertEquals(mockMember.getMemberId(), result.getMemberId());
+        verify(refreshTokenRepository, times(1)).deleteByMemberId(mockMember.getMemberId());
     }
 
     @Test
@@ -161,10 +161,10 @@ class MemberLoginServiceTest {
         //given
         String newAccessToken = "newAccessToken";
         when(jwtUtil.isTokenValid(mockRefreshToken)).thenReturn(true);
-        when(jwtUtil.extractLoginId(mockRefreshToken)).thenReturn(mockMember.getLoginId());
-        when(memberRepository.findByLoginId(mockMember.getLoginId())).thenReturn(Optional.of(mockMember));
+        when(jwtUtil.extractMemberId(mockRefreshToken)).thenReturn(mockMember.getMemberId());
+        when(memberRepository.findByMemberId(mockMember.getMemberId())).thenReturn(Optional.of(mockMember));
         when(refreshTokenRepository.findByToken(mockRefreshToken)).thenReturn(Optional.of(existingRefreshToken));
-        when(jwtUtil.generateAccessToken(mockMember.getLoginId(), mockMember.getMemberType())).thenReturn(newAccessToken);
+        when(jwtUtil.generateAccessToken(mockMember.getMemberId(), mockMember.getMemberType())).thenReturn(newAccessToken);
         //when
         RefreshTokenDto result = memberLoginService.refreshAccessToken(mockRefreshToken);
         //then

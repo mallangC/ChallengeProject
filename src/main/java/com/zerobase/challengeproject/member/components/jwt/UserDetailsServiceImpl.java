@@ -17,14 +17,14 @@ public class UserDetailsServiceImpl implements UserDetailsService {
 
     /**
      * UserDetails에서 유저의 정보를 가져옵니다.
-     * @param loginId 로그인을 시도한 유저의 아이디
+     * @param memberId 로그인을 시도한 유저의 아이디
      * @return 유저가 입력한 유저의 아이디
      * @throws UsernameNotFoundException
      */
     @Override
-    public UserDetailsImpl loadUserByUsername(String loginId) throws UsernameNotFoundException {
+    public UserDetailsImpl loadUserByUsername(String memberId) throws UsernameNotFoundException {
 
-        Member member = memberRepository.findByLoginId(loginId)
+        Member member = memberRepository.findByMemberId(memberId)
                 .orElseThrow(() -> new CustomException(ErrorCode.NOT_FOUND_MEMBER));
 
         return new UserDetailsImpl(member);

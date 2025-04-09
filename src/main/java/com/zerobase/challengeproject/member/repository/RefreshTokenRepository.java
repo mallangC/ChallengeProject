@@ -20,16 +20,16 @@ public interface RefreshTokenRepository extends JpaRepository<RefreshToken, Long
     Optional<RefreshToken> findByToken(String token);
     /**
      * 특정 회원 ID와 연관된 리프레시 토큰을 삭제.
-     * @param loginId 삭제할 회원 ID
+     * @param memberId 삭제할 회원 ID
      */
     @Modifying
     @Transactional
-    @Query("DELETE FROM RefreshToken r WHERE r.loginId = :loginId")
-    void deleteByMemberId(@Param("memberId") String loginId);
+    @Query("DELETE FROM RefreshToken r WHERE r.memberId = :memberId")
+    void deleteByMemberId(@Param("memberId") String memberId);
     /**
      * 회원 ID를 기준으로 리프레시 토큰을 조회.
-     * @param loginId 찾을 회원 ID
+     * @param memberId 찾을 회원 ID
      * @return 해당 회원 ID와 연결된 Optional<RefreshToken>
      */
-    Optional<RefreshToken> findByLoginId(String loginId);
+    Optional<RefreshToken> findByMemberId(String memberId);
 }

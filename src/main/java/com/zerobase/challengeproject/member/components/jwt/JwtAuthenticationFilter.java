@@ -47,7 +47,7 @@ public class JwtAuthenticationFilter extends UsernamePasswordAuthenticationFilte
               */
             MemberLoginForm form = new ObjectMapper().readValue(request.getInputStream(), MemberLoginForm.class);
             return getAuthenticationManager().authenticate(
-                    new UsernamePasswordAuthenticationToken(form.getLoginId(),
+                    new UsernamePasswordAuthenticationToken(form.getMemberId(),
                             form.getPassword())
             );
         } catch (IOException e) {
@@ -72,8 +72,8 @@ public class JwtAuthenticationFilter extends UsernamePasswordAuthenticationFilte
                                             Authentication authResult) throws IOException, ServletException {
         UserDetailsImpl userDetails = (UserDetailsImpl) authResult.getPrincipal();
         MemberType role = userDetails.getMember().getMemberType();
-        String loginId = userDetails.getMember().getLoginId();
-        String accessToken = jwtUtil.generateAccessToken(loginId, role);
+        String memberId = userDetails.getMember().getMemberId();
+        String accessToken = jwtUtil.generateAccessToken(memberId, role);
 
 
         /**

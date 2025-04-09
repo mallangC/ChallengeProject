@@ -20,7 +20,7 @@ public class DietChallengeDto {
   public static DietChallengeDto from(DietChallenge dietChallenge) {
     return DietChallengeDto.builder()
             .id(dietChallenge.getId())
-            .loginId(dietChallenge.getMember().getLoginId())
+            .loginId(dietChallenge.getMember().getMemberId())
             .goalWeight(dietChallenge.getGoalWeight())
             .currentWeight(dietChallenge.getCurrentWeight())
             .comments(dietChallenge.getComments().stream()
@@ -32,7 +32,7 @@ public class DietChallengeDto {
   public static DietChallengeDto fromWithoutComments(DietChallenge dietChallenge) {
     return DietChallengeDto.builder()
             .id(dietChallenge.getId())
-            .loginId(dietChallenge.getMember().getLoginId())
+            .loginId(dietChallenge.getMember().getMemberId())
             .goalWeight(dietChallenge.getGoalWeight())
             .currentWeight(dietChallenge.getCurrentWeight())
             .comments(new ArrayList<>())

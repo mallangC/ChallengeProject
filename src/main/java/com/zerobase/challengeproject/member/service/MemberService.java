@@ -26,7 +26,7 @@ public class MemberService {
      * @return 유저 정보(로그인아이디, 이름, 닉네임, 전화번호, 이메일주소)
      */
     public MemberProfileDto getProfile(UserDetailsImpl userDetails) {
-        Member member = findMemberByLoginId(userDetails.getUsername());
+        Member member = findMemberByMemberId(userDetails.getUsername());
         return new MemberProfileDto(member);
     }
 
@@ -38,7 +38,7 @@ public class MemberService {
      */
     @Transactional
     public MemberProfileDto updateProfile(UserDetailsImpl userDetails, MemberProfileFrom form) {
-        Member member = findMemberByLoginId(userDetails.getUsername());
+        Member member = findMemberByMemberId(userDetails.getUsername());
         member.updateProfile(form.getPhoneNum(),form.getNickname());
         return new MemberProfileDto(member);
     }
@@ -55,7 +55,7 @@ public class MemberService {
      */
     @Transactional
     public String changePassword(UserDetailsImpl userDetails, ChangePasswordForm form) {
-        Member member = findMemberByLoginId(userDetails.getUsername());
+        Member member = findMemberByMemberId(userDetails.getUsername());
         if(!passwordEncoder.matches(form.getPassword(), member.getPassword())) {
             throw new CustomException(ErrorCode.INCORRECT_PASSWORD);
         }
@@ -67,16 +67,16 @@ public class MemberService {
         }
         String password = passwordEncoder.encode(form.getNewPassword());
         member.changePassword(password);
-        return member.getLoginId();
+        return member.getMemberId();
     }
 
     /**
      * userDetails에 있는 유저의 정보로 DB에서 유저 객체를 가져오고 없으면 예외 발생
-     * @param loginId 유저의 로그인 아이디
+     * @param memberId 유저의 로그인 아이디
      * @return 유저 객체
      */
-    private Member findMemberByLoginId(String loginId) {
-        return memberRepository.findByLoginId(loginId)
+    private Member findMemberByMemberId(String memberId) {
+        return memberRepository.findByMemberId(memberId)
                 .orElseThrow(()-> new CustomException(ErrorCode.NOT_FOUND_MEMBER));
     }
 }

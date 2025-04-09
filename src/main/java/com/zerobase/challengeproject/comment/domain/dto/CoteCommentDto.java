@@ -16,7 +16,7 @@ public class CoteCommentDto {
   public static CoteCommentDto from(CoteComment coteComment) {
     return CoteCommentDto.builder()
             .id(coteComment.getId())
-            .userId(coteComment.getMember().getLoginId())
+            .userId(coteComment.getMember().getMemberId())
             .coteChallengeId(coteComment.getCoteChallenge().getId())
             .image(coteComment.getImage())
             .content(coteComment.getContent())

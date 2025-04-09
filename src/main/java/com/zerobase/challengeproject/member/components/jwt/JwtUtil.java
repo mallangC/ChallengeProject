@@ -12,7 +12,6 @@ import org.springframework.stereotype.Component;
 
 import javax.crypto.SecretKey;
 import java.nio.charset.StandardCharsets;
-import java.time.Duration;
 import java.util.Date;
 
 /**
@@ -33,28 +32,30 @@ public class JwtUtil {
     }
     /**
      * 액세스 토큰 생성
-     * @param loginId 사용자 이름
+     * @param memberId 사용자 이름
      * @param role 사용자 역할
      * @return 생성된 JWT 액세스 토큰
      */
-    public String generateAccessToken(String loginId, MemberType role) {
+    public String generateAccessToken(String memberId, MemberType role) {
+
         return Jwts.builder()
-                .setSubject(loginId)
+                .setSubject(memberId)
                 .claim("role", role.getAuthority())
                 .setIssuedAt(new Date())
                 .setExpiration(new Date(System.currentTimeMillis() + ACCESS_TOKEN_EXPIRATION))
                 .signWith(secretKey, SignatureAlgorithm.HS256)
                 .compact();
+
     }
     /**
      * 리프레시 토큰 생성
-     * @param loginId 사용자 이름
+     * @param memberId 사용자 이름
      * @param role 사용자 역할
      * @return 생성된 JWT 리프레시 토큰
      */
-    public String generateRefreshToken(String loginId, MemberType role) {
+    public String generateRefreshToken(String memberId, MemberType role) {
         return Jwts.builder()
-                .setSubject(loginId)
+                .setSubject(memberId)
                 .claim("role", role.getAuthority())
                 .setIssuedAt(new Date())
                 .setExpiration(new Date(System.currentTimeMillis() + REFRESH_TOKEN_EXPIRATION))
@@ -66,7 +67,7 @@ public class JwtUtil {
      * @param token JWT 토큰
      * @return 사용자 이름
      */
-    public String extractLoginId(String token) {
+    public String extractMemberId(String token) {
         return Jwts.parserBuilder()
                 .setSigningKey(secretKey)
                 .build()
@@ -124,7 +125,7 @@ public class JwtUtil {
                 .httpOnly(true)
                 .secure(isSecure)
                 .path("/")
-                .maxAge(Duration.ofDays(expiresIn))
+                .maxAge((long) expiresIn * 24 * 60 * 60)
                 .build();
     }
 

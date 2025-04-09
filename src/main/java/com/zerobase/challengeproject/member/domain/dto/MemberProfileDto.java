@@ -7,14 +7,14 @@ import lombok.NoArgsConstructor;
 @Getter
 @NoArgsConstructor
 public class MemberProfileDto {
-    private String loginId;
+    private String memberId;
     private String memberName;
     private String nickName;
     private String phoneNum;
     private String email;
 
     public MemberProfileDto (Member member) {
-        this.loginId = member.getLoginId();
+        this.memberId = member.getMemberId();
         this.memberName = member.getMemberName();
         this.nickName = member.getNickname();
         this.phoneNum = member.getPhoneNum();

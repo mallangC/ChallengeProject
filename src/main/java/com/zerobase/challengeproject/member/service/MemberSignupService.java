@@ -47,13 +47,13 @@ public class MemberSignupService {
             throw new CustomException(ErrorCode.CONFIRM_PASSWORD_MISMATCH);
         }
         String password = passwordEncoder.encode(memberSignupForm.getPassword());
-        String loginId = memberSignupForm.getLoginId();
+        String memberId = memberSignupForm.getMemberId();
         String emailAuthKey = UUID.randomUUID().toString();
         String email = memberSignupForm.getEmail();
         if(memberRepository.existsByEmail(email)){
             throw new CustomException(ErrorCode.ALREADY_REGISTER_EMAIL);
         }
-        if(memberRepository.existsByLoginId(loginId)){
+        if(memberRepository.existsByMemberId(memberId)){
             throw new CustomException(ErrorCode.ALREADY_REGISTER_LOGIN_ID);
         }
         Member member = Member.from(memberSignupForm, password, emailAuthKey);
@@ -106,9 +106,9 @@ public class MemberSignupService {
      * @return 정보가 없는 쿠키
      */
     public ResponseCookie unregister(UserDetailsImpl userDetails) {
-        Member member = memberRepository.findByLoginId(userDetails.getUsername())
+        Member member = memberRepository.findByMemberId(userDetails.getUsername())
                 .orElseThrow(() -> new CustomException(ErrorCode.NOT_FOUND_MEMBER));
-        refreshTokenRepository.deleteByMemberId(member.getLoginId());
+        refreshTokenRepository.deleteByMemberId(member.getMemberId());
         ResponseCookie responseCookie =  jwtUtil.createRefreshTokenCookie("", 0);
         memberRepository.delete(member);
         return responseCookie;

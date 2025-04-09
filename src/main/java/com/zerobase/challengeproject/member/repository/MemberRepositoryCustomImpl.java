@@ -34,7 +34,7 @@ public class MemberRepositoryCustomImpl implements MemberRepositoryCustom {
   public Member searchByLoginIdAndAccountDetailsToDate(String loginId, LocalDateTime searchByDate) {
     Member findMember = queryFactory.selectFrom(member)
             .leftJoin(member.accountDetails, accountDetail).fetchJoin()
-            .where(member.loginId.eq(loginId)
+            .where(member.memberId.eq(loginId)
                     .and(accountDetail.accountType.eq(AccountType.CHARGE))
                     .and(accountDetail.isRefunded.eq(false))
                     .and(accountDetail.createdAt.between(searchByDate, LocalDateTime.now())))
@@ -72,7 +72,7 @@ public class MemberRepositoryCustomImpl implements MemberRepositoryCustom {
   public Member searchByLoginIdAndAccountDetailId(String longinId, Long accountId) {
     Member findMember = queryFactory.selectFrom(member)
             .join(member.accountDetails, accountDetail).fetchJoin()
-            .where(member.loginId.eq(longinId)
+            .where(member.memberId.eq(longinId)
                     .and(accountDetail.id.eq(accountId)))
             .fetchOne();
     if (findMember == null) {
@@ -96,7 +96,7 @@ public class MemberRepositoryCustomImpl implements MemberRepositoryCustom {
     Member findMember = queryFactory.selectFrom(member)
             .leftJoin(member.memberChallenges, memberChallenge).fetchJoin()
             .leftJoin(memberChallenge.challenge, challenge).fetchJoin()
-            .where(member.loginId.eq(loginId))
+            .where(member.memberId.eq(loginId))
             .fetchOne();
 
     if (findMember == null) {

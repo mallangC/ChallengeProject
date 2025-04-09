@@ -42,8 +42,8 @@ public class JwtAuthorizationFilter extends OncePerRequestFilter {
         String token = resolveToken(request);
 
         if (token != null && jwtUtil.isTokenValid(token)) {
-            String loginId = jwtUtil.extractLoginId(token);
-            UserDetailsImpl userDetails = userDetailsService.loadUserByUsername(loginId);
+            String memberId = jwtUtil.extractMemberId(token);
+            UserDetailsImpl userDetails = userDetailsService.loadUserByUsername(memberId);
             Authentication authentication =
                     new UsernamePasswordAuthenticationToken(userDetails, null, userDetails.getAuthorities());
 
@@ -61,8 +61,8 @@ public class JwtAuthorizationFilter extends OncePerRequestFilter {
             }
             token.substring(7);
             if(jwtUtil.isTokenValid(token)){
-                String loginId = jwtUtil.extractLoginId(token);
-                UserDetailsImpl userDetails = userDetailsService.loadUserByUsername(loginId);
+                String memberId = jwtUtil.extractMemberId(token);
+                UserDetailsImpl userDetails = userDetailsService.loadUserByUsername(memberId);
                 Authentication authentication =
                         new UsernamePasswordAuthenticationToken(userDetails, null, userDetails.getAuthorities());
 
