@@ -56,8 +56,6 @@ dependencies {
 
     //OAuth
     implementation 'org.springframework.boot:spring-boot-starter-oauth2-client'
-    //통합 테스트용 DB
-    testImplementation 'com.h2database:h2'
 
 
 }
