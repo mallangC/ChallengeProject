@@ -1,7 +1,6 @@
 package com.zerobase.challengeproject.comment.controller;
 
 import com.zerobase.challengeproject.BaseResponseDto;
-import com.zerobase.challengeproject.account.domain.dto.PageDto;
 import com.zerobase.challengeproject.comment.domain.dto.DietChallengeDto;
 import com.zerobase.challengeproject.comment.domain.dto.DietCommentDto;
 import com.zerobase.challengeproject.comment.domain.form.DietChallengeAddForm;
@@ -11,7 +10,6 @@ import com.zerobase.challengeproject.comment.domain.form.DietCommentUpdateForm;
 import com.zerobase.challengeproject.comment.service.DietChallengeService;
 import com.zerobase.challengeproject.member.components.jwt.UserDetailsImpl;
 import jakarta.validation.Valid;
-import jakarta.validation.constraints.Min;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
@@ -52,19 +50,6 @@ public class DietChallengeController {
     return ResponseEntity.ok(dietChallengeService.getDietChallenge(challengeId, userDetails));
   }
 
-  /**
-   * 다이어트 챌린지 전체를 조회 컨트롤러 메서드
-   *
-   * @param page        페이지 번호
-   * @param challengeId 챌린지 아이디
-   * @return 페이징이된 다이어트 챌린지 리스트
-   */
-  @GetMapping
-  public ResponseEntity<BaseResponseDto<PageDto<DietChallengeDto>>> getAllDietChallenge(
-          @RequestParam @Min(1) int page,
-          @RequestParam("id") Long challengeId) {
-    return ResponseEntity.ok(dietChallengeService.getAllDietChallenge(page, challengeId));
-  }
 
   /**
    * 다이어트 챌린지 수정 컨트롤러 메서드

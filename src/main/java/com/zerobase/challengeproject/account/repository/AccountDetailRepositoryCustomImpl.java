@@ -13,6 +13,7 @@ import java.util.List;
 
 import static com.zerobase.challengeproject.account.entity.QAccountDetail.accountDetail;
 
+
 @RequiredArgsConstructor
 public class AccountDetailRepositoryCustomImpl implements AccountDetailRepositoryCustom {
 

@@ -1,5 +1,6 @@
 package com.zerobase.challengeproject.comment.repository;
 
+import com.querydsl.core.types.dsl.BooleanExpression;
 import com.querydsl.jpa.impl.JPAQueryFactory;
 import com.zerobase.challengeproject.comment.domain.dto.DietChallengeDto;
 import com.zerobase.challengeproject.comment.entity.DietChallenge;
@@ -55,15 +56,27 @@ public class DietChallengeRepositoryCustomImpl implements DietChallengeRepositor
    *
    * @param page        페이지 숫자
    * @param challengeId 챌린지 아이디
+   * @param isPass      챌린지 성공 여부
    * @return 페이징된 다이어트 챌린지 정보 (댓글 제외)
    */
   @Override
-  public Page<DietChallengeDto> searchAllDietChallengeByChallengeId(int page, Long challengeId) {
+  public Page<DietChallengeDto> searchAllDietChallengeByChallengeId(
+          int page, Long challengeId, Boolean isPass) {
     Pageable pageable = PageRequest.of(page, 20);
+
+    BooleanExpression expression = null;
+    if (isPass != null) {
+      if (isPass) {
+        expression = dietChallenge.currentWeight.loe(dietChallenge.goalWeight);
+      } else {
+        expression = dietChallenge.currentWeight.gt(dietChallenge.goalWeight);
+      }
+    }
 
     Long total = queryFactory.select(dietChallenge.count())
             .from(dietChallenge)
-            .where(dietChallenge.challenge.id.eq(challengeId))
+            .where(dietChallenge.challenge.id.eq(challengeId)
+                    .and(expression))
             .fetchOne();
 
     if (total == null) {
@@ -73,7 +86,8 @@ public class DietChallengeRepositoryCustomImpl implements DietChallengeRepositor
     List<DietChallenge> findDietChallenges = queryFactory.selectFrom(dietChallenge)
             .join(dietChallenge.challenge, challenge).fetchJoin()
             .join(dietChallenge.member, member).fetchJoin()
-            .where(dietChallenge.challenge.id.eq(challengeId))
+            .where(dietChallenge.challenge.id.eq(challengeId)
+                    .and(expression))
             .limit(pageable.getPageSize())
             .offset(pageable.getOffset())
             .fetch();

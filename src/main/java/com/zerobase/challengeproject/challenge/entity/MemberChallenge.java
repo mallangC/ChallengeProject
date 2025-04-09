@@ -1,14 +1,11 @@
 package com.zerobase.challengeproject.challenge.entity;
 
 
-import com.zerobase.challengeproject.account.entity.AccountDetail;
 import com.zerobase.challengeproject.member.entity.Member;
 import jakarta.persistence.*;
 import lombok.*;
 
 import java.time.LocalDateTime;
-import java.util.ArrayList;
-import java.util.List;
 
 @Entity
 @Getter
@@ -18,23 +15,24 @@ import java.util.List;
 @Builder
 public class MemberChallenge {
 
-    @Id
-    @GeneratedValue(strategy = GenerationType.IDENTITY)
-    private Long id;
+  @Id
+  @GeneratedValue(strategy = GenerationType.IDENTITY)
+  private Long id;
 
-    @ManyToOne
-    @JoinColumn(name = "challenge_id", nullable = false)
-    private Challenge challenge;
+  @ManyToOne
+  @JoinColumn(name = "challenge_id", nullable = false)
+  private Challenge challenge;
 
-    @ManyToOne
-    @JoinColumn(name = "member_id", nullable = false)
-    private Member member;
+  @ManyToOne
+  @JoinColumn(name = "member_id", nullable = false)
+  private Member member;
 
-    private LocalDateTime entered_at;
+  private LocalDateTime entered_at;
 
-    private Long memberDeposit;
+  private Long memberDeposit;
 
-    private boolean isDepositBack = false;
+  @Builder.Default
+  private boolean isDepositBack = false;
 
 
 }

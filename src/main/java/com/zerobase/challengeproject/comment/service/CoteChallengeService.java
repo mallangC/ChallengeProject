@@ -20,6 +20,7 @@ import com.zerobase.challengeproject.member.components.jwt.UserDetailsImpl;
 import com.zerobase.challengeproject.member.entity.Member;
 import com.zerobase.challengeproject.member.repository.MemberRepository;
 import com.zerobase.challengeproject.type.CategoryType;
+import com.zerobase.challengeproject.type.MemberType;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
 import org.springframework.http.HttpStatus;
@@ -61,7 +62,10 @@ public class CoteChallengeService {
     if (!Objects.equals(challenge.getMember().getLoginId(), userDetails.getUsername())) {
       throw new CustomException(ErrorCode.NOT_OWNER_OF_CHALLENGE);
     }
-
+    if (form.getStartAt().isBefore(challenge.getStartDate()) ||
+            form.getStartAt().isAfter(challenge.getEndDate())) {
+      throw new CustomException(ErrorCode.NOT_ADDED_COTE_CHALLENGE);
+    }
     boolean isExist = challenge.getCoteChallenges().stream()
             .anyMatch(c -> c.getStartAt().isEqual(form.getStartAt()));
     if (isExist) {
@@ -259,6 +263,30 @@ public class CoteChallengeService {
             HttpStatus.OK);
   }
 
+
+  /**
+   * 관리자가 코테 챌린지 인증 댓글을 삭제하기 위한 서비스 메서드
+   * 인증 댓글 아이디가 맞지 않으면 예외 발생
+   * (DB호출 2회) 호출 1, 삭제 1
+   *
+   * @param commentId   댓글 아이디
+   * @param userDetails 회원 정보
+   * @return 삭제된 인증 댓글 정보
+   */
+  @Transactional
+  public BaseResponseDto<CoteCommentDto> adminDeleteComment(Long commentId,
+                                                            UserDetailsImpl userDetails) {
+    CoteComment coteComment = searchCoteCommentById(commentId);
+    if (userDetails.getMember().getMemberType() != MemberType.ADMIN) {
+      throw new CustomException(ErrorCode.NOT_MEMBER_TYPE_ADMIN);
+    }
+    coteCommentRepository.delete(coteComment);
+    return new BaseResponseDto<>(
+            CoteCommentDto.from(coteComment),
+            "관리자 권한으로 인증 댓글 삭제를 성공했습니다.",
+            HttpStatus.OK);
+  }
+
   private CoteComment searchCoteCommentById(Long commentId) {
     return coteCommentRepository.findById(commentId)
             .orElseThrow(() -> new CustomException(ErrorCode.NOT_FOUND_COTE_COMMENT));
@@ -283,6 +311,7 @@ public class CoteChallengeService {
 
   private LocalDateTime parseToday() {
     LocalDateTime now = LocalDateTime.now();
-    return LocalDateTime.parse(String.format("%04d-%02d-%02dT00:00:00", now.getYear(), now.getMonthValue(), now.getDayOfMonth()));
+    return LocalDateTime.of(
+            now.getYear(), now.getMonthValue(), now.getDayOfMonth(), 0, 0, 0);
   }
 }

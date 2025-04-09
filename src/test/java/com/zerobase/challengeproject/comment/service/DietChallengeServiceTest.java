@@ -25,7 +25,9 @@ import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
-import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageImpl;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
 import org.springframework.http.HttpStatus;
 
 import java.time.LocalDateTime;
@@ -53,7 +55,6 @@ class DietChallengeServiceTest {
 
   @InjectMocks
   private DietChallengeService dietChallengeService;
-
 
   Member memberBase = Member.builder()
           .id(1L)
@@ -233,22 +234,22 @@ class DietChallengeServiceTest {
     assertEquals("test", result.getData().getLoginId());
   }
 
-  @Test
-  @DisplayName("다이어트 챌린지 전체 조회 성공")
-  void getAllDietChallenge() {
-    //given
-    given(dietChallengeRepository.searchAllDietChallengeByChallengeId(anyInt(), anyLong()))
-            .willReturn(Page.empty());
-
-    //when
-    int page = 1;
-    BaseResponseDto<PageDto<DietChallengeDto>> result =
-            dietChallengeService.getAllDietChallenge(page, 1L);
-    //then
-    assertEquals(HttpStatus.OK, result.getStatus());
-    assertEquals("다이어트 챌린지 전체 조회를 성공했습니다.(" + page + "페이지)", result.getMessage());
-    assertEquals(0, result.getData().getSize());
-  }
+//  @Test
+//  @DisplayName("다이어트 챌린지 전체 조회 성공(관리자)")
+//  void getAllDietChallenge() {
+//    //given
+//    given(dietChallengeRepository.searchAllDietChallengeByChallengeId(anyInt(), anyLong(), anyBoolean()))
+//            .willReturn(Page.empty());
+//
+//    //when
+//    int page = 1;
+//    BaseResponseDto<PageDto<DietChallengeDto>> result =
+//            dietChallengeService.getAllDietChallenge(page, 1L, null, userDetailsBase);
+//    //then
+//    assertEquals(HttpStatus.OK, result.getStatus());
+//    assertEquals("다이어트 챌린지 전체 조회를 성공했습니다.(" + page + "페이지)", result.getMessage());
+//    assertEquals(0, result.getData().getSize());
+//  }
 
   @Test
   @DisplayName("다이어트 챌린지 수정 성공")
@@ -454,4 +455,75 @@ class DietChallengeServiceTest {
     //then
     assertEquals(NOT_OWNER_OF_COMMENT, exception.getErrorCode());
   }
+
+
+  @Test
+  @DisplayName("다이어트 댓글 삭제 성공(관리자)")
+  void adminDeleteDietComment() {
+    //given
+    given(dietCommentRepository.searchDietCommentById(anyLong()))
+            .willReturn(dietCommentBase);
+
+    UserDetailsImpl userDetails = new UserDetailsImpl(Member.builder()
+            .id(1L)
+            .memberType(MemberType.ADMIN)
+            .build());
+
+    //when
+    BaseResponseDto<DietCommentDto> result =
+            dietChallengeService.adminDeleteDietComment(1L, userDetails);
+    //then
+    assertEquals(HttpStatus.OK, result.getStatus());
+    assertEquals("관리자 권한으로 다이어트 댓글 삭제를 성공했습니다.", result.getMessage());
+    assertEquals("베이스 이미지주소", result.getData().getImage());
+    assertEquals("베이스 내용", result.getData().getContent());
+    assertEquals("test", result.getData().getLoginId());
+    verify(dietCommentRepository, times(1)).delete(any());
+  }
+
+  @Test
+  @DisplayName("다이어트 댓글 삭제 실패(관리자)(관리자가 아님)")
+  void adminDeleteDietCommentFailure() {
+    //given
+    given(dietCommentRepository.searchDietCommentById(anyLong()))
+            .willReturn(dietCommentBase);
+    //when
+    CustomException exception = assertThrows(CustomException.class, () ->
+            dietChallengeService.adminDeleteDietComment(1L, userDetailsBase));
+    //then
+    assertEquals(NOT_MEMBER_TYPE_ADMIN, exception.getErrorCode());
+  }
+
+  @Test
+  @DisplayName("다이어트 챌린지 전체 조회 성공(관리자)")
+  void getAllDietChallenge() {
+    //given
+    Pageable pageable = PageRequest.of(0, 20);
+    given(dietChallengeRepository.searchAllDietChallengeByChallengeId(anyInt(), anyLong(), anyBoolean()))
+            .willReturn(new PageImpl<>(List.of(DietChallengeDto.fromWithoutComments(dietChallengeBase)), pageable, 1));
+    UserDetailsImpl userDetails = new UserDetailsImpl(Member.builder()
+            .id(1L)
+            .memberType(MemberType.ADMIN)
+            .build());
+    int page = 1;
+    //when
+    BaseResponseDto<PageDto<DietChallengeDto>> result =
+            dietChallengeService.getAllDietChallenge(page, 1L, true, userDetails);
+    //then
+    assertEquals(HttpStatus.OK, result.getStatus());
+    assertEquals("다이어트 챌린지 전체 조회를 성공했습니다.(" + page + "페이지)", result.getMessage());
+  }
+
+  @Test
+  @DisplayName("다이어트 챌린지 전체 조회 실패(관리자가 아님)")
+  void getAllDietChallengeFailure() {
+    //given
+    int page = 1;
+    //when
+    CustomException exception = assertThrows(CustomException.class, () ->
+            dietChallengeService.getAllDietChallenge(page, 1L, true, userDetailsBase));
+    //then
+    assertEquals(NOT_MEMBER_TYPE_ADMIN, exception.getErrorCode());
+  }
+
 }

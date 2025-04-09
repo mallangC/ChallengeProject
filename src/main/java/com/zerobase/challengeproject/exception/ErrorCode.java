@@ -16,6 +16,7 @@ public enum ErrorCode {
   EMAIL_SEND_FAILED(HttpStatus.INTERNAL_SERVER_ERROR, "이메일 전송에 실패했습니다."),
   CONFIRM_PASSWORD_MISMATCH(HttpStatus.BAD_REQUEST, "확인 비밀번호가 일치하지 않습니다."),
   MATCHES_PREVIOUS_PASSWORD(HttpStatus.BAD_REQUEST, "이전 비밀번호와 동일합니다."),
+  NOT_MEMBER_TYPE_ADMIN(HttpStatus.BAD_REQUEST, "회원 유형이 관리자가 아닙니다."),
   //토큰
   INCORRECT_PASSWORD(HttpStatus.BAD_REQUEST, "비밀번호가 틀렸습니다."),
   TOKEN_IS_EXPIRATION(HttpStatus.UNAUTHORIZED, "토큰이 만료되었습니다."),
@@ -44,18 +45,20 @@ public enum ErrorCode {
   INSUFFICIENT_DEPOSIT(HttpStatus.BAD_REQUEST, "보증금이 부족합니다."),
   CHALLENGE_ALREADY_ENDED(HttpStatus.BAD_REQUEST, "이미 종료된 챌린지입니다."),
   NOT_DEPOSIT_DETAIL(HttpStatus.BAD_REQUEST, "보증금 내역이 아닙니다."),
-  NOT_ENOUGH_MONEY(HttpStatus.BAD_REQUEST, "계좌에 돈이 부족합니다." ),
+  NOT_ENOUGH_MONEY(HttpStatus.BAD_REQUEST, "계좌에 돈이 부족합니다."),
   CHALLENGE_FULL(HttpStatus.BAD_REQUEST, "챌린지의 인원이 가득 찼습니다."),
-  NOT_FOUND_PARTICIPATION(HttpStatus.BAD_REQUEST, "참여한 유저가 아닙니다." ),
+  NOT_FOUND_PARTICIPATION(HttpStatus.BAD_REQUEST, "참여한 유저가 아닙니다."),
   ALREADY_STARTED_CHALLENGE(HttpStatus.BAD_REQUEST, "이미 시작한 챌린지입니다. 취소가 불가능합니다."),
   CANNOT_DELETE_HAS_PARTICIPANTS(HttpStatus.BAD_REQUEST, "참여중인 유저가 있으므로 삭제가 불가능합니다." ),
   CHALLENGE_FAIL(HttpStatus.BAD_REQUEST, "챌린지 달성에 실패했습니다." ),
   CHALLENGE_NOT_ENDED(HttpStatus.BAD_REQUEST, "챌린지가 아직 종료되지 않았습니다." ),
   NO_DIET_COMMENT(HttpStatus.BAD_REQUEST, "몸무게 인증내역이 없습니다." ),
 
+
   //하위 챌린지
   //코테
   NOT_FOUND_COTE_CHALLENGE(HttpStatus.BAD_REQUEST, "코테 챌린지를 찾을 수 없습니다."),
+  NOT_ADDED_COTE_CHALLENGE(HttpStatus.BAD_REQUEST, "코테 챌린지를 추가할 수 없습니다."),
   NOT_COTE_CHALLENGE(HttpStatus.BAD_REQUEST, "코테 챌린지가 아닙니다."),
   NOT_FOUND_COTE_COMMENT(HttpStatus.BAD_REQUEST, "코테 댓글을 찾을 수 없습니다."),
   ALREADY_ADDED_THAT_DATE(HttpStatus.BAD_REQUEST, "입력한 날짜에 이미 문제가 추가되어 있습니다."),
@@ -69,13 +72,15 @@ public enum ErrorCode {
   ALREADY_ADDED_DIET_CHALLENGE(HttpStatus.BAD_REQUEST, "이미 다이어트 챌린지가 추가되어 있습니다."),
   NOT_FOUND_DIET_CHALLENGE(HttpStatus.BAD_REQUEST, "다이어트 챌린지를 찾을 수 없습니다."),
   DIFFERENCE_MORE_THEN_5KG(HttpStatus.BAD_REQUEST, "현재 몸무게와 목표 몸무게의 차이가 5kg이상 되어야 합니다."),
-  CANNOT_UPDATE_AFTER_START_CHALLENGE(HttpStatus.BAD_REQUEST, "챌린지가 시작하면 다이어트 챌린지를 수정할 수 없습니다."),
+  CANNOT_UPDATE_AFTER_START_CHALLENGE(HttpStatus.BAD_REQUEST, "챌린지가 시작하면 챌린지를 수정할 수 없습니다."),
   NOT_FOUND_DIET_COMMENT(HttpStatus.BAD_REQUEST, "다이어트 댓글을 찾을 수 없습니다."),
+  //물마시기
+  NOT_WATER_CHALLENGE(HttpStatus.BAD_REQUEST, "물마시기 챌린지가 아닙니다."),
+  NOT_FOUND_WATER_CHALLENGE(HttpStatus.BAD_REQUEST, "물마시기 챌린지를 찾을 수 없습니다."),
+  ALREADY_ADDED_WATER_CHALLENGE(HttpStatus.BAD_REQUEST, "이미 물마시기 챌린지를 추가했습니다."),
+  NOT_FOUND_WATER_COMMENT(HttpStatus.BAD_REQUEST, "물마시기 댓글을 찾을 수 없습니다."),
 
-
-
-
-
+  
   ;
   private final HttpStatus httpStatus;
   private final String message;
