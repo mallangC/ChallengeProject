@@ -86,7 +86,7 @@ public class SecurityConfig {
                         .requestMatchers("/api/member/sign-up",
                                 "/api/member/email-auth",
                                 "/api/member/login").permitAll()
-                        .requestMatchers("/aip/admin/**").hasRole("ADMIN")
+                        .requestMatchers("/api/admin/**").hasRole("ADMIN")
                         .anyRequest().authenticated()
                 );
         http.sessionManagement(session

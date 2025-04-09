@@ -64,6 +64,7 @@ public class DietChallengeService {
     DietComment dietComment = DietComment.builder()
             .dietChallenge(dietChallenge)
             .member(member)
+            .currentWeight(form.getCurrentWeight())
             .image(form.getImage())
             .content("참여 인증")
             .build();

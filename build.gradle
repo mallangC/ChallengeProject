@@ -66,6 +66,9 @@ sourceSets {
 tasks.named('compileJava') {
     options.annotationProcessorGeneratedSourcesDirectory = file("$buildDir/generated")
 }
+tasks.withType(JavaCompile) {
+    options.annotationProcessorGeneratedSourcesDirectory = file("$buildDir/generated/sources/annotationProcessor/java/main")
+}
 
 clean {
     delete file("$buildDir/generated")
