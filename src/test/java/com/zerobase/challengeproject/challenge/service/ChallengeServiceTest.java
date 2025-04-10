@@ -11,8 +11,12 @@ import com.zerobase.challengeproject.challenge.entity.MemberChallenge;
 import com.zerobase.challengeproject.challenge.repository.MemberChallengeRepository;
 import com.zerobase.challengeproject.comment.entity.CoteChallenge;
 import com.zerobase.challengeproject.comment.entity.CoteComment;
+import com.zerobase.challengeproject.comment.entity.DietChallenge;
+import com.zerobase.challengeproject.comment.entity.WaterChallenge;
 import com.zerobase.challengeproject.comment.repository.CoteChallengeRepository;
 import com.zerobase.challengeproject.comment.repository.CoteCommentRepository;
+import com.zerobase.challengeproject.comment.repository.DietChallengeRepository;
+import com.zerobase.challengeproject.comment.repository.WaterChallengeRepository;
 import com.zerobase.challengeproject.type.CategoryType;
 import com.zerobase.challengeproject.challenge.entity.Challenge;
 import com.zerobase.challengeproject.challenge.repository.ChallengeRepository;
@@ -68,6 +72,12 @@ public class ChallengeServiceTest {
 
     @Mock
     private MemberChallengeRepository memberChallengeRepository;
+
+    @Mock
+    private DietChallengeRepository dietChallengeRepository;
+
+    @Mock
+    private WaterChallengeRepository waterChallengeRepository;
 
 
     @Mock
@@ -375,8 +385,8 @@ public class ChallengeServiceTest {
     }
 
     @Test
-    @DisplayName("챌린지 환급 성공")
-    void challengeDepositBack() {
+    @DisplayName("코테 챌린지 환급 성공")
+    void coteChallengeDepositBack() {
         // Given
 
         when(userDetails.getMember()).thenReturn(member);
@@ -458,6 +468,60 @@ public class ChallengeServiceTest {
         assertThatThrownBy(() -> challengeService.challengeDepositBack(challengeId, userDetails))
                 .isInstanceOf(CustomException.class)
                 .hasMessage(ErrorCode.ALREADY_REFUNDED.getMessage());
+    }
+    @Test
+    @DisplayName("다이어트 챌린지 환급 성공")
+    void dietChallengeDepositBack() {
+        // Given
+        when(userDetails.getMember()).thenReturn(member);
+
+        Challenge challenge = new Challenge();
+        challenge.setCategoryType(CategoryType.DIET);
+        challenge.setEndDate(LocalDateTime.now().minusDays(1));
+
+        DietChallenge dietChallenge = DietChallenge.builder()
+                .goalWeight(65.2F)
+                .currentWeight(64.5F)
+                .build();
+
+        when(challengeRepository.findById(challengeId)).thenReturn(Optional.of(challenge));
+        when(dietChallengeRepository.findByChallengeId(challengeId)).thenReturn(dietChallenge);
+
+        MemberChallenge memberChallenge = mock(MemberChallenge.class);
+        when(memberChallengeRepository.findByChallengeAndMember(challenge, member)).thenReturn(Optional.of(memberChallenge));
+        when(memberChallenge.isDepositBack()).thenReturn(false);
+        when(memberChallenge.getMemberDeposit()).thenReturn(1000L);
+
+        // When
+        ResponseEntity<BaseResponseDto<DepositBackDto>> response = challengeService.challengeDepositBack(challengeId, userDetails);
+
+        // Then
+        assertThat(response.getStatusCode()).isEqualTo(HttpStatus.OK);
+        assertThat(response.getBody().getData().getDepositBack()).isEqualTo(2000L);
+    }
+
+    @Test
+    @DisplayName("물마시기 챌린지 달성실패시 환급실패")
+    void waterChallengeDepositBackFailure() {
+        // Given
+        when(userDetails.getMember()).thenReturn(member);
+
+        Challenge challenge = new Challenge();
+        challenge.setCategoryType(CategoryType.WATER);
+        challenge.setEndDate(LocalDateTime.now().minusDays(1));
+
+        WaterChallenge waterChallenge = WaterChallenge.builder()
+                .goalMl(1500)
+                .currentMl(800)
+                .build();
+        when(challengeRepository.findById(challengeId)).thenReturn(Optional.of(challenge));
+        when(waterChallengeRepository.findByChallengeId(challengeId)).thenReturn(waterChallenge);
+
+        // When
+        ResponseEntity<BaseResponseDto<DepositBackDto>> response = challengeService.challengeDepositBack(challengeId, userDetails);
+
+        // Then
+        assertThat(response.getBody().getData().getDepositBack()).isNull();
     }
 
 }

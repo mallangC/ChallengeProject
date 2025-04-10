@@ -14,10 +14,8 @@ import com.zerobase.challengeproject.challenge.repository.MemberChallengeReposit
 import com.zerobase.challengeproject.comment.entity.CoteChallenge;
 import com.zerobase.challengeproject.comment.entity.CoteComment;
 import com.zerobase.challengeproject.comment.entity.DietChallenge;
-import com.zerobase.challengeproject.comment.repository.CoteChallengeRepository;
-import com.zerobase.challengeproject.comment.repository.CoteCommentRepository;
-import com.zerobase.challengeproject.comment.repository.DietChallengeRepository;
-import com.zerobase.challengeproject.comment.repository.DietCommentRepository;
+import com.zerobase.challengeproject.comment.entity.WaterChallenge;
+import com.zerobase.challengeproject.comment.repository.*;
 import com.zerobase.challengeproject.exception.CustomException;
 import com.zerobase.challengeproject.exception.ErrorCode;
 import com.zerobase.challengeproject.member.components.jwt.UserDetailsImpl;
@@ -54,6 +52,7 @@ public class ChallengeService {
   private final CoteCommentRepository coteCommentRepository;
   private final DietChallengeRepository dietChallengeRepository;
   private final DietCommentRepository dietCommentRepository;
+  private final WaterChallengeRepository waterChallengeRepository;
 
     /**
      * 전체 챌린지조회
@@ -307,9 +306,9 @@ public class ChallengeService {
             depositBackDto.setDepositBackDto(challengeId, depositBackAmount, member.getAccount());
 
         }else{
-            /*
-            WaterChallenge waterChallenge = waterRepository.findByChallengeId(challengeId);
-            if(waterChallenge.getCurrentMl().equals(waterChallenge.getGoalMl())){
+
+            WaterChallenge waterChallenge = waterChallengeRepository.findByChallengeId(challengeId);
+            if(waterChallenge.getCurrentMl() >= waterChallenge.getGoalMl()){
                 MemberChallenge memberChallenge = memberChallengeRepository.findByChallengeAndMember(challenge, member)
                         .orElseThrow(() -> new CustomException(ErrorCode.NOT_FOUND_CHALLENGE));
                 if (memberChallenge.isDepositBack()) {
@@ -318,7 +317,6 @@ public class ChallengeService {
                 Long depositBackAmount = depositBackProcess(memberChallenge, member);
                 depositBackDto.setDepositBackDto(challengeId, depositBackAmount, member.getAccount());
             }
-             */
         }
 
         return ResponseEntity.ok(new BaseResponseDto<DepositBackDto>(depositBackDto, "챌린지 환급 성공", HttpStatus.OK));

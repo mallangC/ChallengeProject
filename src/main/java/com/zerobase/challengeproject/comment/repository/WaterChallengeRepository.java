@@ -6,4 +6,5 @@ import org.springframework.stereotype.Repository;
 
 @Repository
 public interface WaterChallengeRepository extends JpaRepository<WaterChallenge, Long> , WaterChallengeRepositoryCustom{
+    WaterChallenge findByChallengeId(Long challengeId);
 }
