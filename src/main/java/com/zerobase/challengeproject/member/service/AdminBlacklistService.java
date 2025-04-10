@@ -15,6 +15,11 @@ public class AdminBlacklistService {
 
     private final MemberRepository memberRepository;
 
+    /**
+     * 관리자가 회원을 블랙리스트로 등록하는 서비스 메서드
+     * @param form 블랙리스트로 등록하려는 회원 로그인 아이디
+     * @return 블랙리스트 맴버 아이디
+     */
     @Transactional
     public String registerBlacklist(BlackListRegisterForm form) {
         Member member = memberRepository.findByLoginId(form.getBlacklistUserLoginId())
@@ -22,6 +27,6 @@ public class AdminBlacklistService {
                         ()-> new CustomException(ErrorCode.NOT_FOUND_MEMBER)
                 );
         member.registerBlacklist();
-        return member.getLoginId() + "님 블랙리스트 등록 완료";
+        return member.getLoginId();
     }
 }

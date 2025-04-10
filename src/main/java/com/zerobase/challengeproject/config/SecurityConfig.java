@@ -7,7 +7,6 @@ import com.zerobase.challengeproject.member.components.jwt.UserDetailsServiceImp
 import com.zerobase.challengeproject.member.components.oauthHandler.OAuth2FailureHandler;
 import com.zerobase.challengeproject.member.components.oauthHandler.OAuth2SuccessHandler;
 import com.zerobase.challengeproject.member.service.CustomOAuth2UserService;
-import com.zerobase.challengeproject.member.service.MemberService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
