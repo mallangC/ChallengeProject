@@ -7,6 +7,7 @@ import com.zerobase.challengeproject.member.components.jwt.UserDetailsServiceImp
 import com.zerobase.challengeproject.member.components.oauthHandler.OAuth2FailureHandler;
 import com.zerobase.challengeproject.member.components.oauthHandler.OAuth2SuccessHandler;
 import com.zerobase.challengeproject.member.service.CustomOAuth2UserService;
+import com.zerobase.challengeproject.member.service.MemberService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
@@ -60,9 +61,11 @@ public class SecurityConfig {
      */
     @Bean
     public JwtAuthenticationFilter jwtAuthenticationFilter(AuthenticationManager authenticationManager) {
-        JwtAuthenticationFilter filter = new JwtAuthenticationFilter(jwtUtil, authenticationManager);
-        filter.setFilterProcessesUrl("/api/member/login");
-        return filter;
+        return new JwtAuthenticationFilter(jwtUtil, authenticationManager);
+        // Security로 로그인을 처리시
+//        JwtAuthenticationFilter filter = new JwtAuthenticationFilter(jwtUtil, authenticationManager);
+//        filter.setFilterProcessesUrl("/api/member/login");
+//        return filter;
     }
 
     /**
@@ -101,8 +104,6 @@ public class SecurityConfig {
 
         http.addFilterAfter(jwtAuthorizationFilter(), UsernamePasswordAuthenticationFilter.class);
         http.addFilterAt(jwtAuthenticationFilter(authenticationManager), UsernamePasswordAuthenticationFilter.class);
-
-
 
         return http.build();
     }

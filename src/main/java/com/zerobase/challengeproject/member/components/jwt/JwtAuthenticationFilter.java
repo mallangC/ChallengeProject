@@ -84,8 +84,7 @@ public class JwtAuthenticationFilter extends UsernamePasswordAuthenticationFilte
           */
         response.addHeader(HttpHeaders.SET_COOKIE, refreshTokenCookie.toString());
         response.setHeader(HttpHeaders.AUTHORIZATION, "Bearer " + accessToken);
-        response.setContentType("application/json");
-        response.getWriter().write(new ObjectMapper().writeValueAsString(Map.of("token", accessToken)));
+        writeJsonResponse(response, 200, "로그인 성공", userDetails.getMember().getLoginId(),accessToken);
     }
     /**
      * 인증 실패 시 호출되는 메서드.
@@ -99,8 +98,23 @@ public class JwtAuthenticationFilter extends UsernamePasswordAuthenticationFilte
      */
     @Override
     protected void unsuccessfulAuthentication(HttpServletRequest request, HttpServletResponse response, AuthenticationException failed) throws IOException, ServletException {
-        response.setStatus(HttpServletResponse.SC_UNAUTHORIZED);
+        writeJsonResponse(response, 403, "로그인 실패", null, null);
+    }
+
+    private void writeJsonResponse(HttpServletResponse response, int status, String message, String loginId, String token ) throws IOException {
+        response.setStatus(status);
         response.setContentType("application/json");
-        response.getWriter().write(new ObjectMapper().writeValueAsString(Map.of("error", "인증 실패")));
+        Map<String, Object> data = Map.of(
+                "loginId", loginId,
+                "token", token
+        );
+
+        Map<String, Object> body = Map.of(
+                "status", status,
+                "message", message,
+                "data", data
+        );
+
+        response.getWriter().write(new ObjectMapper().writeValueAsString(body));
     }
 }
