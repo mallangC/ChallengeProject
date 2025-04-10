@@ -62,6 +62,7 @@ class MemberLoginServiceTest {
                 .phoneNum("01011112222")
                 .password("encodedPassword")
                 .memberType(MemberType.USER)
+                .isBlackList(false)
                 .build();
 
         // 기존 리프레시 토큰 (삭제될 토큰)
@@ -94,7 +95,7 @@ class MemberLoginServiceTest {
         assertNotNull(result);
         assertEquals(mockAccessToken, result.getAccessToken());
         assertEquals(mockMember.getLoginId(), result.getLoginId());
-        verify(refreshTokenRepository, times(1)).deleteByMemberId(existingRefreshToken.getLoginId());
+        verify(refreshTokenRepository, times(1)).deleteByLoginId(existingRefreshToken.getLoginId());
         verify(refreshTokenRepository, times(1)).save(any(RefreshToken.class));
     }
 
@@ -130,6 +131,28 @@ class MemberLoginServiceTest {
     }
 
     @Test
+    @DisplayName("로그인 실패 - 블랙리스트 회원")
+    void loginFailure3() {
+        MemberLoginForm loginForm = MemberLoginForm.builder()
+                .loginId("testId")
+                .password("testPassword1!")
+                .build();
+        // given
+        Member blacklistedMember = Member.builder()
+                .loginId("blackuser")
+                .password("encodedPassword")
+                .memberType(MemberType.USER)
+                .isBlackList(true) // 블랙리스트 설정
+                .build();
+        when(memberRepository.findByLoginId(loginForm.getLoginId())).thenReturn(Optional.of(blacklistedMember));
+        when(passwordEncoder.matches(loginForm.getPassword(), mockMember.getPassword())).thenReturn(true);
+
+        // when & then
+        CustomException exception = assertThrows(CustomException.class, () -> memberLoginService.login(loginForm));
+        assertEquals(ErrorCode.MEMBER_IS_BLACKLIST, exception.getErrorCode());
+    }
+
+    @Test
     @DisplayName("로그아웃 성공 - 리프레시 토큰이 들어있는 쿠키 삭제")
     public void logout() {
         //given
@@ -142,7 +165,7 @@ class MemberLoginServiceTest {
         //then
         assertNotNull(result);
         assertEquals(mockMember.getLoginId(), result.getLoginId());
-        verify(refreshTokenRepository, times(1)).deleteByMemberId(mockMember.getLoginId());
+        verify(refreshTokenRepository, times(1)).deleteByLoginId(mockMember.getLoginId());
     }
 
     @Test

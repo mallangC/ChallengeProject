@@ -59,7 +59,7 @@ class WaterChallengeServiceTest {
 
   Member memberBase = Member.builder()
           .id(1L)
-          .memberId("test")
+          .loginId("test")
           .memberType(MemberType.USER)
           .memberName("testName")
           .nickname("testNickname")
@@ -389,7 +389,7 @@ class WaterChallengeServiceTest {
             .image("수정된 이미지주소")
             .build();
     UserDetailsImpl userDetails = new UserDetailsImpl(Member.builder()
-            .memberId("tttest")
+            .loginId("tttest")
             .build());
     //when
     CustomException exception = assertThrows(CustomException.class, () ->
@@ -405,7 +405,7 @@ class WaterChallengeServiceTest {
     given(waterCommentRepository.searchWaterCommentById(anyLong()))
             .willReturn(waterCommentBase);
     UserDetailsImpl userDetails = new UserDetailsImpl(Member.builder()
-            .memberId("admin")
+            .loginId("admin")
             .memberType(MemberType.ADMIN)
             .build());
     //when
