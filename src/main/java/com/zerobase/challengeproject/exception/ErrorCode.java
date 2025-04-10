@@ -85,4 +85,12 @@ public enum ErrorCode {
   ;
   private final HttpStatus httpStatus;
   private final String message;
+
+  public HttpStatus getHttpStatus() {
+    return httpStatus;
+  }
+
+  public String getMessage() {
+    return message;
+  }
 }
