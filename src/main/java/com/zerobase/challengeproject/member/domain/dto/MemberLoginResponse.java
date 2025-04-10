@@ -9,11 +9,11 @@ import org.springframework.http.ResponseCookie;
 public class MemberLoginResponse {
     private String accessToken;
     private ResponseCookie refreshTokenCookie;
-    private String memberId;
+    private String loginId;
 
-    public MemberLoginResponse(String token,ResponseCookie refreshTokenCookie, String memberId) {
+    public MemberLoginResponse(String token,ResponseCookie refreshTokenCookie, String loginId) {
         this.accessToken = token;
         this.refreshTokenCookie = refreshTokenCookie;
-        this.memberId = memberId;
+        this.loginId = loginId;
     }
 }

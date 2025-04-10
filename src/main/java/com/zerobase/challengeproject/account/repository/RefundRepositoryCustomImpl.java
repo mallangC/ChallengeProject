@@ -17,6 +17,7 @@ import java.util.List;
 
 import static com.zerobase.challengeproject.account.entity.QRefund.refund;
 
+
 @RequiredArgsConstructor
 public class RefundRepositoryCustomImpl implements RefundRepositoryCustom {
 
@@ -87,7 +88,7 @@ public class RefundRepositoryCustomImpl implements RefundRepositoryCustom {
 
     Long total = queryFactory.select(refund.count())
             .from(refund)
-            .where(refund.member.memberId.eq(userId))
+            .where(refund.member.loginId.eq(userId))
             .fetchOne();
 
     if (total == null) {
@@ -97,7 +98,7 @@ public class RefundRepositoryCustomImpl implements RefundRepositoryCustom {
     List<Refund> findRefunds = queryFactory.selectFrom(refund)
             .join(refund.member).fetchJoin()
             .join(refund.accountDetail).fetchJoin()
-            .where(refund.member.memberId.eq(userId))
+            .where(refund.member.loginId.eq(userId))
             .orderBy(refund.createdAt.desc())
             .limit(pageable.getPageSize())
             .offset(pageable.getOffset())

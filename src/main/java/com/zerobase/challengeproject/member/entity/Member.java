@@ -9,6 +9,7 @@ import com.zerobase.challengeproject.exception.ErrorCode;
 import com.zerobase.challengeproject.member.domain.form.MemberSignupForm;
 import com.zerobase.challengeproject.type.AccountType;
 import com.zerobase.challengeproject.type.MemberType;
+import com.zerobase.challengeproject.type.SocialProvider;
 import jakarta.persistence.*;
 import lombok.*;
 
@@ -25,11 +26,11 @@ public class Member {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Column(nullable = false)
     private Long id;
-    @Column(length = 50, nullable = false)
-    private String memberId;
+    @Column(length = 100, nullable = false)
+    private String loginId;
     @Column(length = 50, nullable = false)
     private String memberName;
-    @Column(length = 150, nullable = false)
+    @Column(nullable = false)
     private String password;
     @Column(length = 50, nullable = false)
     private String nickname;
@@ -54,6 +55,12 @@ public class Member {
     @Column(nullable = false)
     @Enumerated(EnumType.STRING)
     private MemberType memberType;
+    @Column(length = 20)
+    @Enumerated(EnumType.STRING)
+    private SocialProvider socialProvider;
+
+    @Column(length = 100)
+    private String socialId;
 
     private Long account;
 
@@ -78,7 +85,7 @@ public class Member {
 
     public static Member from(MemberSignupForm form, String password, String emailAuthKey) {
         return Member.builder()
-                .memberId(form.getMemberId())
+                .loginId(form.getLoginId())
                 .memberName(form.getMemberName())
                 .password(password)
                 .nickname(form.getNickname())

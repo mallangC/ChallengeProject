@@ -39,19 +39,19 @@ class MemberServiceTest {
     void getProfile() {
         //given
         Member member = Member.builder()
-                .memberId("testId")
+                .loginId("testId")
                 .memberName("testName")
                 .nickname("testNickname")
                 .email("testEmail@email.com")
                 .phoneNum("01011112222")
                 .build();
         UserDetailsImpl userDetails = new UserDetailsImpl(member);
-        given(memberRepository.findByMemberId(userDetails.getUsername())).willReturn(Optional.of(member));
+        given(memberRepository.findByLoginId(userDetails.getUsername())).willReturn(Optional.of(member));
         //when
         MemberProfileDto memberProfileDto = memberService.getProfile(userDetails);
         //then
         assertNotNull(memberProfileDto);
-        assertEquals(member.getMemberId(), memberProfileDto.getMemberId());
+        assertEquals(member.getLoginId(), memberProfileDto.getLoginId());
         assertEquals(member.getMemberName(), memberProfileDto.getMemberName());
     }
 
@@ -60,14 +60,14 @@ class MemberServiceTest {
     void getProfileFailure() {
         //given
         Member NotFoundMember = Member.builder()
-                .memberId("testId")
+                .loginId("testId")
                 .memberName("testName")
                 .nickname("testNickname")
                 .email("testEmail@email.com")
                 .phoneNum("01011112222")
                 .build();
         UserDetailsImpl userDetails = new UserDetailsImpl(NotFoundMember);
-        when(memberRepository.findByMemberId(NotFoundMember.getMemberId()))
+        when(memberRepository.findByLoginId(NotFoundMember.getLoginId()))
                 .thenReturn(Optional.empty());
         //when&then
         CustomException exception = assertThrows(CustomException.class,
@@ -80,7 +80,7 @@ class MemberServiceTest {
     void updateProfile() {
         // given
         Member member = Member.builder()
-                .memberId("testId")
+                .loginId("testId")
                 .memberName("testName")
                 .nickname("testNickname")
                 .email("testEmail@email.com")
@@ -91,8 +91,8 @@ class MemberServiceTest {
                 .phoneNum("01011112222")
                 .build();
         UserDetailsImpl userDetails = mock(UserDetailsImpl.class);
-        when(userDetails.getUsername()).thenReturn(member.getMemberId());
-        when(memberRepository.findByMemberId(userDetails.getUsername())).thenReturn(Optional.of(member));
+        when(userDetails.getUsername()).thenReturn(member.getLoginId());
+        when(memberRepository.findByLoginId(userDetails.getUsername())).thenReturn(Optional.of(member));
         // When
         MemberProfileDto result = memberService.updateProfile(userDetails, form);
 
@@ -100,7 +100,7 @@ class MemberServiceTest {
         assertNotNull(result);
         assertEquals(form.getPhoneNum(), result.getPhoneNum());
         assertEquals(form.getNickname(), result.getNickName());
-        verify(memberRepository, times(1)).findByMemberId(member.getMemberId());
+        verify(memberRepository, times(1)).findByLoginId(member.getLoginId());
     }
 
     @Test
@@ -108,7 +108,7 @@ class MemberServiceTest {
     void changePassword() {
         // given
         Member member = Member.builder()
-                .memberId("testId")
+                .loginId("testId")
                 .password("testPassword")
                 .memberName("testName")
                 .nickname("testNickname")
@@ -116,13 +116,13 @@ class MemberServiceTest {
                 .phoneNum("01011112222")
                 .build();
         UserDetailsImpl userDetails = mock(UserDetailsImpl.class);
-        when(userDetails.getUsername()).thenReturn(member.getMemberId());
+        when(userDetails.getUsername()).thenReturn(member.getLoginId());
         ChangePasswordForm form = ChangePasswordForm.builder()
                 .password("testPassword")
                 .newPassword("newPassword")
                 .newPasswordVerify("newPassword")
                 .build();
-        when(memberRepository.findByMemberId(userDetails.getUsername())).thenReturn(Optional.of(member));
+        when(memberRepository.findByLoginId(userDetails.getUsername())).thenReturn(Optional.of(member));
         when(passwordEncoder.matches("testPassword", member.getPassword())).thenReturn(true);
         when(passwordEncoder.matches("newPassword", member.getPassword())).thenReturn(false);
         when(passwordEncoder.encode("newPassword")).thenReturn("newEncodePassword");
@@ -131,7 +131,7 @@ class MemberServiceTest {
         String result = memberService.changePassword(userDetails, form);
 
         // Then
-        assertEquals(member.getMemberId(), result);
+        assertEquals(member.getLoginId(), result);
         verify(passwordEncoder, times(1)).matches("testPassword", "testPassword");
         verify(passwordEncoder, times(1)).matches("newPassword", "testPassword");
         verify(passwordEncoder, times(1)).encode("newPassword");
@@ -142,7 +142,7 @@ class MemberServiceTest {
     void changePasswordFailure() {
         // Given
         Member member = Member.builder()
-                .memberId("testId")
+                .loginId("testId")
                 .password("testPassword")
                 .memberName("testName")
                 .nickname("testNickname")
@@ -150,13 +150,13 @@ class MemberServiceTest {
                 .phoneNum("01011112222")
                 .build();
         UserDetailsImpl userDetails = mock(UserDetailsImpl.class);
-        when(userDetails.getUsername()).thenReturn(member.getMemberId());
+        when(userDetails.getUsername()).thenReturn(member.getLoginId());
         ChangePasswordForm form = ChangePasswordForm.builder()
                 .password("wrongPassword")
                 .newPassword("newPassword")
                 .newPasswordVerify("newPassword")
                 .build();
-        when(memberRepository.findByMemberId(userDetails.getUsername())).thenReturn(Optional.of(member));
+        when(memberRepository.findByLoginId(userDetails.getUsername())).thenReturn(Optional.of(member));
         when(passwordEncoder.matches(anyString(), eq(member.getPassword())))
                 .thenAnswer(invocation -> {
                     String rawPassword = invocation.getArgument(0);
@@ -175,7 +175,7 @@ class MemberServiceTest {
     void changePasswordFailure2() {
         // Given
         Member member = Member.builder()
-                .memberId("testId")
+                .loginId("testId")
                 .password("testPassword")
                 .memberName("testName")
                 .nickname("testNickname")
@@ -183,13 +183,13 @@ class MemberServiceTest {
                 .phoneNum("01011112222")
                 .build();
         UserDetailsImpl userDetails = mock(UserDetailsImpl.class);
-        when(userDetails.getUsername()).thenReturn(member.getMemberId());
+        when(userDetails.getUsername()).thenReturn(member.getLoginId());
         ChangePasswordForm form = ChangePasswordForm.builder()
                 .password("testPassword")
                 .newPassword("newPassword")
                 .newPasswordVerify("wrongNewPassword")
                 .build();
-        when(memberRepository.findByMemberId(userDetails.getUsername())).thenReturn(Optional.of(member));
+        when(memberRepository.findByLoginId(userDetails.getUsername())).thenReturn(Optional.of(member));
         // when & then
         CustomException exception = assertThrows(CustomException.class, () -> {
             memberService.changePassword(userDetails, form);
@@ -202,7 +202,7 @@ class MemberServiceTest {
     void changePassword_MatchesPreviousPassword() {
         // Given
         Member member = Member.builder()
-                .memberId("testId")
+                .loginId("testId")
                 .password("testPassword")
                 .memberName("testName")
                 .nickname("testNickname")
@@ -210,13 +210,13 @@ class MemberServiceTest {
                 .phoneNum("01011112222")
                 .build();
         UserDetailsImpl userDetails = mock(UserDetailsImpl.class);
-        when(userDetails.getUsername()).thenReturn(member.getMemberId());
+        when(userDetails.getUsername()).thenReturn(member.getLoginId());
         ChangePasswordForm form = ChangePasswordForm.builder()
                 .password("testPassword")
                 .newPassword("testPassword")
                 .newPasswordVerify("testPassword")
                 .build();
-        when(memberRepository.findByMemberId(userDetails.getUsername())).thenReturn(Optional.of(member));
+        when(memberRepository.findByLoginId(userDetails.getUsername())).thenReturn(Optional.of(member));
         when(passwordEncoder.matches(form.getPassword(), member.getPassword())).thenReturn(true);
         when(passwordEncoder.matches(form.getPassword(), member.getPassword())).thenReturn(true);
 

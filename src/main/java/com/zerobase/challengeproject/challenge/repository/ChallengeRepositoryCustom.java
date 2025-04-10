@@ -7,4 +7,7 @@ public interface ChallengeRepositoryCustom {
   Challenge searchChallengeWithCoteChallengeById(Long challengeId);
 
   Challenge searchChallengeWithDietChallengeById(Long challengeId);
+
+  Challenge searchChallengeWithWaterChallengeById(Long challengeId);
+
 }

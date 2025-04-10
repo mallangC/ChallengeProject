@@ -6,7 +6,7 @@ import lombok.Getter;
 public enum CategoryType {
 
   COTE("COTE"),
-  DRINKING("DRINKING"),
+  WATER("WATER"),
   DIET("DIET");
 
   private final String description;

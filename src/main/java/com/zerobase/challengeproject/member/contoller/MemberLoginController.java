@@ -31,7 +31,7 @@ public class MemberLoginController {
         return ResponseEntity.ok()
                 .header(HttpHeaders.SET_COOKIE, response.getRefreshTokenCookie().toString())
                 .header(HttpHeaders.AUTHORIZATION, "Bearer " + response.getAccessToken())
-                .body(new BaseResponseDto<>(new MemberLoginDto(response.getMemberId()),"로그인에 성공했습니다", HttpStatus.OK));
+                .body(new BaseResponseDto<>(new MemberLoginDto(response.getLoginId()),"로그인에 성공했습니다", HttpStatus.OK));
     }
 
     /**
@@ -49,7 +49,7 @@ public class MemberLoginController {
 
         return ResponseEntity.ok()
                 .header(HttpHeaders.SET_COOKIE, dto.getResponseCookie().toString())
-                .body(new BaseResponseDto<>(dto.getMemberId(), "로그아웃 성공했습니다.", HttpStatus.OK));
+                .body(new BaseResponseDto<>(dto.getLoginId(), "로그아웃 성공했습니다.", HttpStatus.OK));
     }
 
     /**

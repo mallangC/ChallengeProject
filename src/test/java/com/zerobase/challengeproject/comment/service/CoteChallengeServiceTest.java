@@ -63,7 +63,7 @@ class CoteChallengeServiceTest {
 
   Member memberBase = Member.builder()
           .id(1L)
-          .memberId("test")
+          .loginId("test")
           .memberType(MemberType.USER)
           .memberName("testName")
           .nickname("testNickname")
@@ -87,6 +87,8 @@ class CoteChallengeServiceTest {
           .maxDeposit(50L)
           .standard("challengeStandard")
           .member(memberBase)
+          .startDate(startAt)
+          .endDate(LocalDateTime.parse("2025-05-10T00:00:00"))
           .coteChallenges(new ArrayList<>())
           .build();
 
@@ -111,7 +113,7 @@ class CoteChallengeServiceTest {
           .maxDeposit(50L)
           .standard("challengeStandard")
           .member(Member.builder()
-                  .memberId("틀리다")
+                  .loginId("틀리다")
                   .build())
           .coteChallenges(new ArrayList<>())
           .build();
@@ -153,7 +155,7 @@ class CoteChallengeServiceTest {
 
   @Test
   @DisplayName("코테 챌린지 추가 실패(내가 만든 챌린지가 아님)")
-  void accCoteChallengeFailure1() {
+  void accCoteChallengeFailure2() {
     //given
     given(challengeRepository.searchChallengeWithCoteChallengeById(anyLong()))
             .willReturn(badChallenge);
@@ -173,9 +175,47 @@ class CoteChallengeServiceTest {
     verify(coteChallengeRepository, times(0)).save(any());
   }
 
+
   @Test
-  @DisplayName("코테 챌린지 추가 실패(이미 코테챌린지가 추가됨)")
-  void accCoteChallengeFailure2() {
+  @DisplayName("코테 챌린지 추가 실패(코테 챌린지가 아님)")
+  void accCoteChallengeFailure1() {
+    //given
+    given(challengeRepository.searchChallengeWithCoteChallengeById(anyLong()))
+            .willReturn((Challenge.builder()
+                    .id(1L)
+                    .title("challengeTitle")
+                    .img("challengeImg")
+                    .categoryType(CategoryType.DIET)
+                    .maxParticipant(10L)
+                    .currentParticipant(1L)
+                    .description("challengeDescription")
+                    .minDeposit(10L)
+                    .maxDeposit(50L)
+                    .standard("challengeStandard")
+                    .member(memberBase)
+                    .coteChallenges(List.of(coteChallengeBase))
+                    .startDate(startAt)
+                    .endDate(LocalDateTime.parse("2025-05-10T00:00:00"))
+                    .build()));
+
+    CoteChallengeForm form = CoteChallengeForm.builder()
+            .challengeId(1L)
+            .title("문제 제목")
+            .question("코테 문제 링크")
+            .startAt(startAt)
+            .build();
+    //when
+    CustomException exception = assertThrows(CustomException.class, () ->
+            coteChallengeService.addCoteChallenge(form, userDetailsBase));
+
+    //then
+    assertEquals(NOT_COTE_CHALLENGE, exception.getErrorCode());
+    verify(coteChallengeRepository, times(0)).save(any());
+  }
+
+  @Test
+  @DisplayName("코테 챌린지 추가 실패(챌린지 기간이 아님)")
+  void accCoteChallengeFailure3() {
     //given
     given(challengeRepository.searchChallengeWithCoteChallengeById(anyLong()))
             .willReturn(Challenge.builder()
@@ -191,6 +231,45 @@ class CoteChallengeServiceTest {
                     .standard("challengeStandard")
                     .member(memberBase)
                     .coteChallenges(List.of(coteChallengeBase))
+                    .startDate(startAt)
+                    .endDate(LocalDateTime.parse("2025-05-10T00:00:00"))
+                    .build());
+
+    CoteChallengeForm form = CoteChallengeForm.builder()
+            .challengeId(1L)
+            .title("문제 제목")
+            .question("코테 문제 링크")
+            .startAt(LocalDateTime.parse("2025-05-11T00:00:00"))
+            .build();
+    //when
+    CustomException exception = assertThrows(CustomException.class, () ->
+            coteChallengeService.addCoteChallenge(form, userDetailsBase));
+
+    //then
+    assertEquals(NOT_ADDED_COTE_CHALLENGE, exception.getErrorCode());
+    verify(coteChallengeRepository, times(0)).save(any());
+  }
+
+  @Test
+  @DisplayName("코테 챌린지 추가 실패(이미 코테챌린지가 추가됨)")
+  void accCoteChallengeFailure4() {
+    //given
+    given(challengeRepository.searchChallengeWithCoteChallengeById(anyLong()))
+            .willReturn(Challenge.builder()
+                    .id(1L)
+                    .title("challengeTitle")
+                    .img("challengeImg")
+                    .categoryType(CategoryType.COTE)
+                    .maxParticipant(10L)
+                    .currentParticipant(1L)
+                    .description("challengeDescription")
+                    .minDeposit(10L)
+                    .maxDeposit(50L)
+                    .standard("challengeStandard")
+                    .member(memberBase)
+                    .coteChallenges(List.of(coteChallengeBase))
+                    .startDate(startAt)
+                    .endDate(LocalDateTime.parse("2025-05-10T00:00:00"))
                     .build());
 
     CoteChallengeForm form = CoteChallengeForm.builder()
@@ -368,7 +447,7 @@ class CoteChallengeServiceTest {
     given(memberRepository.searchByLoginId(anyString()))
             .willReturn(Member.builder()
                     .id(1L)
-                    .memberId("인증댓글추가멤버아이디")
+                    .loginId("인증댓글추가멤버아이디")
                     .memberChallenges(List.of(MemberChallenge.builder()
                             .id(1L)
                             .challenge(challengeBase)
@@ -404,7 +483,7 @@ class CoteChallengeServiceTest {
     given(memberRepository.searchByLoginId(anyString()))
             .willReturn(Member.builder()
                     .id(1L)
-                    .memberId("인증댓글추가멤버아이디")
+                    .loginId("인증댓글추가멤버아이디")
                     .memberChallenges(new ArrayList<>())
                     .build());
     given(coteChallengeRepository.searchCoteChallengeByStartAt(anyLong(), anyString(), any()))
@@ -477,7 +556,7 @@ class CoteChallengeServiceTest {
                     .id(1L)
                     .member(Member.builder()
                             .id(1L)
-                            .memberId("실패멤버아이디")
+                            .loginId("실패멤버아이디")
                             .build())
                     .build());
     CoteCommentUpdateForm form = CoteCommentUpdateForm.builder()
@@ -520,7 +599,7 @@ class CoteChallengeServiceTest {
                     .id(1L)
                     .member(Member.builder()
                             .id(1L)
-                            .memberId("실패멤버아이디")
+                            .loginId("실패멤버아이디")
                             .build())
                     .build());
     //when
@@ -528,6 +607,40 @@ class CoteChallengeServiceTest {
             coteChallengeService.deleteComment(1L, userDetailsBase));
     //then
     assertEquals(NOT_OWNER_OF_COMMENT, exception.getErrorCode());
+  }
+
+  @Test
+  @DisplayName("코테 댓글 삭제 성공 (관리자)")
+  void adminDeleteComment() {
+    //given
+    given(coteCommentRepository.findById(anyLong())).willReturn(Optional.ofNullable(commentBase));
+
+    UserDetailsImpl userDetails = new UserDetailsImpl(Member.builder()
+            .id(1L)
+            .memberType(MemberType.ADMIN)
+            .build());
+    //when
+    BaseResponseDto<CoteCommentDto> result = coteChallengeService.adminDeleteComment(1L, userDetails);
+    //then
+    assertEquals(HttpStatus.OK, result.getStatus());
+    assertEquals("관리자 권한으로 인증 댓글 삭제를 성공했습니다.", result.getMessage());
+    assertEquals("test", result.getData().getUserId());
+    assertEquals("인증 댓글 이미지 링크", result.getData().getImage());
+    assertEquals("정말 어려웠다", result.getData().getContent());
+    assertEquals(1L, result.getData().getCoteChallengeId());
+  }
+
+  @Test
+  @DisplayName("코테 댓글 삭제 실패 (관리자가 아님)")
+  void adminDeleteCommentFailure() {
+    //given
+    given(coteCommentRepository.findById(anyLong())).willReturn(Optional.ofNullable(commentBase));
+
+    //when
+    CustomException exception = assertThrows(CustomException.class, () ->
+            coteChallengeService.adminDeleteComment(1L, userDetailsBase));
+    //then
+    assertEquals(NOT_MEMBER_TYPE_ADMIN, exception.getErrorCode());
   }
 
 }

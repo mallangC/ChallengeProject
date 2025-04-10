@@ -18,10 +18,10 @@ public interface MemberRepository extends JpaRepository<Member, Long>, MemberRep
 
     /**
      * 회원 가입시 아이디 중복을 막기 위한 메서드
-     * @param memberId 회원 가입을 요청한 유저의 아이디
+     * @param loginId 회원 가입을 요청한 유저의 아이디
      * @return 동일 아이디 존재 유무
      */
-    boolean existsByMemberId(String memberId);
+    boolean existsByLoginId(String loginId);
     /**
      * 이메일 인증시 유저를 찾기 위한 메서드
      * @param emailAuthKey 회원 가입시 생성된 이메일 인증 키
@@ -31,10 +31,11 @@ public interface MemberRepository extends JpaRepository<Member, Long>, MemberRep
 
     /**
      * 유저 아이디로 유저 객체를 찾기 위한 메서드
-     * @param memberId 유저 아이디
+     * @param loginId 유저 아이디
      * @return 유저 객체
      */
-    Optional<Member> findByMemberId(String memberId);
+    Optional<Member> findByLoginId(String loginId);
 
 
+    Optional<Member> findByEmail(String email);
 }

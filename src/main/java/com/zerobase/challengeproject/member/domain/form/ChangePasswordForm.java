@@ -9,8 +9,9 @@ import lombok.NoArgsConstructor;
 
 @Getter
 @Builder
-@AllArgsConstructor
 @NoArgsConstructor
+@AllArgsConstructor
+
 public class ChangePasswordForm {
     @NotBlank
     @Pattern(

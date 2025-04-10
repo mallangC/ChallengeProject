@@ -1,7 +1,6 @@
 package com.zerobase.challengeproject.member.components.jwt;
 
 import com.zerobase.challengeproject.exception.CustomException;
-import com.zerobase.challengeproject.member.domain.form.MemberSignupForm;
 import com.zerobase.challengeproject.member.entity.Member;
 import com.zerobase.challengeproject.member.repository.MemberRepository;
 import org.junit.jupiter.api.DisplayName;
@@ -33,20 +32,20 @@ class UserDetailsServiceImplTest {
         String memberId = "testId";
         Member mockMember = Member.builder()
                 .id(1L)
-                .memberId("testId")
+                .loginId("testId")
                 .memberName("testName")
                 .nickname("testNickname")
                 .email("testEmail@email.com")
                 .phoneNum("01011112222")
                 .password("testtest1!")
                 .build();
-        when(memberRepository.findByMemberId(mockMember.getMemberId()))
+        when(memberRepository.findByLoginId(mockMember.getLoginId()))
                 .thenReturn(Optional.of(mockMember));
         //when
         UserDetails result = userDetailsServiceImpl.loadUserByUsername(memberId);
         //then
         assertNotNull(result);
-        assertEquals(mockMember.getMemberId(), result.getUsername());
+        assertEquals(mockMember.getLoginId(), result.getUsername());
     }
 
     @Test
@@ -54,7 +53,7 @@ class UserDetailsServiceImplTest {
     void loadUserByUsernameFailure() {
         //given
         String memberId = "nonExistTestId";
-        when(memberRepository.findByMemberId(memberId)).thenReturn(Optional.empty());
+        when(memberRepository.findByLoginId(memberId)).thenReturn(Optional.empty());
         //when & then
         assertThrows(CustomException.class, () -> userDetailsServiceImpl.loadUserByUsername(memberId));
     }
