@@ -7,6 +7,8 @@ import jakarta.servlet.FilterChain;
 import jakarta.servlet.ServletException;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
+import org.springframework.http.HttpHeaders;
+import org.springframework.http.ResponseCookie;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.AuthenticationServiceException;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
@@ -74,12 +76,14 @@ public class JwtAuthenticationFilter extends UsernamePasswordAuthenticationFilte
         MemberType role = userDetails.getMember().getMemberType();
         String loginId = userDetails.getMember().getLoginId();
         String accessToken = jwtUtil.generateAccessToken(loginId, role);
-
+        String refreshToken = jwtUtil.generateRefreshToken(loginId, role);
+        ResponseCookie refreshTokenCookie = jwtUtil.createRefreshTokenCookie(refreshToken, 7);
 
         /**
          * JWT를 응답 헤더에 추가
           */
-        response.addHeader("Authorization", "Bearer " + accessToken);
+        response.addHeader(HttpHeaders.SET_COOKIE, refreshTokenCookie.toString());
+        response.setHeader(HttpHeaders.AUTHORIZATION, "Bearer " + accessToken);
         response.setContentType("application/json");
         response.getWriter().write(new ObjectMapper().writeValueAsString(Map.of("token", accessToken)));
     }

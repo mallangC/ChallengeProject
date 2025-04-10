@@ -60,7 +60,9 @@ public class SecurityConfig {
      */
     @Bean
     public JwtAuthenticationFilter jwtAuthenticationFilter(AuthenticationManager authenticationManager) {
-        return new JwtAuthenticationFilter(jwtUtil, authenticationManager);
+        JwtAuthenticationFilter filter = new JwtAuthenticationFilter(jwtUtil, authenticationManager);
+        filter.setFilterProcessesUrl("/api/member/login");
+        return filter;
     }
 
     /**
@@ -80,6 +82,7 @@ public class SecurityConfig {
     public SecurityFilterChain securityFilterChain(HttpSecurity http, AuthenticationManager authenticationManager) throws Exception {
         http
                 .csrf(AbstractHttpConfigurer::disable)
+                .formLogin(AbstractHttpConfigurer::disable)
                 .authorizeHttpRequests(auth -> auth
                         .requestMatchers("/api/member/sign-up",
                                 "/api/member/email-auth",
