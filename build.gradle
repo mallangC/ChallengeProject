@@ -59,15 +59,12 @@ dependencies {
 
 sourceSets {
     named("main") {
-        java.srcDirs("src/main/java", "src/main/generated")
+        java.srcDirs("src/main/java")
     }
 }
 
 tasks.named('compileJava') {
     options.annotationProcessorGeneratedSourcesDirectory = file("$buildDir/generated")
-}
-tasks.withType(JavaCompile) {
-    options.annotationProcessorGeneratedSourcesDirectory = file("$buildDir/generated/sources/annotationProcessor/java/main")
 }
 
 clean {

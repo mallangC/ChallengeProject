@@ -14,7 +14,6 @@ import com.zerobase.challengeproject.challenge.repository.MemberChallengeReposit
 import com.zerobase.challengeproject.comment.entity.CoteChallenge;
 import com.zerobase.challengeproject.comment.entity.CoteComment;
 import com.zerobase.challengeproject.comment.entity.DietChallenge;
-import com.zerobase.challengeproject.comment.entity.DietComment;
 import com.zerobase.challengeproject.comment.repository.CoteChallengeRepository;
 import com.zerobase.challengeproject.comment.repository.CoteCommentRepository;
 import com.zerobase.challengeproject.comment.repository.DietChallengeRepository;
@@ -39,8 +38,6 @@ import org.springframework.web.bind.annotation.RequestBody;
 
 import java.time.LocalDate;
 import java.time.LocalDateTime;
-import java.util.ArrayList;
-import java.util.Comparator;
 import java.util.List;
 
 @Service
@@ -271,7 +268,7 @@ public class ChallengeService {
             List<CoteComment> coteComments = coteCommentRepository
                     .findAllByCoteChallengeIdInAndMemberId(coteChallengeIds, member.getId());
             int matchedCount = 0;
-            for (CoteChallenge coteChallenge :  coteChallenges) {
+            for (CoteChallenge coteChallenge : coteChallenges) {
                 LocalDate coteDate = coteChallenge.getStartAt().toLocalDate();
 
                 boolean hasMatchingComment = coteComments.stream()
@@ -321,7 +318,6 @@ public class ChallengeService {
                 Long depositBackAmount = depositBackProcess(memberChallenge, member);
                 depositBackDto.setDepositBackDto(challengeId, depositBackAmount, member.getAccount());
             }
-
              */
         }
 

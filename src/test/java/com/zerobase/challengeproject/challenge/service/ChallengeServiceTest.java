@@ -380,7 +380,6 @@ public class ChallengeServiceTest {
         // Given
 
         when(userDetails.getMember()).thenReturn(member);
-        // 챌린지 설정: 끝난 상태로 설정
 
         Challenge challenge = new Challenge();
         challenge.setCategoryType(CategoryType.COTE);
