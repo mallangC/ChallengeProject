@@ -23,7 +23,6 @@ public class AdminChallengeService {
     private final ChallengeRepository challengeRepository;
 
     public ResponseEntity<BaseResponseDto<GetChallengeDto>> deleteChallengeByAdmin(Long challengeId, UserDetailsImpl userDetails){
-
         Challenge challenge = challengeRepository.findById(challengeId)
                 .orElseThrow(() -> new CustomException(ErrorCode.NOT_FOUND_CHALLENGE));
 
