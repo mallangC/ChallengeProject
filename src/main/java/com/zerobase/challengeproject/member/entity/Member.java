@@ -62,6 +62,8 @@ public class Member {
     @Column(length = 100)
     private String socialId;
 
+    private boolean isBlackList;
+
     private Long account;
 
 
@@ -134,5 +136,9 @@ public class Member {
 
     public void changePassword(String newPassword) {
         this.password = newPassword;
+    }
+
+    public void registerBlacklist() {
+        this.isBlackList = true;
     }
 }
