@@ -108,7 +108,7 @@ public class MemberSignupService {
     public ResponseCookie unregister(UserDetailsImpl userDetails) {
         Member member = memberRepository.findByLoginId(userDetails.getUsername())
                 .orElseThrow(() -> new CustomException(ErrorCode.NOT_FOUND_MEMBER));
-        refreshTokenRepository.deleteByMemberId(member.getLoginId());
+        refreshTokenRepository.deleteByLoginId(member.getLoginId());
         ResponseCookie responseCookie =  jwtUtil.createRefreshTokenCookie("", 0);
         memberRepository.delete(member);
         return responseCookie;

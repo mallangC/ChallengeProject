@@ -98,6 +98,7 @@ public class Member {
                 .registerDate(LocalDateTime.now())
                 .email(form.getEmail())
                 .account(0L)
+                .isBlackList(false)
                 .build();
     }
 

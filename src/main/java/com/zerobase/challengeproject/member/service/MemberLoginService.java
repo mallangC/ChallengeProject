@@ -39,12 +39,15 @@ public class MemberLoginService {
         if(!passwordEncoder.matches(form.getPassword(), member.getPassword())) {
             throw new CustomException(ErrorCode.INCORRECT_PASSWORD);
         }
+        if(member.isBlackList()){
+            throw new CustomException(ErrorCode.MEMBER_IS_BLACKLIST);
+        }
         String accessToken = jwtUtil.generateAccessToken(form.getLoginId(), member.getMemberType());
         String refreshToken = jwtUtil.generateRefreshToken(form.getLoginId(), member.getMemberType());
 
         //리프레시 토큰이 존재시 한명의 유저가 여러 개의 리프레시토큰을 가질 수 있어 그것을 방지하고 자 만듦
         Optional<RefreshToken> existingToken = refreshTokenRepository.findByLoginId(form.getLoginId());
-        existingToken.ifPresent(token -> refreshTokenRepository.deleteByMemberId(token.getLoginId()));
+        existingToken.ifPresent(token -> refreshTokenRepository.deleteByLoginId(token.getLoginId()));
 
         RefreshToken refreshTokenEntity = new RefreshToken(null, form.getLoginId(), refreshToken, Instant.now()
                 .plusMillis(7 * 24 * 60 * 60 * 1000));
@@ -66,17 +69,17 @@ public class MemberLoginService {
      */
     public MemberLogoutDto logout(String token, String refreshToken) {
         token = token.substring(7);
-        String memberId = jwtUtil.extractLoginId(token);
+        String loginId = jwtUtil.extractLoginId(token);
         if (refreshToken == null) {
             throw new CustomException(ErrorCode.TOKEN_NOT_PROVIDED);
         }
         if (!jwtUtil.isTokenValid(refreshToken)) {
             throw new CustomException(ErrorCode.TOKEN_IS_INVALID_OR_EXPIRED);
         }
-        refreshTokenRepository.deleteByMemberId(memberId);
+        refreshTokenRepository.deleteByLoginId(loginId);
 
         ResponseCookie responseCookie =  jwtUtil.createRefreshTokenCookie("", 0);
-        return new MemberLogoutDto(memberId, responseCookie);
+        return new MemberLogoutDto(loginId, responseCookie);
     }
     /**
      * 리프레시 토큰을 이용해 새로운 액세스 토큰을 발급하는 서비스
