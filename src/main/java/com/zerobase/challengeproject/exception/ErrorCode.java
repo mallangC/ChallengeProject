@@ -17,7 +17,7 @@ public enum ErrorCode {
   CONFIRM_PASSWORD_MISMATCH(HttpStatus.BAD_REQUEST, "확인 비밀번호가 일치하지 않습니다."),
   MATCHES_PREVIOUS_PASSWORD(HttpStatus.BAD_REQUEST, "이전 비밀번호와 동일합니다."),
   NOT_MEMBER_TYPE_ADMIN(HttpStatus.BAD_REQUEST, "회원 유형이 관리자가 아닙니다."),
-  MEMBER_IS_BLACKLIST(HttpStatus.UNAUTHORIZED,"블랙리스트 등록된 회원입니다. 관리자에게 문의하세요" ),
+  MEMBER_IS_BLACKLIST(HttpStatus.UNAUTHORIZED,"블랙리스트 등록된 회원입니다. 관리자에게 문의하세요"),
   //토큰
   INCORRECT_PASSWORD(HttpStatus.BAD_REQUEST, "비밀번호가 틀렸습니다."),
   TOKEN_IS_EXPIRATION(HttpStatus.UNAUTHORIZED, "토큰이 만료되었습니다."),

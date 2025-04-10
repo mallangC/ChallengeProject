@@ -98,7 +98,9 @@ public class JwtAuthenticationFilter extends UsernamePasswordAuthenticationFilte
      */
     @Override
     protected void unsuccessfulAuthentication(HttpServletRequest request, HttpServletResponse response, AuthenticationException failed) throws IOException, ServletException {
-        writeJsonResponse(response, 403, "로그인 실패", null, null);
+        String message = failed.getMessage();
+
+        writeJsonResponse(response, 403, message, null, null);
     }
 
     private void writeJsonResponse(HttpServletResponse response, int status, String message, String loginId, String token ) throws IOException {
