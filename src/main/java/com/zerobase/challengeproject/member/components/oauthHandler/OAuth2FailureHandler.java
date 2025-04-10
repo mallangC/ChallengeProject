@@ -32,10 +32,9 @@ public class OAuth2FailureHandler implements AuthenticationFailureHandler {
         log.warn("OAuth2 로그인 실패: {}", exception.getMessage());
 
         Map<String, Object> errorResponse = Map.of(
+                "data","",
                 "status", HttpServletResponse.SC_UNAUTHORIZED,
-                "error", "UNAUTHORIZED",
-                "message", "OAuth2 로그인 실패: " + exception.getMessage(),
-                "timestamp", LocalDateTime.now().toString()
+                "message", "OAuth2 로그인 실패: " + exception.getMessage()
         );
 
         new ObjectMapper().writeValue(response.getWriter(), errorResponse);

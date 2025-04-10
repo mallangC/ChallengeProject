@@ -1,22 +1,27 @@
 package com.zerobase.challengeproject.member.components.jwt;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
+import com.zerobase.challengeproject.exception.BlacklistedMemberException;
 import com.zerobase.challengeproject.member.domain.form.MemberLoginForm;
 import com.zerobase.challengeproject.type.MemberType;
 import jakarta.servlet.FilterChain;
 import jakarta.servlet.ServletException;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.HttpHeaders;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseCookie;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.AuthenticationServiceException;
+import org.springframework.security.authentication.BadCredentialsException;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.AuthenticationException;
 import org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter;
 
 import java.io.IOException;
+import java.util.HashMap;
 import java.util.Map;
 
 /**
@@ -24,6 +29,7 @@ import java.util.Map;
  * 사용자의 로그인 요청을 처리하고, 인증 성공 시 JWT를 생성하여 반환.
  * UsernamePasswordAuthenticationFilter를 확장하여 사용자 인증을 담당.
  */
+@Slf4j
 public class JwtAuthenticationFilter extends UsernamePasswordAuthenticationFilter {
 
     private final JwtUtil jwtUtil;
@@ -84,7 +90,7 @@ public class JwtAuthenticationFilter extends UsernamePasswordAuthenticationFilte
           */
         response.addHeader(HttpHeaders.SET_COOKIE, refreshTokenCookie.toString());
         response.setHeader(HttpHeaders.AUTHORIZATION, "Bearer " + accessToken);
-        writeJsonResponse(response, 200, "로그인 성공", userDetails.getMember().getLoginId(),accessToken);
+        writeJsonResponse(response, HttpStatus.OK, "로그인에 성공했습니다", userDetails.getMember().getLoginId(),accessToken);
     }
     /**
      * 인증 실패 시 호출되는 메서드.
@@ -100,16 +106,24 @@ public class JwtAuthenticationFilter extends UsernamePasswordAuthenticationFilte
     protected void unsuccessfulAuthentication(HttpServletRequest request, HttpServletResponse response, AuthenticationException failed) throws IOException, ServletException {
         String message = failed.getMessage();
 
-        writeJsonResponse(response, 403, message, null, null);
+        if(failed instanceof BadCredentialsException){
+            message = "아이디 또는 비밀번호가 잘못되었습니다";
+        } else if (failed instanceof BlacklistedMemberException) {
+            BlacklistedMemberException ex = (BlacklistedMemberException) failed;
+            message = ex.getMessage();
+        }
+        log.warn(message);
+        writeJsonResponse(response, HttpStatus.UNAUTHORIZED, message, null, null);
     }
 
-    private void writeJsonResponse(HttpServletResponse response, int status, String message, String loginId, String token ) throws IOException {
-        response.setStatus(status);
+    private void writeJsonResponse(HttpServletResponse response, HttpStatus status, String message, String loginId, String token ) throws IOException {
+        response.setStatus(status.value());
         response.setContentType("application/json");
-        Map<String, Object> data = Map.of(
-                "loginId", loginId,
-                "token", token
-        );
+        response.setCharacterEncoding("UTF-8");
+
+        Map<String, Object> data = new HashMap<>();
+        if (loginId != null) data.put("loginId", loginId);
+        if (token != null) data.put("token", token);
 
         Map<String, Object> body = Map.of(
                 "status", status,
