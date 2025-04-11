@@ -31,7 +31,7 @@ public class WaterChallenge extends BaseEntity {
   private Integer goalMl;
   @Column(nullable = false)
   private Integer currentMl;
-  @OneToMany(mappedBy = "waterChallenge", fetch = FetchType.LAZY)
+  @OneToMany(mappedBy = "waterChallenge", cascade = CascadeType.REMOVE, orphanRemoval = true)
   private List<WaterComment> comments;
 
   public static WaterChallenge from(WaterChallengeForm form, Challenge challenge, Member member) {

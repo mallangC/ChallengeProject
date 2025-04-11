@@ -57,7 +57,7 @@ public class WaterChallengeService {
     }
 
     boolean isEntered = challenge.getWaterChallenges().stream()
-            .anyMatch(c -> c.getMember().getMemberId().equals(member.getMemberId()));
+            .anyMatch(c -> c.getMember().getLoginId().equals(member.getLoginId()));
     if (isEntered) {
       throw new CustomException(ErrorCode.ALREADY_ADDED_WATER_CHALLENGE);
     }
@@ -85,7 +85,7 @@ public class WaterChallengeService {
                                                               UserDetailsImpl userDetails) {
     Member member = userDetails.getMember();
     WaterChallenge waterChallenge = waterChallengeRepository
-            .searchWaterChallengeByChallengeIdAndLoginId(challengeId, member.getMemberId());
+            .searchWaterChallengeByChallengeIdAndLoginId(challengeId, member.getLoginId());
     return new BaseResponseDto<>(WaterChallengeDto.fromWithoutComment(waterChallenge),
             "오늘의 물마시기 챌린지 조회를 성공했습니다."
             , HttpStatus.OK);
@@ -130,7 +130,7 @@ public class WaterChallengeService {
                                                                  UserDetailsImpl userDetails) {
     Member member = userDetails.getMember();
     WaterChallenge waterChallenge = waterChallengeRepository.
-            searchWaterChallengeByChallengeIdAndLoginId(form.getChallengeId(), member.getMemberId());
+            searchWaterChallengeByChallengeIdAndLoginId(form.getChallengeId(), member.getLoginId());
 
     if (LocalDateTime.now().isAfter(waterChallenge.getChallenge().getStartDate())) {
       throw new CustomException(ErrorCode.CANNOT_UPDATE_AFTER_START_CHALLENGE);
@@ -154,7 +154,7 @@ public class WaterChallengeService {
                                                           UserDetailsImpl userDetails) {
     Member member = userDetails.getMember();
     WaterChallenge waterChallenge = waterChallengeRepository.
-            searchWaterChallengeByChallengeIdAndLoginId(form.getChallengeId(), member.getMemberId());
+            searchWaterChallengeByChallengeIdAndLoginId(form.getChallengeId(), member.getLoginId());
     WaterComment waterComment = WaterComment.from(form, waterChallenge, member);
     waterChallenge.updateCurrentMl(form.getDrinkingMl());
     waterCommentRepository.save(waterComment);
@@ -192,7 +192,7 @@ public class WaterChallengeService {
                                                              UserDetailsImpl userDetails) {
     Member member = userDetails.getMember();
     WaterComment waterComment = waterCommentRepository.searchWaterCommentById(form.getCommentId());
-    if (!waterComment.getMember().getMemberId().equals(member.getMemberId())) {
+    if (!waterComment.getMember().getLoginId().equals(member.getLoginId())) {
       throw new CustomException(ErrorCode.NOT_OWNER_OF_COMMENT);
     }
     waterComment.update(form);
