@@ -66,7 +66,15 @@ public class AdminChallengeController {
   }
 
 
-  //물마시기 챌린지 전체 조회 (관리자)
+  /**
+   * 물마시기 챌린지 전체 확인 컨트롤러 메서드 (관리자)
+   *
+   * @param page        페이지 숫자
+   * @param challengeId 챌린지 아이디
+   * @param isPass      챌린지 성공 여부
+   * @param userDetails 회원 정보
+   * @return 페이징된 물마시기 챌린지
+   */
   @GetMapping("/water/{challengeId}")
   public ResponseEntity<BaseResponseDto<PageDto<WaterChallengeDto>>> getAllWaterChallenge(
           @PathVariable Long challengeId,
@@ -77,7 +85,13 @@ public class AdminChallengeController {
   }
 
 
-  //물마시기 댓글 삭제 (관리자)
+  /**
+   * 물마시기 댓글 삭제 컨트롤러 메서드 (관리자)
+   *
+   * @param commentId   댓글 아이디
+   * @param userDetails 회원 정보
+   * @return 삭제된 물마시기 댓글 정보
+   */
   @DeleteMapping("/water/comment/{commentId}")
   public ResponseEntity<BaseResponseDto<WaterCommentDto>> deleteWaterComment(
           @PathVariable Long commentId,
@@ -85,5 +99,12 @@ public class AdminChallengeController {
     return ResponseEntity.ok(waterChallengeService.adminDeleteWaterComment(commentId, userDetails));
   }
 
+
+  //오늘 물마시기 챌린지 모두 추가(테스트용)
+  @PostMapping("/water/addall")
+  public ResponseEntity<String> addAllWaterChallenge() {
+    waterChallengeService.addAllWaterChallenge();
+    return ResponseEntity.ok("모두 추가 완료");
+  }
 
 }

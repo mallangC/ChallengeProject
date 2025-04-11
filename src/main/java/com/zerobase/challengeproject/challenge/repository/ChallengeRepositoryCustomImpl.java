@@ -4,7 +4,11 @@ import com.querydsl.jpa.impl.JPAQueryFactory;
 import com.zerobase.challengeproject.challenge.entity.Challenge;
 import com.zerobase.challengeproject.exception.CustomException;
 import com.zerobase.challengeproject.exception.ErrorCode;
+import com.zerobase.challengeproject.type.CategoryType;
 import lombok.RequiredArgsConstructor;
+
+import java.time.LocalDateTime;
+import java.util.List;
 
 import static com.zerobase.challengeproject.challenge.entity.QChallenge.challenge;
 import static com.zerobase.challengeproject.comment.entity.QCoteChallenge.coteChallenge;
@@ -72,5 +76,21 @@ public class ChallengeRepositoryCustomImpl implements ChallengeRepositoryCustom 
       throw new CustomException(ErrorCode.NOT_FOUND_CHALLENGE);
     }
     return findChallenge;
+  }
+
+  @Override
+  public List<Challenge> searchAllChallenge() {
+    LocalDateTime now = LocalDateTime.now();
+    List<Challenge> findChallenges = queryFactory.selectFrom(challenge)
+            .leftJoin(challenge.waterChallenges, waterChallenge).fetchJoin()
+            .leftJoin(waterChallenge.member, member).fetchJoin()
+            .where(challenge.categoryType.eq(CategoryType.WATER)
+                    .and(challenge.startDate.loe(now))
+                    .and(challenge.endDate.goe(now)))
+            .fetch();
+    if (findChallenges.isEmpty()) {
+      return List.of();
+    }
+    return findChallenges;
   }
 }
