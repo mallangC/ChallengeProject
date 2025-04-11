@@ -63,7 +63,13 @@ public class ChallengeRepositoryCustomImpl implements ChallengeRepositoryCustom 
     }
     return findChallenge;
   }
-
+  /**
+   * DB에서 챌린지 객체를 호출하는 메서드
+   * 챌린지에 연결된 멤버, 물마시기 챌린지를 fetchJoin()으로 즉시 로딩
+   *
+   * @param challengeId 챌린지 아이디
+   * @return 챌린지 객체
+   */
   @Override
   public Challenge searchChallengeWithWaterChallengeById(Long challengeId) {
     Challenge findChallenge = queryFactory.selectFrom(challenge)
@@ -78,6 +84,13 @@ public class ChallengeRepositoryCustomImpl implements ChallengeRepositoryCustom 
     return findChallenge;
   }
 
+  /**
+   * DB에서 챌린지 객체 리스트를 호출하는 메서드
+   * 챌린지에 물마시기 챌린지,
+   * 물마시기 챌린지에 연결된 회원을 fetchJoin()으로 즉시 로딩
+   *
+   * @return 챌린지 객체 리스트
+   */
   @Override
   public List<Challenge> searchAllChallenge() {
     LocalDateTime now = LocalDateTime.now();
@@ -89,7 +102,7 @@ public class ChallengeRepositoryCustomImpl implements ChallengeRepositoryCustom 
                     .and(challenge.endDate.goe(now)))
             .fetch();
     if (findChallenges.isEmpty()) {
-      return List.of();
+      throw new CustomException(ErrorCode.NOT_FOUND_CHALLENGE);
     }
     return findChallenges;
   }
