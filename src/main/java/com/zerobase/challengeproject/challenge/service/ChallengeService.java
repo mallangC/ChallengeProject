@@ -307,16 +307,21 @@ public class ChallengeService {
 
         }else{
 
-            WaterChallenge waterChallenge = waterChallengeRepository.findByChallengeId(challengeId);
-            if(waterChallenge.getCurrentMl() >= waterChallenge.getGoalMl()){
-                MemberChallenge memberChallenge = memberChallengeRepository.findByChallengeAndMember(challenge, member)
-                        .orElseThrow(() -> new CustomException(ErrorCode.NOT_FOUND_CHALLENGE));
-                if (memberChallenge.isDepositBack()) {
-                    throw new CustomException(ErrorCode.ALREADY_REFUNDED);
-                }
-                Long depositBackAmount = depositBackProcess(memberChallenge, member);
-                depositBackDto.setDepositBackDto(challengeId, depositBackAmount, member.getAccount());
+            List<WaterChallenge> waterChallenges = waterChallengeRepository.findAllByChallengeIdAndMember(challengeId, member);
+            boolean allDaysMetGoal = waterChallenges.stream()
+                    .allMatch(wc -> wc.getCurrentMl() >= wc.getGoalMl());
+            if (!allDaysMetGoal) {
+                throw new CustomException(ErrorCode.NOT_MET_CHALLENGE_GOAL);
             }
+            MemberChallenge memberChallenge = memberChallengeRepository.findByChallengeAndMember(challenge, member)
+                    .orElseThrow(() -> new CustomException(ErrorCode.NOT_FOUND_CHALLENGE));
+
+            if (memberChallenge.isDepositBack()) {
+                throw new CustomException(ErrorCode.ALREADY_REFUNDED);
+            }
+
+            Long depositBackAmount = depositBackProcess(memberChallenge, member);
+            depositBackDto.setDepositBackDto(challengeId, depositBackAmount, member.getAccount());
         }
 
         return ResponseEntity.ok(new BaseResponseDto<DepositBackDto>(depositBackDto, "챌린지 환급 성공", HttpStatus.OK));

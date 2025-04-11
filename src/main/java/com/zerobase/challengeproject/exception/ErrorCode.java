@@ -79,9 +79,10 @@ public enum ErrorCode {
   NOT_FOUND_WATER_CHALLENGE(HttpStatus.BAD_REQUEST, "물마시기 챌린지를 찾을 수 없습니다."),
   ALREADY_ADDED_WATER_CHALLENGE(HttpStatus.BAD_REQUEST, "이미 물마시기 챌린지를 추가했습니다."),
   NOT_FOUND_WATER_COMMENT(HttpStatus.BAD_REQUEST, "물마시기 댓글을 찾을 수 없습니다."),
+  NOT_MET_CHALLENGE_GOAL(HttpStatus.BAD_REQUEST, "목표섭취량을 충족시키지 못한 일자가 존재합니다." )
 
-  
-  ;
+
+    ;
   private final HttpStatus httpStatus;
   private final String message;
 }
