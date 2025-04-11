@@ -62,6 +62,7 @@ class MemberLoginServiceTest {
                 .phoneNum("01011112222")
                 .password("encodedPassword")
                 .memberType(MemberType.USER)
+                .isBlackList(false)
                 .build();
 
         // 기존 리프레시 토큰 (삭제될 토큰)
@@ -71,62 +72,6 @@ class MemberLoginServiceTest {
                 .expireDate(Instant.now().plusSeconds(60 * 60 * 24 * 7))
                 .loginId(mockMember.getLoginId())
                 .build();
-    }
-
-    @Test
-    @DisplayName("로그인 성공 - 기존 리프레시 토큰 삭제 후 새로운 토큰 발급")
-    void login() {
-        // given
-        MemberLoginForm loginForm = MemberLoginForm.builder()
-                .loginId("testId")
-                .password("testPassword1!")
-                .build();
-        when(memberRepository.findByLoginId(loginForm.getLoginId())).thenReturn(Optional.of(mockMember));
-        when(passwordEncoder.matches(loginForm.getPassword(), mockMember.getPassword())).thenReturn(true);
-        when(jwtUtil.generateAccessToken(loginForm.getLoginId(), mockMember.getMemberType())).thenReturn(mockAccessToken);
-        when(jwtUtil.generateRefreshToken(loginForm.getLoginId(), mockMember.getMemberType())).thenReturn(mockRefreshToken);
-        when(refreshTokenRepository.findByLoginId(loginForm.getLoginId())).thenReturn(Optional.of(existingRefreshToken));
-
-        // when
-        MemberLoginResponse result = memberLoginService.login(loginForm);
-
-        // then
-        assertNotNull(result);
-        assertEquals(mockAccessToken, result.getAccessToken());
-        assertEquals(mockMember.getLoginId(), result.getLoginId());
-        verify(refreshTokenRepository, times(1)).deleteByMemberId(existingRefreshToken.getLoginId());
-        verify(refreshTokenRepository, times(1)).save(any(RefreshToken.class));
-    }
-
-    @Test
-    @DisplayName("로그인 실패 - 존재하지 않는 회원")
-    void loginFailure1() {
-        // given
-        MemberLoginForm loginForm = MemberLoginForm.builder()
-                .loginId("testId")
-                .password("testPassword1!")
-                .build();
-        when(memberRepository.findByLoginId(loginForm.getLoginId())).thenReturn(Optional.empty());
-
-        // when & then
-        CustomException exception = assertThrows(CustomException.class, () -> memberLoginService.login(loginForm));
-        assertEquals(ErrorCode.NOT_FOUND_MEMBER, exception.getErrorCode());
-    }
-
-    @Test
-    @DisplayName("로그인 실패 - 비밀번호 불일치")
-    void loginFailure2() {
-        MemberLoginForm loginForm = MemberLoginForm.builder()
-                .loginId("testId")
-                .password("testPassword1!")
-                .build();
-        // given
-        when(memberRepository.findByLoginId(loginForm.getLoginId())).thenReturn(Optional.of(mockMember));
-        when(passwordEncoder.matches(loginForm.getPassword(), mockMember.getPassword())).thenReturn(false);
-
-        // when & then
-        CustomException exception = assertThrows(CustomException.class, () -> memberLoginService.login(loginForm));
-        assertEquals(ErrorCode.INCORRECT_PASSWORD, exception.getErrorCode());
     }
 
     @Test
@@ -142,7 +87,7 @@ class MemberLoginServiceTest {
         //then
         assertNotNull(result);
         assertEquals(mockMember.getLoginId(), result.getLoginId());
-        verify(refreshTokenRepository, times(1)).deleteByMemberId(mockMember.getLoginId());
+        verify(refreshTokenRepository, times(1)).deleteByLoginId(mockMember.getLoginId());
     }
 
     @Test

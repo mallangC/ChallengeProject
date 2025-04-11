@@ -4,14 +4,17 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import jakarta.servlet.ServletException;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.security.core.AuthenticationException;
 import org.springframework.security.web.authentication.AuthenticationFailureHandler;
 import org.springframework.stereotype.Component;
 
 import java.io.IOException;
+import java.time.LocalDateTime;
 import java.util.Map;
 
 @Component
+@Slf4j
 public class OAuth2FailureHandler implements AuthenticationFailureHandler {
     /***
      * OAuth 로그인 실패 시 호출 되는 메서드입니다.
@@ -26,11 +29,14 @@ public class OAuth2FailureHandler implements AuthenticationFailureHandler {
         response.setContentType("application/json;charset=UTF-8");
         response.setStatus(HttpServletResponse.SC_UNAUTHORIZED);
 
-        String message = "OAuth2 로그인 실패: " + exception.getMessage();
+        log.warn("OAuth2 로그인 실패: {}", exception.getMessage());
 
-        new ObjectMapper().writeValue(response.getWriter(), Map.of(
-                "error", message,
-                "exception", exception
-        ));
+        Map<String, Object> errorResponse = Map.of(
+                "data","",
+                "status", HttpServletResponse.SC_UNAUTHORIZED,
+                "message", "OAuth2 로그인 실패: " + exception.getMessage()
+        );
+
+        new ObjectMapper().writeValue(response.getWriter(), errorResponse);
     }
 }

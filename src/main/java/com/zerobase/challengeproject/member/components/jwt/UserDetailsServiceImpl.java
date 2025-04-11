@@ -1,7 +1,5 @@
 package com.zerobase.challengeproject.member.components.jwt;
 
-import com.zerobase.challengeproject.exception.CustomException;
-import com.zerobase.challengeproject.exception.ErrorCode;
 import com.zerobase.challengeproject.member.entity.Member;
 import com.zerobase.challengeproject.member.repository.MemberRepository;
 import lombok.RequiredArgsConstructor;
@@ -25,7 +23,7 @@ public class UserDetailsServiceImpl implements UserDetailsService {
     public UserDetailsImpl loadUserByUsername(String loginId) throws UsernameNotFoundException {
 
         Member member = memberRepository.findByLoginId(loginId)
-                .orElseThrow(() -> new CustomException(ErrorCode.NOT_FOUND_MEMBER));
+                .orElseThrow(() -> new UsernameNotFoundException("아이디 또는 비밀번호가 잘못되었습니다."));
 
         return new UserDetailsImpl(member);
     }

@@ -174,7 +174,7 @@ class MemberSignupServiceTest {
         assertNotNull(responseCookie);
         assertEquals("", responseCookie.getValue());
         assertEquals(0, responseCookie.getMaxAge().getSeconds());
-        verify(refreshTokenRepository, times(1)).deleteByMemberId(member.getLoginId());
+        verify(refreshTokenRepository, times(1)).deleteByLoginId(member.getLoginId());
         verify(memberRepository, times(1)).delete(member);
     }
 
@@ -193,7 +193,7 @@ class MemberSignupServiceTest {
         });
 
         assertEquals(ErrorCode.NOT_FOUND_MEMBER, exception.getErrorCode());
-        verify(refreshTokenRepository, never()).deleteByMemberId(any());
+        verify(refreshTokenRepository, never()).deleteByLoginId(any());
         verify(memberRepository, never()).delete(any());
     }
 }

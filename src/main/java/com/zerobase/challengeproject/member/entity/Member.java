@@ -62,6 +62,8 @@ public class Member {
     @Column(length = 100)
     private String socialId;
 
+    private boolean isBlackList;
+
     private Long account;
 
 
@@ -96,6 +98,7 @@ public class Member {
                 .registerDate(LocalDateTime.now())
                 .email(form.getEmail())
                 .account(0L)
+                .isBlackList(false)
                 .build();
     }
 
@@ -134,5 +137,9 @@ public class Member {
 
     public void changePassword(String newPassword) {
         this.password = newPassword;
+    }
+
+    public void registerBlacklist() {
+        this.isBlackList = true;
     }
 }

@@ -12,6 +12,7 @@ import org.springframework.security.oauth2.client.userinfo.DefaultOAuth2UserServ
 import org.springframework.security.oauth2.client.userinfo.OAuth2UserRequest;
 import org.springframework.security.oauth2.client.userinfo.OAuth2UserService;
 import org.springframework.security.oauth2.core.OAuth2AuthenticationException;
+import org.springframework.security.oauth2.core.OAuth2Error;
 import org.springframework.security.oauth2.core.oidc.user.OidcUser;
 import org.springframework.security.oauth2.core.user.OAuth2User;
 import org.springframework.stereotype.Service;
@@ -52,20 +53,25 @@ public class CustomOAuth2UserService implements OAuth2UserService<OAuth2UserRequ
         // 기본 OAuth2 사용자 정보 조회
         OAuth2User oAuth2User = delegate.loadUser(request);
         Map<String, Object> attributes = oAuth2User.getAttributes();
-        // 제공자별 사용자 정보 파싱
-        OAuth2UserInfo userInfo = OAuth2UserInfoFactory.getOAuth2UserInfo(provider, attributes);
         /**
          *  🫢 OpenID Connect 사용자일 경우 속성 다시 추출 🫢
          */
         if(oAuth2User instanceof OidcUser oidcUser){
             attributes = oidcUser.getAttributes();
-            userInfo = OAuth2UserInfoFactory.getOAuth2UserInfo(provider, attributes);
+        } else {
+            attributes = oAuth2User.getAttributes();
         }
-
+        // 제공자별 사용자 정보 파싱
+        OAuth2UserInfo userInfo = OAuth2UserInfoFactory.getOAuth2UserInfo(provider, attributes);
         String loginId = provider + "_" + userInfo.getProviderId();
         String encodedPassword = passwordEncoder.encode(provider + UUID.randomUUID());
 
         Member member = saveOrGetMember(loginId,encodedPassword,userInfo,provider);
+        if(member.isBlackList()){
+            throw new OAuth2AuthenticationException(
+                    new OAuth2Error("blacklist_user", "블랙리스트 등록된 회원입니다. 관리자에게 문의하세요.", null)
+            );
+        }
 
         return new CustomOAuth2User(member, attributes);
     }
@@ -93,6 +99,7 @@ public class CustomOAuth2UserService implements OAuth2UserService<OAuth2UserRequ
                         .socialId(userInfo.getProviderId())
                         .emailAuthYn(true)
                         .emailAuthDate(LocalDateTime.now())
+                        .isBlackList(false)
                         .account(0L)
                         .build()));
     }

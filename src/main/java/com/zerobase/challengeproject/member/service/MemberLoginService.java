@@ -3,10 +3,8 @@ package com.zerobase.challengeproject.member.service;
 import com.zerobase.challengeproject.exception.CustomException;
 import com.zerobase.challengeproject.exception.ErrorCode;
 import com.zerobase.challengeproject.member.components.jwt.JwtUtil;
-import com.zerobase.challengeproject.member.domain.dto.MemberLoginResponse;
 import com.zerobase.challengeproject.member.domain.dto.MemberLogoutDto;
 import com.zerobase.challengeproject.member.domain.dto.RefreshTokenDto;
-import com.zerobase.challengeproject.member.domain.form.MemberLoginForm;
 import com.zerobase.challengeproject.member.entity.Member;
 import com.zerobase.challengeproject.member.entity.RefreshToken;
 import com.zerobase.challengeproject.member.repository.MemberRepository;
@@ -16,7 +14,6 @@ import org.springframework.http.ResponseCookie;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
-import java.time.Instant;
 import java.util.Optional;
 
 @Service
@@ -29,32 +26,6 @@ public class MemberLoginService {
     private final RefreshTokenRepository refreshTokenRepository;
 
     /**
-     * 유저가 로그인을 시도할 때 사용되는 서비스 메서드
-     * @param form 유저 아이디, 비밀번호
-     * @return 토큰, 유저 아이디
-     */
-    public MemberLoginResponse login(MemberLoginForm form) {
-        Member member = memberRepository.findByLoginId(form.getLoginId())
-                .orElseThrow(()-> new CustomException(ErrorCode.NOT_FOUND_MEMBER));
-        if(!passwordEncoder.matches(form.getPassword(), member.getPassword())) {
-            throw new CustomException(ErrorCode.INCORRECT_PASSWORD);
-        }
-        String accessToken = jwtUtil.generateAccessToken(form.getLoginId(), member.getMemberType());
-        String refreshToken = jwtUtil.generateRefreshToken(form.getLoginId(), member.getMemberType());
-
-        //리프레시 토큰이 존재시 한명의 유저가 여러 개의 리프레시토큰을 가질 수 있어 그것을 방지하고 자 만듦
-        Optional<RefreshToken> existingToken = refreshTokenRepository.findByLoginId(form.getLoginId());
-        existingToken.ifPresent(token -> refreshTokenRepository.deleteByMemberId(token.getLoginId()));
-
-        RefreshToken refreshTokenEntity = new RefreshToken(null, form.getLoginId(), refreshToken, Instant.now()
-                .plusMillis(7 * 24 * 60 * 60 * 1000));
-        refreshTokenRepository.save(refreshTokenEntity);
-
-        ResponseCookie responseCookie = jwtUtil.createRefreshTokenCookie(refreshToken, 7);
-
-        return new MemberLoginResponse(accessToken, responseCookie, member.getLoginId());
-    }
-    /**
      * 로그아웃 처리 서비스
      * 엑세스 토큰에서 "Bearer "를 제거하고 회원 아이디를 추출.
      * 리프레시 토큰이 제공되지 않거나 유효하지 안으면 예외 처리
@@ -66,17 +37,17 @@ public class MemberLoginService {
      */
     public MemberLogoutDto logout(String token, String refreshToken) {
         token = token.substring(7);
-        String memberId = jwtUtil.extractLoginId(token);
+        String loginId = jwtUtil.extractLoginId(token);
         if (refreshToken == null) {
             throw new CustomException(ErrorCode.TOKEN_NOT_PROVIDED);
         }
         if (!jwtUtil.isTokenValid(refreshToken)) {
             throw new CustomException(ErrorCode.TOKEN_IS_INVALID_OR_EXPIRED);
         }
-        refreshTokenRepository.deleteByMemberId(memberId);
+        refreshTokenRepository.deleteByLoginId(loginId);
 
         ResponseCookie responseCookie =  jwtUtil.createRefreshTokenCookie("", 0);
-        return new MemberLogoutDto(memberId, responseCookie);
+        return new MemberLogoutDto(loginId, responseCookie);
     }
     /**
      * 리프레시 토큰을 이용해 새로운 액세스 토큰을 발급하는 서비스

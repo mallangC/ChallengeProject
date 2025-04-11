@@ -11,6 +11,7 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.security.authentication.AuthenticationManager;
+import org.springframework.security.authentication.AuthenticationProvider;
 import org.springframework.security.config.annotation.authentication.configuration.AuthenticationConfiguration;
 import org.springframework.security.config.annotation.method.configuration.EnableMethodSecurity;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
@@ -31,6 +32,7 @@ public class SecurityConfig {
     private final CustomOAuth2UserService customOAuth2UserService;
     private final OAuth2SuccessHandler oAuth2SuccessHandler;
     private final OAuth2FailureHandler oAuth2FailureHandler;
+    private final AuthenticationProvider customAuthenticationProvider;
 
     /**
      * {@link AuthenticationConfiguration}을 기반으로 {@link AuthenticationManager} 인스턴스를 생성하여 제공합니다.
@@ -99,10 +101,10 @@ public class SecurityConfig {
         http.sessionManagement(session
                 -> session.sessionCreationPolicy(SessionCreationPolicy.STATELESS));
 
+        http.authenticationProvider(customAuthenticationProvider);
+
         http.addFilterAfter(jwtAuthorizationFilter(), UsernamePasswordAuthenticationFilter.class);
         http.addFilterAt(jwtAuthenticationFilter(authenticationManager), UsernamePasswordAuthenticationFilter.class);
-
-
 
         return http.build();
     }
