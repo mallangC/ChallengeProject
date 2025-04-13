@@ -90,7 +90,7 @@ public class MemberSignupService {
         }
 
         Member member = memberOptional.get();
-        if(member.isEmailAuthYn()){
+        if(member.isEmailVerified()){
             throw new CustomException(ErrorCode.ALREADY_VERIFY_EMAIL);
         }
 

@@ -103,7 +103,7 @@ class MemberSignupServiceTest {
         // given
         String emailAuthKey = "valid-key";
         Member member = Member.builder()
-                .emailAuthYn(false)
+                .isEmailVerified(false)
                 .emailAuthKey(emailAuthKey)
                 .build();
         when(memberRepository.findByEmailAuthKey(emailAuthKey)).thenReturn(Optional.of(member));
@@ -112,7 +112,7 @@ class MemberSignupServiceTest {
         MemberEmailAuthDto authDto = memberService.verifyEmail(emailAuthKey);
 
         // then
-        assertTrue(member.isEmailAuthYn());
+        assertTrue(member.isEmailVerified());
         assertNotNull(authDto);
     }
 
@@ -122,7 +122,7 @@ class MemberSignupServiceTest {
         // given
         String emailAuthKey = "verified-key";
         Member member = Member.builder()
-                .emailAuthYn(true)
+                .isEmailVerified(true)
                 .emailAuthKey(emailAuthKey)
                 .build();
         when(memberRepository.findByEmailAuthKey(emailAuthKey)).thenReturn(Optional.of(member));

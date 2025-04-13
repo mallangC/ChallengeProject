@@ -40,7 +40,7 @@ public class Member {
     @Column(length = 50, nullable = false)
     private String email;
     private LocalDateTime registerDate;
-    private boolean emailAuthYn;
+    private boolean isEmailVerified;
     private LocalDateTime emailAuthDate;
     private String emailAuthKey;
     @Column(length = 50)
@@ -74,8 +74,8 @@ public class Member {
      * 이메일 인증을 완료하는 메서드. 이미 인증된 경우 처리 생략
      */
     public void completeEmailAuth() {
-        if (!this.emailAuthYn) {
-            this.emailAuthYn = true;
+        if (!this.isEmailVerified) {
+            this.isEmailVerified = true;
             this.emailAuthDate = LocalDateTime.now();
         }
     }
@@ -93,7 +93,7 @@ public class Member {
                 .nickname(form.getNickname())
                 .phoneNum(form.getPhoneNum())
                 .emailAuthKey(emailAuthKey)
-                .emailAuthYn(false)
+                .isEmailVerified(false)
                 .memberType(MemberType.USER)
                 .registerDate(LocalDateTime.now())
                 .email(form.getEmail())

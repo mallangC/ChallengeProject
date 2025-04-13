@@ -97,7 +97,7 @@ public class CustomOAuth2UserService implements OAuth2UserService<OAuth2UserRequ
                         .registerDate(LocalDateTime.now())
                         .socialProvider(SocialProvider.valueOf(provider.toUpperCase()))
                         .socialId(userInfo.getProviderId())
-                        .emailAuthYn(true)
+                        .isEmailVerified(true)
                         .emailAuthDate(LocalDateTime.now())
                         .isBlackList(false)
                         .account(0L)
