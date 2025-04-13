@@ -142,4 +142,9 @@ public class Member {
     public void registerBlacklist() {
         this.isBlackList = true;
     }
+
+    public void unRegisterBlacklist() {
+        this.isBlackList = false;
+    }
+
 }

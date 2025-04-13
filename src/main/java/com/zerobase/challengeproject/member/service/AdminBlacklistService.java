@@ -29,4 +29,16 @@ public class AdminBlacklistService {
         member.registerBlacklist();
         return member.getLoginId();
     }
+
+    public String unRegisterBlacklist(BlackListRegisterForm form) {
+        Member member = memberRepository.findByLoginId(form.getBlacklistUserLoginId())
+                .orElseThrow(
+                        ()-> new CustomException(ErrorCode.NOT_FOUND_MEMBER)
+                );
+        if(!member.isBlackList()){
+            throw new CustomException(ErrorCode.MEMBER_IS_UNBLACKLIST);
+        }
+        member.unRegisterBlacklist();
+        return member.getLoginId();
+    }
 }
