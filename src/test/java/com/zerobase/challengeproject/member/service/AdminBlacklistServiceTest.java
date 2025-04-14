@@ -6,6 +6,7 @@ import com.zerobase.challengeproject.member.domain.form.BlackListRegisterForm;
 import com.zerobase.challengeproject.member.entity.Member;
 import com.zerobase.challengeproject.member.repository.MemberRepository;
 import com.zerobase.challengeproject.type.MemberType;
+import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
@@ -27,11 +28,12 @@ class AdminBlacklistServiceTest {
     @InjectMocks
     private AdminBlacklistService adminBlacklistService;
 
-    @Test
-    @DisplayName("블랙리스트 등록 성공")
-    void registerBlacklist () {
-        //given
-        Member mockMember = Member.builder()
+    private Member mockMember;
+    private BlackListRegisterForm form;
+
+    @BeforeEach
+    void setUp() {
+        mockMember = Member.builder()
                 .id(1L)
                 .loginId("testId")
                 .memberName("testName")
@@ -42,37 +44,72 @@ class AdminBlacklistServiceTest {
                 .memberType(MemberType.USER)
                 .isBlackList(false)
                 .build();
-        BlackListRegisterForm form = BlackListRegisterForm.builder()
+        form = BlackListRegisterForm.builder()
                 .blacklistUserLoginId("blacklistUserLoginId")
                 .build();
+    }
+
+    @Test
+    @DisplayName("블랙리스트 등록 성공")
+    void registerBlacklist() {
+        //given
         when(memberRepository.findByLoginId(form.getBlacklistUserLoginId())).thenReturn(Optional.of(mockMember));
         //when
         String result = adminBlacklistService.registerBlacklist(form);
         //then
-        assertEquals(mockMember.getLoginId()+"님 블랙리스트 등록 완료", result);
+        assertEquals(mockMember.getLoginId(), result);
     }
+
     @Test
     @DisplayName("블랙리스트 등록 실패 - 존재하지 않는 회원")
-    void registerBlacklistFailure () {
+    void registerBlacklistFailure() {
         //given
-        Member mockMember = Member.builder()
-                .id(1L)
-                .loginId("testId")
-                .memberName("testName")
-                .nickname("testNickname")
-                .email("testEmail@email.com")
-                .phoneNum("01011112222")
-                .password("encodedPassword")
-                .memberType(MemberType.USER)
-                .isBlackList(false)
-                .build();
-        BlackListRegisterForm form = BlackListRegisterForm.builder()
-                .blacklistUserLoginId("blacklistUserLoginId")
-                .build();
         when(memberRepository.findByLoginId(form.getBlacklistUserLoginId())).thenReturn(Optional.empty());
         //when & then
         CustomException exception = assertThrows(CustomException.class, () -> adminBlacklistService.registerBlacklist(form));
         assertEquals(ErrorCode.NOT_FOUND_MEMBER, exception.getErrorCode());
 
+    }
+
+    @Test
+    @DisplayName("블랙리스트 해제 성공")
+    void unRegisterBlacklist() {
+        Member isBlacklistMember = Member.builder()
+                .id(1L)
+                .loginId("testId")
+                .memberName("testName")
+                .nickname("testNickname")
+                .email("testEmail@email.com")
+                .phoneNum("01011112222")
+                .password("encodedPassword")
+                .memberType(MemberType.USER)
+                .isBlackList(true)
+                .build();
+        //given
+        when(memberRepository.findByLoginId(form.getBlacklistUserLoginId())).thenReturn(Optional.of(isBlacklistMember));
+        //when
+        String result = adminBlacklistService.unRegisterBlacklist(form);
+        //then
+        assertEquals(isBlacklistMember.getLoginId(),result);
+    }
+
+    @Test
+    @DisplayName("블랙리스트 해제 실패 - 블랙리스트가 아닌 맴버")
+    void unRegisterBlacklistFailure() {
+        //given
+        when(memberRepository.findByLoginId(form.getBlacklistUserLoginId())).thenReturn(Optional.of(mockMember));
+        //when & then
+        CustomException exception = assertThrows(CustomException.class, () -> adminBlacklistService.unRegisterBlacklist(form));
+        assertEquals(ErrorCode.MEMBER_IS_UNBLACKLIST, exception.getErrorCode());
+    }
+
+    @Test
+    @DisplayName("블랙리스트 해제 실패 - 존재하지 않는 회원")
+    void unRegisterBlacklistFailure2() {
+        //given
+        when(memberRepository.findByLoginId(form.getBlacklistUserLoginId())).thenReturn(Optional.empty());
+        //when & then
+        CustomException exception = assertThrows(CustomException.class, () -> adminBlacklistService.unRegisterBlacklist(form));
+        assertEquals(ErrorCode.NOT_FOUND_MEMBER, exception.getErrorCode());
     }
 }

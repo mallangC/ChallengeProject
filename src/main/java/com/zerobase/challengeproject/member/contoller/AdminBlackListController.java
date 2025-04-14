@@ -32,7 +32,11 @@ public class AdminBlackListController {
                 )
         );
     }
-
+    /**
+     * 관리자가 회원을 블랙리스트로 해제하는 컨트롤러 메서드
+     * @param form 블랙리스트로 해제하려는 회원 로그인 아이디
+     * @return 블랙리스트가 헤제된 맴버 아이디
+     */
     @PatchMapping("/blacklist")
     public ResponseEntity<BaseResponseDto> unRegisterBlacklist(
             @RequestBody BlackListRegisterForm form

@@ -30,6 +30,11 @@ public class AdminBlacklistService {
         return member.getLoginId();
     }
 
+    /**
+     * 관리자가 회원을 블랙리스트로 해제하는 서비스 메서드
+     * @param form 블랙리스트로 해제하려는 회원 로그인 아이디
+     * @return 블랙리스트가 헤제된 맴버 아이디
+     */
     public String unRegisterBlacklist(BlackListRegisterForm form) {
         Member member = memberRepository.findByLoginId(form.getBlacklistUserLoginId())
                 .orElseThrow(
