@@ -14,34 +14,34 @@ public class GetChallengeDto {
     private Long id;
     private Long memberId;
     private String title;
-    private String img;
+    private String imgUrl;
     private CategoryType categoryType;
     private Long maxParticipant;
     private Long currentParticipant;
     private String description;
-    private Long min_deposit;
-    private Long max_deposit;
+    private Long minDeposit;
+    private Long maxDeposit;
     private String standard;
     private LocalDateTime startDate;
     private LocalDateTime endDate;
-    private LocalDateTime createAt;
-    private LocalDateTime updateAt;
+    private LocalDateTime createdAt;
+    private LocalDateTime updatedAt;
 
     public GetChallengeDto(Challenge challenge) {
         this.memberId = challenge.getMember().getId();
         this.id = challenge.getId();
-        this.updateAt = challenge.getUpdateAt();
-        this.createAt = challenge.getCreateAt();
+        this.updatedAt = challenge.getUpdatedAt();
+        this.createdAt = challenge.getCreatedAt();
         this.endDate = challenge.getEndDate();
         this.startDate = challenge.getStartDate();
         this.standard = challenge.getStandard();
-        this.max_deposit = challenge.getMaxDeposit();
-        this.min_deposit = challenge.getMinDeposit();
+        this.maxDeposit = challenge.getMaxDeposit();
+        this.minDeposit = challenge.getMinDeposit();
         this.description = challenge.getDescription();
         this.maxParticipant = challenge.getMaxParticipant();
         this.currentParticipant = challenge.getCurrentParticipant();
         this.categoryType = challenge.getCategoryType();
-        this.img = challenge.getImg();
+        this.imgUrl = challenge.getImageUrl();
         this.title = challenge.getTitle();
     }
 }

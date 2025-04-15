@@ -1,6 +1,6 @@
 package com.zerobase.challengeproject.account.service;
 
-import com.zerobase.challengeproject.BaseResponseDto;
+import com.zerobase.challengeproject.HttpApiResponse;
 import com.zerobase.challengeproject.account.domain.dto.AccountDetailDto;
 import com.zerobase.challengeproject.account.domain.dto.PageDto;
 import com.zerobase.challengeproject.account.domain.dto.RefundDto;
@@ -91,16 +91,16 @@ class AccountServiceTest {
             .willReturn(Optional.of(memberBase));
 
     //when
-    BaseResponseDto<AccountDetailDto> responseDto = accountService.addAmount(accountAddForm, userDetails);
+    HttpApiResponse<AccountDetailDto> responseDto = accountService.addAmount(accountAddForm, userDetails);
 
     //then
-    assertEquals(HttpStatus.OK, responseDto.getStatus());
-    assertEquals("test@company.com", responseDto.getData().getMemberId());
-    assertEquals(10000L, responseDto.getData().getPreAmount());
-    assertEquals(15000L, responseDto.getData().getCurAmount());
-    assertEquals(5000L, responseDto.getData().getAmount());
-    assertEquals(AccountType.CHARGE, responseDto.getData().getAccountType());
-    assertFalse(responseDto.getData().isRefunded());
+    assertEquals(HttpStatus.OK, responseDto.status());
+    assertEquals("test@company.com", responseDto.data().getMemberId());
+    assertEquals(10000L, responseDto.data().getPreAmount());
+    assertEquals(15000L, responseDto.data().getCurAmount());
+    assertEquals(5000L, responseDto.data().getAmount());
+    assertEquals(AccountType.CHARGE, responseDto.data().getAccountType());
+    assertFalse(responseDto.data().isRefunded());
     verify(accountDetailRepository, times(1)).save(any());
   }
 
@@ -131,16 +131,16 @@ class AccountServiceTest {
             .willReturn(memberSearch);
 
     //when
-    BaseResponseDto<RefundDto> result = accountService.addRefund(refundAddForm, userDetails);
+    HttpApiResponse<RefundDto> result = accountService.addRefund(refundAddForm, userDetails);
 
     //then
-    assertEquals(1L, result.getData().getAccountDetailId());
-    assertEquals("환불 사유", result.getData().getMemberContent());
-    assertNull(result.getData().getAdminContent());
-    assertFalse(result.getData().isDone());
-    assertFalse(result.getData().isRefunded());
-    assertEquals(HttpStatus.OK, result.getStatus());
-    assertEquals("환불 신청을 성공했습니다.", result.getMessage());
+    assertEquals(1L, result.data().getAccountDetailId());
+    assertEquals("환불 사유", result.data().getMemberContent());
+    assertNull(result.data().getAdminContent());
+    assertFalse(result.data().isDone());
+    assertFalse(result.data().isRefunded());
+    assertEquals(HttpStatus.OK, result.status());
+    assertEquals("환불 신청을 성공했습니다.", result.message());
     verify(refundRepository, times(1)).save(any());
   }
 
@@ -182,20 +182,20 @@ class AccountServiceTest {
     given(refundRepository.searchAllMyRefund(anyInt(), anyString()))
             .willReturn(pageRefundDtos);
     //when
-    BaseResponseDto<PageDto<RefundDto>> result = accountService.getAllMyRefund(1, userDetails);
+    HttpApiResponse<PageDto<RefundDto>> result = accountService.getAllMyRefund(1, userDetails);
 
     //then
-    assertEquals(HttpStatus.OK, result.getStatus());
-    assertEquals("회원의 환불신청 조회에 성공했습니다.(1페이지)", result.getMessage());
-    assertEquals(1L, result.getData().getContent().get(0).getId());
-    assertEquals(1L, result.getData().getContent().get(0).getAccountDetailId());
-    assertEquals("환불 사유", result.getData().getContent().get(0).getMemberContent());
-    assertNull(result.getData().getContent().get(0).getAdminContent());
-    assertFalse(result.getData().getContent().get(0).isDone());
-    assertFalse(result.getData().getContent().get(0).isRefunded());
-    assertEquals(1, result.getData().getTotalElements());
-    assertEquals(0, result.getData().getNumber());
-    assertEquals(20, result.getData().getSize());
+    assertEquals(HttpStatus.OK, result.status());
+    assertEquals("회원의 환불신청 조회에 성공했습니다.(1페이지)", result.message());
+    assertEquals(1L, result.data().getContent().get(0).getId());
+    assertEquals(1L, result.data().getContent().get(0).getAccountDetailId());
+    assertEquals("환불 사유", result.data().getContent().get(0).getMemberContent());
+    assertNull(result.data().getContent().get(0).getAdminContent());
+    assertFalse(result.data().getContent().get(0).isDone());
+    assertFalse(result.data().getContent().get(0).isRefunded());
+    assertEquals(1, result.data().getTotalElements());
+    assertEquals(0, result.data().getNumber());
+    assertEquals(20, result.data().getSize());
   }
 
 
@@ -214,16 +214,16 @@ class AccountServiceTest {
                     .isRefunded(false)
                     .build()));
     //when
-    BaseResponseDto<RefundDto> result = accountService.cancelRefund(1L);
+    HttpApiResponse<RefundDto> result = accountService.cancelRefund(1L);
     //then
-    assertEquals(HttpStatus.OK, result.getStatus());
-    assertEquals("환불 신청을 취소했습니다.", result.getMessage());
-    assertEquals(1L, result.getData().getId());
-    assertEquals(1L, result.getData().getAccountDetailId());
-    assertEquals("환불 사유", result.getData().getMemberContent());
-    assertNull(result.getData().getAdminContent());
-    assertFalse(result.getData().isDone());
-    assertFalse(result.getData().isRefunded());
+    assertEquals(HttpStatus.OK, result.status());
+    assertEquals("환불 신청을 취소했습니다.", result.message());
+    assertEquals(1L, result.data().getId());
+    assertEquals(1L, result.data().getAccountDetailId());
+    assertEquals("환불 사유", result.data().getMemberContent());
+    assertNull(result.data().getAdminContent());
+    assertFalse(result.data().isDone());
+    assertFalse(result.data().isRefunded());
     verify(refundRepository, times(1)).delete(any());
   }
 
@@ -294,18 +294,18 @@ class AccountServiceTest {
             .build();
 
     //when
-    BaseResponseDto<RefundDto> result = accountService.refundDecision(
+    HttpApiResponse<RefundDto> result = accountService.refundDecision(
             true, refundUpdateForm);
 
     //then
-    assertEquals(HttpStatus.OK, result.getStatus());
-    assertEquals("환불 승인을 성공했습니다.", result.getMessage());
-    assertEquals(1L, result.getData().getId());
-    assertEquals(1L, result.getData().getAccountDetailId());
-    assertEquals("환불 완료", result.getData().getAdminContent());
-    assertEquals("환불 사유", result.getData().getMemberContent());
-    assertTrue(result.getData().isDone());
-    assertTrue(result.getData().isRefunded());
+    assertEquals(HttpStatus.OK, result.status());
+    assertEquals("환불 승인을 성공했습니다.", result.message());
+    assertEquals(1L, result.data().getId());
+    assertEquals(1L, result.data().getAccountDetailId());
+    assertEquals("환불 완료", result.data().getAdminContent());
+    assertEquals("환불 사유", result.data().getMemberContent());
+    assertTrue(result.data().isDone());
+    assertTrue(result.data().isRefunded());
   }
 
   @Test
@@ -329,18 +329,18 @@ class AccountServiceTest {
             .build();
 
     //when
-    BaseResponseDto<RefundDto> result = accountService.refundDecision(
+    HttpApiResponse<RefundDto> result = accountService.refundDecision(
             false, refundUpdateForm);
 
     //then
-    assertEquals(HttpStatus.OK, result.getStatus());
-    assertEquals("환불 비승인을 성공했습니다.", result.getMessage());
-    assertEquals(1L, result.getData().getId());
-    assertEquals(1L, result.getData().getAccountDetailId());
-    assertEquals("이미 사용한 금액은 환불할 수 없습니다.", result.getData().getAdminContent());
-    assertEquals("환불 사유", result.getData().getMemberContent());
-    assertTrue(result.getData().isDone());
-    assertFalse(result.getData().isRefunded());
+    assertEquals(HttpStatus.OK, result.status());
+    assertEquals("환불 비승인을 성공했습니다.", result.message());
+    assertEquals(1L, result.data().getId());
+    assertEquals(1L, result.data().getAccountDetailId());
+    assertEquals("이미 사용한 금액은 환불할 수 없습니다.", result.data().getAdminContent());
+    assertEquals("환불 사유", result.data().getMemberContent());
+    assertTrue(result.data().isDone());
+    assertFalse(result.data().isRefunded());
   }
 
 

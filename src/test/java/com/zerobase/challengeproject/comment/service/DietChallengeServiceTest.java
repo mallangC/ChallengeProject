@@ -1,6 +1,6 @@
 package com.zerobase.challengeproject.comment.service;
 
-import com.zerobase.challengeproject.BaseResponseDto;
+import com.zerobase.challengeproject.HttpApiResponse;
 import com.zerobase.challengeproject.account.domain.dto.PageDto;
 import com.zerobase.challengeproject.challenge.entity.Challenge;
 import com.zerobase.challengeproject.challenge.repository.ChallengeRepository;
@@ -85,7 +85,7 @@ class DietChallengeServiceTest {
   Challenge challengeBase = Challenge.builder()
           .id(1L)
           .title("challengeTitle")
-          .img("challengeImg")
+          .imageUrl("challengeImg")
           .categoryType(CategoryType.DIET)
           .maxParticipant(10L)
           .currentParticipant(1L)
@@ -132,14 +132,14 @@ class DietChallengeServiceTest {
             .goalWeight(55.7f)
             .build();
     //when
-    BaseResponseDto<DietChallengeDto> result =
+    HttpApiResponse<DietChallengeDto> result =
             dietChallengeService.addDietChallenge(form, userDetailsBase);
     //then
-    assertEquals(HttpStatus.OK, result.getStatus());
-    assertEquals("다이어트 챌린지 추가를 성공했습니다.", result.getMessage());
-    assertEquals(65.2f, result.getData().getCurrentWeight());
-    assertEquals(55.7f, result.getData().getGoalWeight());
-    assertEquals("test", result.getData().getLoginId());
+    assertEquals(HttpStatus.OK, result.status());
+    assertEquals("다이어트 챌린지 추가를 성공했습니다.", result.message());
+    assertEquals(65.2f, result.data().getCurrentWeight());
+    assertEquals(55.7f, result.data().getGoalWeight());
+    assertEquals("test", result.data().getLoginId());
     verify(dietChallengeRepository, times(1)).save(any());
     verify(dietCommentRepository, times(1)).save(any());
   }
@@ -152,7 +152,7 @@ class DietChallengeServiceTest {
             .willReturn(Challenge.builder()
                     .id(1L)
                     .title("challengeTitle")
-                    .img("challengeImg")
+                    .imageUrl("challengeImg")
                     .categoryType(CategoryType.COTE)
                     .maxParticipant(10L)
                     .currentParticipant(1L)
@@ -188,7 +188,7 @@ class DietChallengeServiceTest {
             .willReturn(Challenge.builder()
                     .id(1L)
                     .title("challengeTitle")
-                    .img("challengeImg")
+                    .imageUrl("challengeImg")
                     .categoryType(CategoryType.DIET)
                     .maxParticipant(10L)
                     .currentParticipant(1L)
@@ -224,14 +224,14 @@ class DietChallengeServiceTest {
             .willReturn(dietChallengeBase);
 
     //when
-    BaseResponseDto<DietChallengeDto> result =
+    HttpApiResponse<DietChallengeDto> result =
             dietChallengeService.getDietChallenge(1L, userDetailsBase);
     //then
-    assertEquals(HttpStatus.OK, result.getStatus());
-    assertEquals("다이어트 챌린지 단건 조회를 성공했습니다.", result.getMessage());
-    assertEquals(65.2f, result.getData().getCurrentWeight());
-    assertEquals(55.7f, result.getData().getGoalWeight());
-    assertEquals("test", result.getData().getLoginId());
+    assertEquals(HttpStatus.OK, result.status());
+    assertEquals("다이어트 챌린지 단건 조회를 성공했습니다.", result.message());
+    assertEquals(65.2f, result.data().getCurrentWeight());
+    assertEquals(55.7f, result.data().getGoalWeight());
+    assertEquals("test", result.data().getLoginId());
   }
 
 //  @Test
@@ -264,14 +264,14 @@ class DietChallengeServiceTest {
             .goalWeight(57.7f)
             .build();
     //when
-    BaseResponseDto<DietChallengeDto> result =
+    HttpApiResponse<DietChallengeDto> result =
             dietChallengeService.updateDietChallenge(form, userDetailsBase);
     //then
-    assertEquals(HttpStatus.OK, result.getStatus());
-    assertEquals("다이어트 챌린지 수정을 성공했습니다.", result.getMessage());
-    assertEquals(67.2f, result.getData().getCurrentWeight());
-    assertEquals(57.7f, result.getData().getGoalWeight());
-    assertEquals("test", result.getData().getLoginId());
+    assertEquals(HttpStatus.OK, result.status());
+    assertEquals("다이어트 챌린지 수정을 성공했습니다.", result.message());
+    assertEquals(67.2f, result.data().getCurrentWeight());
+    assertEquals(57.7f, result.data().getGoalWeight());
+    assertEquals("test", result.data().getLoginId());
   }
 
   @Test
@@ -281,7 +281,7 @@ class DietChallengeServiceTest {
     Challenge challenge = Challenge.builder()
             .id(1L)
             .title("challengeTitle")
-            .img("challengeImg")
+            .imageUrl("challengeImg")
             .categoryType(CategoryType.DIET)
             .maxParticipant(10L)
             .currentParticipant(1L)
@@ -334,14 +334,14 @@ class DietChallengeServiceTest {
             .currentWeight(50.2f)
             .build();
     //when
-    BaseResponseDto<DietCommentDto> result =
+    HttpApiResponse<DietCommentDto> result =
             dietChallengeService.addDietComment(form, userDetailsBase);
     //then
-    assertEquals(HttpStatus.OK, result.getStatus());
-    assertEquals("다이어트 댓글 추가를 성공했습니다.", result.getMessage());
-    assertEquals("추가성공이미지주소", result.getData().getImage());
-    assertEquals("추가성공내용", result.getData().getContent());
-    assertEquals("test", result.getData().getLoginId());
+    assertEquals(HttpStatus.OK, result.status());
+    assertEquals("다이어트 댓글 추가를 성공했습니다.", result.message());
+    assertEquals("추가성공이미지주소", result.data().getImage());
+    assertEquals("추가성공내용", result.data().getContent());
+    assertEquals("test", result.data().getLoginId());
     verify(dietCommentRepository, times(1)).save(any());
   }
 
@@ -354,14 +354,14 @@ class DietChallengeServiceTest {
             .willReturn(dietCommentBase);
 
     //when
-    BaseResponseDto<DietCommentDto> result =
+    HttpApiResponse<DietCommentDto> result =
             dietChallengeService.getDietComment(1L);
     //then
-    assertEquals(HttpStatus.OK, result.getStatus());
-    assertEquals("다이어트 댓글 조회를 성공했습니다.", result.getMessage());
-    assertEquals("베이스 이미지주소", result.getData().getImage());
-    assertEquals("베이스 내용", result.getData().getContent());
-    assertEquals("test", result.getData().getLoginId());
+    assertEquals(HttpStatus.OK, result.status());
+    assertEquals("다이어트 댓글 조회를 성공했습니다.", result.message());
+    assertEquals("베이스 이미지주소", result.data().getImage());
+    assertEquals("베이스 내용", result.data().getContent());
+    assertEquals("test", result.data().getLoginId());
   }
 
   @Test
@@ -379,14 +379,14 @@ class DietChallengeServiceTest {
             .build();
 
     //when
-    BaseResponseDto<DietCommentDto> result =
+    HttpApiResponse<DietCommentDto> result =
             dietChallengeService.updateDietComment(form, userDetailsBase);
     //then
-    assertEquals(HttpStatus.OK, result.getStatus());
-    assertEquals("다이어트 댓글 수정을 성공했습니다.", result.getMessage());
-    assertEquals("수정성공이미지주소", result.getData().getImage());
-    assertEquals("수정성공내용", result.getData().getContent());
-    assertEquals("test", result.getData().getLoginId());
+    assertEquals(HttpStatus.OK, result.status());
+    assertEquals("다이어트 댓글 수정을 성공했습니다.", result.message());
+    assertEquals("수정성공이미지주소", result.data().getImage());
+    assertEquals("수정성공내용", result.data().getContent());
+    assertEquals("test", result.data().getLoginId());
   }
 
   @Test
@@ -425,14 +425,14 @@ class DietChallengeServiceTest {
             .willReturn(dietCommentBase);
 
     //when
-    BaseResponseDto<DietCommentDto> result =
+    HttpApiResponse<DietCommentDto> result =
             dietChallengeService.deleteDietComment(1L, userDetailsBase);
     //then
-    assertEquals(HttpStatus.OK, result.getStatus());
-    assertEquals("다이어트 댓글 삭제를 성공했습니다.", result.getMessage());
-    assertEquals("베이스 이미지주소", result.getData().getImage());
-    assertEquals("베이스 내용", result.getData().getContent());
-    assertEquals("test", result.getData().getLoginId());
+    assertEquals(HttpStatus.OK, result.status());
+    assertEquals("다이어트 댓글 삭제를 성공했습니다.", result.message());
+    assertEquals("베이스 이미지주소", result.data().getImage());
+    assertEquals("베이스 내용", result.data().getContent());
+    assertEquals("test", result.data().getLoginId());
     verify(dietCommentRepository, times(1)).delete(any());
   }
 
@@ -470,14 +470,14 @@ class DietChallengeServiceTest {
             .build());
 
     //when
-    BaseResponseDto<DietCommentDto> result =
+    HttpApiResponse<DietCommentDto> result =
             dietChallengeService.adminDeleteDietComment(1L, userDetails);
     //then
-    assertEquals(HttpStatus.OK, result.getStatus());
-    assertEquals("관리자 권한으로 다이어트 댓글 삭제를 성공했습니다.", result.getMessage());
-    assertEquals("베이스 이미지주소", result.getData().getImage());
-    assertEquals("베이스 내용", result.getData().getContent());
-    assertEquals("test", result.getData().getLoginId());
+    assertEquals(HttpStatus.OK, result.status());
+    assertEquals("관리자 권한으로 다이어트 댓글 삭제를 성공했습니다.", result.message());
+    assertEquals("베이스 이미지주소", result.data().getImage());
+    assertEquals("베이스 내용", result.data().getContent());
+    assertEquals("test", result.data().getLoginId());
     verify(dietCommentRepository, times(1)).delete(any());
   }
 
@@ -507,11 +507,11 @@ class DietChallengeServiceTest {
             .build());
     int page = 1;
     //when
-    BaseResponseDto<PageDto<DietChallengeDto>> result =
+    HttpApiResponse<PageDto<DietChallengeDto>> result =
             dietChallengeService.getAllDietChallenge(page, 1L, true, userDetails);
     //then
-    assertEquals(HttpStatus.OK, result.getStatus());
-    assertEquals("다이어트 챌린지 전체 조회를 성공했습니다.(" + page + "페이지)", result.getMessage());
+    assertEquals(HttpStatus.OK, result.status());
+    assertEquals("다이어트 챌린지 전체 조회를 성공했습니다.(" + page + "페이지)", result.message());
   }
 
   @Test

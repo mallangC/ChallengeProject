@@ -28,7 +28,6 @@ public interface ChallengeRepository extends JpaRepository<Challenge, Long>, Cha
 
 
 
-
     /**
      * 챌린지 제목으로 검색, title컬럼으로 full text index생성
      * @param title

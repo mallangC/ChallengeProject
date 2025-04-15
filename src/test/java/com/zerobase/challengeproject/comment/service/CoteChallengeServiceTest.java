@@ -1,6 +1,6 @@
 package com.zerobase.challengeproject.comment.service;
 
-import com.zerobase.challengeproject.BaseResponseDto;
+import com.zerobase.challengeproject.HttpApiResponse;
 import com.zerobase.challengeproject.challenge.entity.Challenge;
 import com.zerobase.challengeproject.challenge.entity.MemberChallenge;
 import com.zerobase.challengeproject.challenge.repository.ChallengeRepository;
@@ -78,7 +78,7 @@ class CoteChallengeServiceTest {
   Challenge challengeBase = Challenge.builder()
           .id(1L)
           .title("challengeTitle")
-          .img("challengeImg")
+          .imageUrl("challengeImg")
           .categoryType(CategoryType.COTE)
           .description("challengeDescription")
           .maxParticipant(10L)
@@ -104,7 +104,7 @@ class CoteChallengeServiceTest {
   Challenge badChallenge = Challenge.builder()
           .id(1L)
           .title("challengeTitle")
-          .img("challengeImg")
+          .imageUrl("challengeImg")
           .categoryType(CategoryType.COTE)
           .description("challengeDescription")
           .maxParticipant(10L)
@@ -142,14 +142,14 @@ class CoteChallengeServiceTest {
             .startAt(startAt)
             .build();
     //when
-    BaseResponseDto<CoteChallengeDto> result =
+    HttpApiResponse<CoteChallengeDto> result =
             coteChallengeService.addCoteChallenge(form, userDetailsBase);
     //then
-    assertEquals(HttpStatus.OK, result.getStatus());
-    assertEquals("코테 챌린지 생성을 성공했습니다.", result.getMessage());
-    assertEquals(startAt, result.getData().getStartAt());
-    assertEquals("문제 제목", result.getData().getTitle());
-    assertEquals("코테 문제 링크", result.getData().getQuestion());
+    assertEquals(HttpStatus.OK, result.status());
+    assertEquals("코테 챌린지 생성을 성공했습니다.", result.message());
+    assertEquals(startAt, result.data().getStartAt());
+    assertEquals("문제 제목", result.data().getTitle());
+    assertEquals("코테 문제 링크", result.data().getQuestion());
     verify(coteChallengeRepository, times(1)).save(any());
   }
 
@@ -184,7 +184,7 @@ class CoteChallengeServiceTest {
             .willReturn((Challenge.builder()
                     .id(1L)
                     .title("challengeTitle")
-                    .img("challengeImg")
+                    .imageUrl("challengeImg")
                     .categoryType(CategoryType.DIET)
                     .maxParticipant(10L)
                     .currentParticipant(1L)
@@ -221,7 +221,7 @@ class CoteChallengeServiceTest {
             .willReturn(Challenge.builder()
                     .id(1L)
                     .title("challengeTitle")
-                    .img("challengeImg")
+                    .imageUrl("challengeImg")
                     .categoryType(CategoryType.COTE)
                     .maxParticipant(10L)
                     .currentParticipant(1L)
@@ -258,7 +258,7 @@ class CoteChallengeServiceTest {
             .willReturn(Challenge.builder()
                     .id(1L)
                     .title("challengeTitle")
-                    .img("challengeImg")
+                    .imageUrl("challengeImg")
                     .categoryType(CategoryType.COTE)
                     .maxParticipant(10L)
                     .currentParticipant(1L)
@@ -294,15 +294,15 @@ class CoteChallengeServiceTest {
     given(coteChallengeRepository.findById(anyLong()))
             .willReturn(Optional.of(coteChallengeBase));
     //when
-    BaseResponseDto<CoteChallengeDto> result =
+    HttpApiResponse<CoteChallengeDto> result =
             coteChallengeService.getCoteChallenge(1L);
     //then
-    assertEquals(HttpStatus.OK, result.getStatus());
-    assertEquals("코테 챌린지 단건 조회를 성공했습니다.", result.getMessage());
-    assertEquals(1L, result.getData().getChallengeId());
-    assertEquals(1L, result.getData().getId());
-    assertEquals(coteChallengeBase.getTitle(), result.getData().getTitle());
-    assertEquals(coteChallengeBase.getQuestion(), result.getData().getQuestion());
+    assertEquals(HttpStatus.OK, result.status());
+    assertEquals("코테 챌린지 단건 조회를 성공했습니다.", result.message());
+    assertEquals(1L, result.data().getChallengeId());
+    assertEquals(1L, result.data().getId());
+    assertEquals(coteChallengeBase.getTitle(), result.data().getTitle());
+    assertEquals(coteChallengeBase.getQuestion(), result.data().getQuestion());
   }
 
   @Test
@@ -332,14 +332,14 @@ class CoteChallengeServiceTest {
             .question("업데이트 문제")
             .build();
     //when
-    BaseResponseDto<CoteChallengeDto> result =
+    HttpApiResponse<CoteChallengeDto> result =
             coteChallengeService.updateCoteChallenge(form, userDetailsBase);
     //then
-    assertEquals(HttpStatus.OK, result.getStatus());
-    assertEquals("코테 챌린지 수정을 성공했습니다.", result.getMessage());
-    assertEquals(1L, result.getData().getChallengeId());
-    assertEquals("업데이트 제목", result.getData().getTitle());
-    assertEquals("업데이트 문제", result.getData().getQuestion());
+    assertEquals(HttpStatus.OK, result.status());
+    assertEquals("코테 챌린지 수정을 성공했습니다.", result.message());
+    assertEquals(1L, result.data().getChallengeId());
+    assertEquals("업데이트 제목", result.data().getTitle());
+    assertEquals("업데이트 문제", result.data().getQuestion());
   }
 
   @Test
@@ -383,17 +383,17 @@ class CoteChallengeServiceTest {
                     .comments(new ArrayList<>())
                     .build());
     //when
-    BaseResponseDto<CoteChallengeDto> result =
+    HttpApiResponse<CoteChallengeDto> result =
             coteChallengeService.deleteCoteChallenge(1L, userDetailsBase);
 
     //then
-    assertEquals(HttpStatus.OK, result.getStatus());
-    assertEquals("코테 챌린지 삭제를 성공했습니다.", result.getMessage());
-    assertEquals(1L, result.getData().getId());
-    assertEquals(1L, result.getData().getChallengeId());
-    assertEquals("삭제 제목", result.getData().getTitle());
-    assertEquals("삭제 문제 링크", result.getData().getQuestion());
-    assertEquals(startAt, result.getData().getStartAt());
+    assertEquals(HttpStatus.OK, result.status());
+    assertEquals("코테 챌린지 삭제를 성공했습니다.", result.message());
+    assertEquals(1L, result.data().getId());
+    assertEquals(1L, result.data().getChallengeId());
+    assertEquals("삭제 제목", result.data().getTitle());
+    assertEquals("삭제 문제 링크", result.data().getQuestion());
+    assertEquals(startAt, result.data().getStartAt());
   }
 
 
@@ -463,15 +463,15 @@ class CoteChallengeServiceTest {
             .build();
 
     //when
-    BaseResponseDto<CoteCommentDto> result =
+    HttpApiResponse<CoteCommentDto> result =
             coteChallengeService.addComment(form, userDetailsBase);
     //then
-    assertEquals(HttpStatus.OK, result.getStatus());
-    assertEquals("인증 댓글 추가를 성공했습니다.", result.getMessage());
-    assertEquals("이미지 링크", result.getData().getImage());
-    assertEquals("어렵다 어려워", result.getData().getContent());
-    assertEquals("인증댓글추가멤버아이디", result.getData().getUserId());
-    assertEquals(1L, result.getData().getCoteChallengeId());
+    assertEquals(HttpStatus.OK, result.status());
+    assertEquals("인증 댓글 추가를 성공했습니다.", result.message());
+    assertEquals("이미지 링크", result.data().getImage());
+    assertEquals("어렵다 어려워", result.data().getContent());
+    assertEquals("인증댓글추가멤버아이디", result.data().getUserId());
+    assertEquals(1L, result.data().getCoteChallengeId());
     verify(coteCommentRepository, times(1)).save(any());
   }
 
@@ -512,14 +512,14 @@ class CoteChallengeServiceTest {
     given(coteCommentRepository.findById(anyLong()))
             .willReturn(Optional.of(commentBase));
     //when
-    BaseResponseDto<CoteCommentDto> result = coteChallengeService.getComment(1L);
+    HttpApiResponse<CoteCommentDto> result = coteChallengeService.getComment(1L);
     //then
-    assertEquals(HttpStatus.OK, result.getStatus());
-    assertEquals("인증 댓글 조회를 성공했습니다.", result.getMessage());
-    assertEquals(1L, result.getData().getCoteChallengeId());
-    assertEquals("test", result.getData().getUserId());
-    assertEquals("인증 댓글 이미지 링크", result.getData().getImage());
-    assertEquals("정말 어려웠다", result.getData().getContent());
+    assertEquals(HttpStatus.OK, result.status());
+    assertEquals("인증 댓글 조회를 성공했습니다.", result.message());
+    assertEquals(1L, result.data().getCoteChallengeId());
+    assertEquals("test", result.data().getUserId());
+    assertEquals("인증 댓글 이미지 링크", result.data().getImage());
+    assertEquals("정말 어려웠다", result.data().getContent());
   }
 
 
@@ -535,16 +535,16 @@ class CoteChallengeServiceTest {
             .image("수정한 이미지 링크")
             .build();
     //when
-    BaseResponseDto<CoteCommentDto> result =
+    HttpApiResponse<CoteCommentDto> result =
             coteChallengeService.updateComment(form, userDetailsBase);
 
     //then
-    assertEquals(HttpStatus.OK, result.getStatus());
-    assertEquals("인증 댓글 수정을 성공했습니다.", result.getMessage());
-    assertEquals("test", result.getData().getUserId());
-    assertEquals("수정한 이미지 링크", result.getData().getImage());
-    assertEquals("수정한 내용", result.getData().getContent());
-    assertEquals(1L, result.getData().getCoteChallengeId());
+    assertEquals(HttpStatus.OK, result.status());
+    assertEquals("인증 댓글 수정을 성공했습니다.", result.message());
+    assertEquals("test", result.data().getUserId());
+    assertEquals("수정한 이미지 링크", result.data().getImage());
+    assertEquals("수정한 내용", result.data().getContent());
+    assertEquals(1L, result.data().getCoteChallengeId());
   }
 
   @Test
@@ -579,14 +579,14 @@ class CoteChallengeServiceTest {
     given(coteCommentRepository.searchCoteCommentById(anyLong()))
             .willReturn(commentBase);
     //when
-    BaseResponseDto<CoteCommentDto> result = coteChallengeService.deleteComment(1L, userDetailsBase);
+    HttpApiResponse<CoteCommentDto> result = coteChallengeService.deleteComment(1L, userDetailsBase);
     //then
-    assertEquals(HttpStatus.OK, result.getStatus());
-    assertEquals("인증 댓글 삭제를 성공했습니다.", result.getMessage());
-    assertEquals("test", result.getData().getUserId());
-    assertEquals("인증 댓글 이미지 링크", result.getData().getImage());
-    assertEquals("정말 어려웠다", result.getData().getContent());
-    assertEquals(1L, result.getData().getCoteChallengeId());
+    assertEquals(HttpStatus.OK, result.status());
+    assertEquals("인증 댓글 삭제를 성공했습니다.", result.message());
+    assertEquals("test", result.data().getUserId());
+    assertEquals("인증 댓글 이미지 링크", result.data().getImage());
+    assertEquals("정말 어려웠다", result.data().getContent());
+    assertEquals(1L, result.data().getCoteChallengeId());
   }
 
 
@@ -620,14 +620,14 @@ class CoteChallengeServiceTest {
             .memberType(MemberType.ADMIN)
             .build());
     //when
-    BaseResponseDto<CoteCommentDto> result = coteChallengeService.adminDeleteComment(1L, userDetails);
+    HttpApiResponse<CoteCommentDto> result = coteChallengeService.adminDeleteComment(1L, userDetails);
     //then
-    assertEquals(HttpStatus.OK, result.getStatus());
-    assertEquals("관리자 권한으로 인증 댓글 삭제를 성공했습니다.", result.getMessage());
-    assertEquals("test", result.getData().getUserId());
-    assertEquals("인증 댓글 이미지 링크", result.getData().getImage());
-    assertEquals("정말 어려웠다", result.getData().getContent());
-    assertEquals(1L, result.getData().getCoteChallengeId());
+    assertEquals(HttpStatus.OK, result.status());
+    assertEquals("관리자 권한으로 인증 댓글 삭제를 성공했습니다.", result.message());
+    assertEquals("test", result.data().getUserId());
+    assertEquals("인증 댓글 이미지 링크", result.data().getImage());
+    assertEquals("정말 어려웠다", result.data().getContent());
+    assertEquals(1L, result.data().getCoteChallengeId());
   }
 
   @Test

@@ -1,6 +1,6 @@
 package com.zerobase.challengeproject.comment.controller;
 
-import com.zerobase.challengeproject.BaseResponseDto;
+import com.zerobase.challengeproject.HttpApiResponse;
 import com.zerobase.challengeproject.comment.domain.dto.WaterChallengeDto;
 import com.zerobase.challengeproject.comment.domain.dto.WaterCommentDto;
 import com.zerobase.challengeproject.comment.domain.form.WaterChallengeForm;
@@ -23,7 +23,7 @@ public class WaterChallengeController {
 
   //물마시기 챌린지 추가
   @PostMapping
-  public ResponseEntity<BaseResponseDto<WaterChallengeDto>> addWaterChallenge(
+  public ResponseEntity<HttpApiResponse<WaterChallengeDto>> addWaterChallenge(
           @RequestBody @Valid WaterChallengeForm form,
           @AuthenticationPrincipal UserDetailsImpl userDetails) {
     return ResponseEntity.ok(waterChallengeService.addWaterChallenge(form, userDetails));
@@ -31,7 +31,7 @@ public class WaterChallengeController {
 
   //오늘의 물마시기 챌린지 확인
   @GetMapping("/{challengeId}")
-  public ResponseEntity<BaseResponseDto<WaterChallengeDto>> getWaterChallenge(
+  public ResponseEntity<HttpApiResponse<WaterChallengeDto>> getWaterChallenge(
           @PathVariable Long challengeId,
           @AuthenticationPrincipal UserDetailsImpl userDetails) {
     return ResponseEntity.ok(waterChallengeService.getWaterChallenge(challengeId, userDetails));
@@ -39,7 +39,7 @@ public class WaterChallengeController {
 
   //물마시기 챌린지 수정
   @PatchMapping
-  public ResponseEntity<BaseResponseDto<WaterChallengeDto>> updateWaterChallenge(
+  public ResponseEntity<HttpApiResponse<WaterChallengeDto>> updateWaterChallenge(
           @RequestBody @Valid WaterChallengeForm form,
           @AuthenticationPrincipal UserDetailsImpl userDetails) {
     return ResponseEntity.ok(waterChallengeService.updateWaterChallenge(form, userDetails));
@@ -47,7 +47,7 @@ public class WaterChallengeController {
 
   //물마시기 댓글 추가
   @PostMapping("/comment")
-  public ResponseEntity<BaseResponseDto<WaterCommentDto>> addWaterComment(
+  public ResponseEntity<HttpApiResponse<WaterCommentDto>> addWaterComment(
           @RequestBody @Valid WaterCommentAddForm form,
           @AuthenticationPrincipal UserDetailsImpl userDetails) {
     return ResponseEntity.ok(waterChallengeService.addWaterComment(form, userDetails));
@@ -55,14 +55,14 @@ public class WaterChallengeController {
 
   //물마시기 댓글 단건 확인
   @GetMapping("/comment/{commentId}")
-  public ResponseEntity<BaseResponseDto<WaterCommentDto>> getWaterComment(
+  public ResponseEntity<HttpApiResponse<WaterCommentDto>> getWaterComment(
           @PathVariable Long commentId) {
     return ResponseEntity.ok(waterChallengeService.getWaterComment(commentId));
   }
 
   //물마시기 댓글 추가
   @PatchMapping("/comment")
-  public ResponseEntity<BaseResponseDto<WaterCommentDto>> updateWaterComment(
+  public ResponseEntity<HttpApiResponse<WaterCommentDto>> updateWaterComment(
           @RequestBody @Valid WaterCommentUpdateForm form,
           @AuthenticationPrincipal UserDetailsImpl userDetails) {
     return ResponseEntity.ok(waterChallengeService.updateWaterComment(form, userDetails));

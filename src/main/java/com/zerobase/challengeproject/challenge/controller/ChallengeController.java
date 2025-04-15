@@ -1,18 +1,13 @@
 package com.zerobase.challengeproject.challenge.controller;
 
 
-import com.zerobase.challengeproject.account.repository.AccountDetailRepository;
+import com.zerobase.challengeproject.PagenatedResponseDto;
 import com.zerobase.challengeproject.challenge.domain.dto.*;
-import com.zerobase.challengeproject.challenge.domain.form.CreateChallengeForm;
-import com.zerobase.challengeproject.challenge.domain.form.RegistrationChallengeForm;
-import com.zerobase.challengeproject.challenge.domain.form.UpdateChallengeForm;
-import com.zerobase.challengeproject.challenge.repository.ChallengeRepository;
-import com.zerobase.challengeproject.challenge.repository.MemberChallengeRepository;
+import com.zerobase.challengeproject.challenge.domain.request.CreateChallengeRequest;
+import com.zerobase.challengeproject.challenge.domain.request.RegistrationChallengeRequest;
+import com.zerobase.challengeproject.challenge.domain.request.UpdateChallengeRequest;
 import com.zerobase.challengeproject.challenge.service.ChallengeService;
-import com.zerobase.challengeproject.comment.repository.CoteChallengeRepository;
-import com.zerobase.challengeproject.comment.repository.CoteCommentRepository;
 import com.zerobase.challengeproject.member.components.jwt.UserDetailsImpl;
-import com.zerobase.challengeproject.member.repository.MemberRepository;
 import jakarta.validation.Valid;
 import lombok.AllArgsConstructor;
 import org.springframework.data.domain.Page;
@@ -36,51 +31,65 @@ public class ChallengeController {
      * 챌린지 전체 조회
      */
     @GetMapping
-    public ResponseEntity<BaseResponseDto<Page<GetChallengeDto>>> getAllChallenge(Pageable pageable) {
+    public ResponseEntity<PagenatedResponseDto<GetChallengeDto>> getAllChallenges(Pageable pageable) {
         List<GetChallengeDto> challengeList = challengeService.getAllChallenges(pageable);
 
-        Page<GetChallengeDto> challengePage = new PageImpl<>(
-                challengeList,
-                pageable,
-                challengeList.size()
-        );
-        return ResponseEntity.ok(new BaseResponseDto<>(challengePage, "전체 챌린지 조회 성공", HttpStatus.OK));
+        Page<GetChallengeDto> challengePage = new PageImpl<>(challengeList, pageable, challengeList.size());
+        return ResponseEntity.ok(PagenatedResponseDto.from(challengePage, "전체 챌린지 조회 성공", HttpStatus.OK));
     }
+
 
     /**
      * 챌린지 상세조회
      */
     @GetMapping("/{challengeId}")
-    public ResponseEntity<BaseResponseDto<GetChallengeDto>> getChallengeDetail(@PathVariable Long challengeId){
-
-        return challengeService.getChallengeDetail(challengeId);
+    public ResponseEntity<HttpApiResponse<GetChallengeDto>> getChallengeDetail(@PathVariable Long challengeId) {
+        GetChallengeDto challengeDto = challengeService.getChallengeDetail(challengeId);
+        return ResponseEntity.ok(new HttpApiResponse<>(challengeDto, "챌린지 상세정보 조회 성공", HttpStatus.OK));
     }
 
     /**
      * 사용자가 생성한 챌린지 조회
      */
     @GetMapping("/my-challenge")
-    public ResponseEntity<BaseResponseDto<Page<GetChallengeDto>>> getChallengesMadeByUser(Pageable pageable, @AuthenticationPrincipal UserDetailsImpl userDetails){
+    public ResponseEntity<PagenatedResponseDto<GetChallengeDto>> getChallengesMadeByUser(Pageable pageable,
+                                                                                               @AuthenticationPrincipal UserDetailsImpl userDetails) {
 
-        return challengeService.getChallengesMadeByUser(pageable, userDetails);
+        Long memberId = userDetails.getMember().getId();
+        Page<GetChallengeDto> usersChallengePages = challengeService.getChallengesMadeByUser(pageable, memberId);
+
+        return ResponseEntity.ok(PagenatedResponseDto.from(usersChallengePages, "유저가 생성한 챌린지 조회 성공", HttpStatus.OK));
+
     }
 
     /**
      * 사용자가 참여중인 챌린지 조회
      */
     @GetMapping("/participation")
-    public ResponseEntity<BaseResponseDto<Page<ParticipationChallengeDto>>> ongoingChallenges(Pageable pageable, @AuthenticationPrincipal UserDetailsImpl userDetails){
+    public ResponseEntity<PagenatedResponseDto<ParticipationChallengeDto>> getOngoingChallenges(Pageable pageable,
+                                                                                                 @AuthenticationPrincipal UserDetailsImpl userDetails) {
 
-        return challengeService.getOngoingChallenges(pageable, userDetails);
+        Long memberId = userDetails.getMember().getId();
+        Page<ParticipationChallengeDto> challengeDtos = challengeService.getOngoingChallenges(pageable, memberId);
+
+        return ResponseEntity.ok(PagenatedResponseDto.from(challengeDtos, "유저가 참여중인 챌린지 조회 성공", HttpStatus.OK)
+        );
     }
 
     /**
      * 사용자가 챌린지에 참여
      */
     @PostMapping("/registrations/{challengeId}")
-    public ResponseEntity<BaseResponseDto<EnterChallengeDto>> enterChallenge(@PathVariable Long challengeId, @Valid @RequestBody RegistrationChallengeForm registrationChallengeForm, @AuthenticationPrincipal UserDetailsImpl userDetails){
+    public ResponseEntity<HttpApiResponse<RegistrationChallengeDto>> registerChallenge(
+            @PathVariable Long challengeId,
+            @Valid @RequestBody RegistrationChallengeRequest registrationChallengeRequest,
+            @AuthenticationPrincipal UserDetailsImpl userDetails) {
 
-        return challengeService.enterChallenge(challengeId, registrationChallengeForm, userDetails);
+        Long memberId = userDetails.getMember().getId();
+        RegistrationChallengeDto registrationChallengeDto = challengeService.registerChallenge(challengeId, registrationChallengeRequest, memberId);
+
+        return ResponseEntity.ok(new HttpApiResponse<>(registrationChallengeDto, "챌린지 참여에 성공했습니다.", HttpStatus.OK)
+        );
     }
 
     /**
@@ -88,45 +97,69 @@ public class ChallengeController {
      *
      */
     @DeleteMapping("/cancel/{challengeId}")
-    public ResponseEntity<BaseResponseDto<GetChallengeDto>> cancelChallenge(@PathVariable Long challengeId, @AuthenticationPrincipal UserDetailsImpl userDetails ){
+    public ResponseEntity<HttpApiResponse<Void>> cancelChallenge(
+            @PathVariable Long challengeId,
+            @AuthenticationPrincipal UserDetailsImpl userDetails) {
 
-
-        return challengeService.cancelChallenge(challengeId, userDetails);
+        Long memberId = userDetails.getMember().getId();
+        challengeService.cancelChallenge(challengeId, memberId);
+        return ResponseEntity.ok(new HttpApiResponse<>(null, "챌린지 참여가 취소되었습니다.", HttpStatus.OK)
+        );
     }
 
     /**
      * 챌린지 생성
      */
     @PostMapping
-    public ResponseEntity<BaseResponseDto<GetChallengeDto>> createChallenge(@Valid @RequestBody CreateChallengeForm form, @AuthenticationPrincipal UserDetailsImpl userDetails) {
+    public ResponseEntity<HttpApiResponse<GetChallengeDto>> createChallenge(
+            @Valid @RequestBody CreateChallengeRequest form,
+            @AuthenticationPrincipal UserDetailsImpl userDetails) {
 
-        return challengeService.createChallenge(form, userDetails);
+        Long memberId = userDetails.getMember().getId();
+        GetChallengeDto challengeDto = challengeService.createChallenge(form, memberId);
+
+        return ResponseEntity.ok(new HttpApiResponse<>(challengeDto, "챌린지 생성 성공", HttpStatus.OK)
+        );
     }
 
     /**
      * 챌린지 수정
      */
     @PutMapping("/{challengeId}")
-    public ResponseEntity<BaseResponseDto<GetChallengeDto>> updateChallenge(@PathVariable Long challengeId, @Valid @RequestBody UpdateChallengeForm form, @AuthenticationPrincipal UserDetailsImpl userDetails){
+    public ResponseEntity<HttpApiResponse<GetChallengeDto>> updateChallenge(
+            @PathVariable Long challengeId,
+            @Valid @RequestBody UpdateChallengeRequest form,
+            @AuthenticationPrincipal UserDetailsImpl userDetails) {
 
-        return challengeService.updateChallenge(challengeId, form, userDetails);
+        GetChallengeDto updatedChallenge = challengeService.updateChallenge(challengeId, form);
+        return ResponseEntity.ok(new HttpApiResponse<GetChallengeDto>(updatedChallenge, "챌린지 수정 성공", HttpStatus.OK)
+        );
     }
 
     /**
      * 챌린지 삭제
      */
     @DeleteMapping("/{challengeId}")
-    public ResponseEntity<BaseResponseDto<GetChallengeDto>> deleteChallenge(@PathVariable Long challengeId, @AuthenticationPrincipal UserDetailsImpl userDetails){
+    public ResponseEntity<HttpApiResponse<Void>> deleteChallenge(
+            @PathVariable Long challengeId,
+            @AuthenticationPrincipal UserDetailsImpl userDetails
+    ) {
+        challengeService.deleteChallenge(challengeId, userDetails.getMember());
 
-        return challengeService.deleteChallenge(challengeId, userDetails);
+        return ResponseEntity.ok(new HttpApiResponse<>(null, "챌린지 삭제 성공", HttpStatus.OK)
+        );
     }
 
     /**
      * 챌린지 환급
      */
     @PostMapping("/{challengeId}")
-    public ResponseEntity<BaseResponseDto<DepositBackDto>> challengeDepositBack(@PathVariable Long challengeId, @AuthenticationPrincipal UserDetailsImpl userDetails){
+    public ResponseEntity<HttpApiResponse<DepositBackDto>> challengeDepositBack(
+            @PathVariable Long challengeId,
+            @AuthenticationPrincipal UserDetailsImpl userDetails) {
 
-        return challengeService.challengeDepositBack(challengeId, userDetails);
+        DepositBackDto dto = challengeService.challengeDepositBack(challengeId, userDetails.getMember());
+
+        return ResponseEntity.ok(new HttpApiResponse<>(dto, "챌린지 환급 성공", HttpStatus.OK));
     }
 }

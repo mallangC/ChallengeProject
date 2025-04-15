@@ -1,4 +1,4 @@
-    package com.zerobase.challengeproject.challenge.domain.form;
+    package com.zerobase.challengeproject.challenge.domain.request;
 
 
     import com.zerobase.challengeproject.exception.CustomException;
@@ -14,7 +14,7 @@
     @NoArgsConstructor
     @AllArgsConstructor
     @Builder
-    public class CreateChallengeForm {
+    public class CreateChallengeRequest {
 
         @NotBlank(message = "제목을 작성해 주세요.")
         @Size(min = 3, max = 100, message = "제목은 3자 이상, 100자 이하로 입력해야 합니다.")
