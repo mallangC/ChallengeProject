@@ -1,6 +1,9 @@
 package com.zerobase.challengeproject.member.contoller;
 
-import com.zerobase.challengeproject.BaseResponseDto;
+import com.zerobase.challengeproject.HttpApiPageResponse;
+import com.zerobase.challengeproject.exception.CustomException;
+import com.zerobase.challengeproject.exception.ErrorCode;
+import com.zerobase.challengeproject.member.components.jwt.JwtUtil;
 import com.zerobase.challengeproject.member.domain.dto.MemberLogoutDto;
 import com.zerobase.challengeproject.member.domain.dto.RefreshTokenDto;
 import com.zerobase.challengeproject.member.service.MemberLoginService;
@@ -16,6 +19,7 @@ import org.springframework.web.bind.annotation.*;
 public class MemberLoginController {
 
     private final MemberLoginService memberLoginService;
+    private final JwtUtil jwtUtil;
 
     /**
      * 로그인한 유저가 로그 아웃을 시도할 때 사용하는 컨트롤러 메서드
@@ -24,15 +28,21 @@ public class MemberLoginController {
      * @return 로그인한 유저의 아이디, 아무정보도 없는 쿠키
      */
     @PostMapping("/logout")
-    public ResponseEntity<BaseResponseDto> logout(@RequestHeader("Authorization") String token,
-                                                  @CookieValue(value = "refreshToken", required = false)
+    public ResponseEntity<HttpApiPageResponse> logout(@RequestHeader("Authorization") String token,
+                                                      @CookieValue(value = "refreshToken", required = false)
                                                   String refreshToken) {
-
-        MemberLogoutDto dto = memberLoginService.logout(token,refreshToken);
+        token = token.substring(7);
+        if (refreshToken == null) {
+            throw new CustomException(ErrorCode.TOKEN_NOT_PROVIDED);
+        }
+        if (!jwtUtil.isTokenValid(refreshToken)) {
+            throw new CustomException(ErrorCode.TOKEN_IS_INVALID_OR_EXPIRED);
+        }
+        MemberLogoutDto dto = memberLoginService.logout(token);
 
         return ResponseEntity.ok()
                 .header(HttpHeaders.SET_COOKIE, dto.getResponseCookie().toString())
-                .body(new BaseResponseDto<>(dto.getLoginId(), "로그아웃 성공했습니다.", HttpStatus.OK));
+                .body(new HttpApiPageResponse<>(dto.getLoginId(), "로그아웃 성공했습니다.", HttpStatus.OK));
     }
 
     /**
@@ -41,12 +51,16 @@ public class MemberLoginController {
      * @return AccessToken
      */
     @PostMapping("/token/refresh")
-    public ResponseEntity<BaseResponseDto> refreshAccessToken(@CookieValue(value = "refreshToken", required = false) String refreshToken  ) {
+    public ResponseEntity<HttpApiPageResponse> refreshAccessToken(
+            @CookieValue(value = "refreshToken", required = false) String refreshToken) {
+        if (refreshToken == null || !jwtUtil.isTokenValid(refreshToken)) {
+            throw new CustomException(ErrorCode.TOKEN_IS_INVALID_OR_EXPIRED);
+        }
         RefreshTokenDto dto = memberLoginService.refreshAccessToken(refreshToken);
 
         return ResponseEntity.ok()
                 .header(HttpHeaders.AUTHORIZATION, "Bearer " + dto.getAccessToken())
                 .header(HttpHeaders.SET_COOKIE, dto.getRefreshToken())
-                .body(new BaseResponseDto<>(null, "토큰이 재 발행되었습니다", HttpStatus.OK));
+                .body(new HttpApiPageResponse<>(null, "토큰이 재 발행되었습니다", HttpStatus.OK));
     }
 }

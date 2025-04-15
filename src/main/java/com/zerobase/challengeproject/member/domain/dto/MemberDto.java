@@ -13,17 +13,13 @@ public class MemberDto {
   private String loginId;
   private String memberName;
   private String nickName;
-  private String phoneNum;
+  private String phoneNumber;
   private String email;
   private Long account;
   private List<AccountDetailDto> accountDetails;
 
   public static MemberDto from(Member member) {
-    return MemberDto.builder()
-            .loginId(member.getLoginId())
-            .memberName(member.getMemberName())
-            .nickName(member.getNickname())
-            .phoneNum(member.getPhoneNum())
+    return (member.getPhoneNumber())
             .email(member.getEmail())
             .account(member.getAccount())
             .accountDetails(member.getAccountDetails().stream()
@@ -37,7 +33,7 @@ public class MemberDto {
             .loginId(member.getLoginId())
             .memberName(member.getMemberName())
             .nickName(member.getNickname())
-            .phoneNum(member.getPhoneNum())
+            .phoneNumber(member.getPhoneNumber())
             .email(member.getEmail())
             .account(member.getAccount())
             .build();

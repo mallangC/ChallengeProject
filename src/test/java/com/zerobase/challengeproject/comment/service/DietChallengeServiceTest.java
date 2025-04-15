@@ -1,6 +1,6 @@
 package com.zerobase.challengeproject.comment.service;
 
-import com.zerobase.challengeproject.BaseResponseDto;
+import com.zerobase.challengeproject.HttpApiPageResponse;
 import com.zerobase.challengeproject.account.domain.dto.PageDto;
 import com.zerobase.challengeproject.challenge.entity.Challenge;
 import com.zerobase.challengeproject.challenge.repository.ChallengeRepository;
@@ -132,7 +132,7 @@ class DietChallengeServiceTest {
             .goalWeight(55.7f)
             .build();
     //when
-    BaseResponseDto<DietChallengeDto> result =
+    HttpApiPageResponse<DietChallengeDto> result =
             dietChallengeService.addDietChallenge(form, userDetailsBase);
     //then
     assertEquals(HttpStatus.OK, result.getStatus());
@@ -224,7 +224,7 @@ class DietChallengeServiceTest {
             .willReturn(dietChallengeBase);
 
     //when
-    BaseResponseDto<DietChallengeDto> result =
+    HttpApiPageResponse<DietChallengeDto> result =
             dietChallengeService.getDietChallenge(1L, userDetailsBase);
     //then
     assertEquals(HttpStatus.OK, result.getStatus());
@@ -264,7 +264,7 @@ class DietChallengeServiceTest {
             .goalWeight(57.7f)
             .build();
     //when
-    BaseResponseDto<DietChallengeDto> result =
+    HttpApiPageResponse<DietChallengeDto> result =
             dietChallengeService.updateDietChallenge(form, userDetailsBase);
     //then
     assertEquals(HttpStatus.OK, result.getStatus());
@@ -334,7 +334,7 @@ class DietChallengeServiceTest {
             .currentWeight(50.2f)
             .build();
     //when
-    BaseResponseDto<DietCommentDto> result =
+    HttpApiPageResponse<DietCommentDto> result =
             dietChallengeService.addDietComment(form, userDetailsBase);
     //then
     assertEquals(HttpStatus.OK, result.getStatus());
@@ -354,7 +354,7 @@ class DietChallengeServiceTest {
             .willReturn(dietCommentBase);
 
     //when
-    BaseResponseDto<DietCommentDto> result =
+    HttpApiPageResponse<DietCommentDto> result =
             dietChallengeService.getDietComment(1L);
     //then
     assertEquals(HttpStatus.OK, result.getStatus());
@@ -379,7 +379,7 @@ class DietChallengeServiceTest {
             .build();
 
     //when
-    BaseResponseDto<DietCommentDto> result =
+    HttpApiPageResponse<DietCommentDto> result =
             dietChallengeService.updateDietComment(form, userDetailsBase);
     //then
     assertEquals(HttpStatus.OK, result.getStatus());
@@ -425,7 +425,7 @@ class DietChallengeServiceTest {
             .willReturn(dietCommentBase);
 
     //when
-    BaseResponseDto<DietCommentDto> result =
+    HttpApiPageResponse<DietCommentDto> result =
             dietChallengeService.deleteDietComment(1L, userDetailsBase);
     //then
     assertEquals(HttpStatus.OK, result.getStatus());
@@ -470,7 +470,7 @@ class DietChallengeServiceTest {
             .build());
 
     //when
-    BaseResponseDto<DietCommentDto> result =
+    HttpApiPageResponse<DietCommentDto> result =
             dietChallengeService.adminDeleteDietComment(1L, userDetails);
     //then
     assertEquals(HttpStatus.OK, result.getStatus());
@@ -507,7 +507,7 @@ class DietChallengeServiceTest {
             .build());
     int page = 1;
     //when
-    BaseResponseDto<PageDto<DietChallengeDto>> result =
+    HttpApiPageResponse<PageDto<DietChallengeDto>> result =
             dietChallengeService.getAllDietChallenge(page, 1L, true, userDetails);
     //then
     assertEquals(HttpStatus.OK, result.getStatus());

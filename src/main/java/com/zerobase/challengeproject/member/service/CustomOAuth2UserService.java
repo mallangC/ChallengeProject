@@ -91,7 +91,7 @@ public class CustomOAuth2UserService implements OAuth2UserService<OAuth2UserRequ
                         .password(encodedPassword)
                         .memberName(userInfo.getName())
                         .nickname("멋쟁이 " + userInfo.getName())
-                        .phoneNum("010-0000-0000")
+                        .phoneNumber("010-0000-0000")
                         .email(userInfo.getEmail())
                         .memberType(MemberType.USER)
                         .registerDate(LocalDateTime.now())

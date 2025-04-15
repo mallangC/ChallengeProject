@@ -1,6 +1,8 @@
 package com.zerobase.challengeproject.member.contoller;
 
-import com.zerobase.challengeproject.BaseResponseDto;
+import com.zerobase.challengeproject.HttpApiPageResponse;
+import com.zerobase.challengeproject.exception.CustomException;
+import com.zerobase.challengeproject.exception.ErrorCode;
 import com.zerobase.challengeproject.member.components.jwt.UserDetailsImpl;
 import com.zerobase.challengeproject.member.domain.dto.MemberEmailAuthDto;
 import com.zerobase.challengeproject.member.domain.dto.MemberSignupDto;
@@ -15,6 +17,8 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.web.bind.annotation.*;
 
+import java.util.Objects;
+
 @RestController
 @RequiredArgsConstructor
 @RequestMapping("/api/member")
@@ -28,8 +32,17 @@ public class MemberSignupController {
      * @return 회원 가입한 유저의 비밀번호를 제외한 정보
      */
     @PostMapping("/sign-up")
-    public ResponseEntity<BaseResponseDto<MemberSignupDto>> signUp(@Valid @RequestBody MemberSignupForm memberSignupForm) {
-        return ResponseEntity.ok(new BaseResponseDto<>(memberService.signup(memberSignupForm), "회원 가입 요청 성공했습니다.", HttpStatus.OK));
+    public ResponseEntity<HttpApiPageResponse<MemberSignupDto>> signUp(
+            @Valid @RequestBody MemberSignupForm memberSignupForm) {
+        if(!Objects.equals(memberSignupForm.getPassword(),
+                memberSignupForm.getConfirmPassword())) {
+            throw new CustomException(ErrorCode.CONFIRM_PASSWORD_MISMATCH);
+        }
+        return ResponseEntity.ok(
+                new HttpApiPageResponse<>(
+                        memberService.signup(memberSignupForm),
+                        "회원 가입 요청 성공했습니다.",
+                        HttpStatus.OK));
     }
 
     /**
@@ -38,8 +51,14 @@ public class MemberSignupController {
      * @return 유저의 아이디, 인증 확인, 인증 날짜
      */
     @GetMapping("/email-auth")
-    public ResponseEntity<BaseResponseDto<MemberEmailAuthDto>> verifyEmail(@RequestParam("id") String emailAuthKey){
-        return ResponseEntity.ok(new BaseResponseDto<>(memberService.verifyEmail(emailAuthKey),"이메일 인증 완료되었습니다.", HttpStatus.OK));
+    public ResponseEntity<HttpApiPageResponse<MemberEmailAuthDto>> verifyEmail(
+            @RequestParam("id") String emailAuthKey){
+        return ResponseEntity.ok(
+                new HttpApiPageResponse<>(
+                        memberService.verifyEmail(emailAuthKey),
+                        "이메일 인증 완료되었습니다.",
+                        HttpStatus.OK)
+        );
     }
 
     /**
@@ -48,10 +67,11 @@ public class MemberSignupController {
      * @return 아무 정보도 없는 쿠키, 회원 탈퇴 성공 메세지
      */
     @DeleteMapping("/unregister")
-    public ResponseEntity<BaseResponseDto> unregister(@AuthenticationPrincipal UserDetailsImpl userDetails) {
-        ResponseCookie cookie = memberService.unregister(userDetails);
+    public ResponseEntity<HttpApiPageResponse<Void>> unregister(
+            @AuthenticationPrincipal UserDetailsImpl userDetails) {
+        ResponseCookie cookie = memberService.unregister(userDetails.getUsername());
         return ResponseEntity.ok()
                 .header(HttpHeaders.SET_COOKIE,cookie.toString())
-                .body(new BaseResponseDto<>(null,"회원 탈퇴 성공했습니다.", HttpStatus.OK));
+                .body(new HttpApiPageResponse<>(null,"회원 탈퇴 성공했습니다.", HttpStatus.OK));
     }
 }

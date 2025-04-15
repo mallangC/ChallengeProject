@@ -38,28 +38,25 @@ public class MemberSignupService {
      * 회원 가입시 사용되는 서비스 메서드, 비밀번호와 확인 비밀번호가 다르면 예외 발생.
      * 이메일 주소가 중복이면 예외발생. 인증 키는 랜덤으로 생성.
      * 비밀번호는 BCryptPasswordEncoder를 이용하여 인코딩하여 저장
-     * @param memberSignupForm 회원 가입 정보들(memberId,memberName,nickname,
+     * @param form 회원 가입 정보들(memberId,memberName,nickname,
      *                         email, phoneNum, password, confirmPassword)
      * @return 회원 가입한 유저의 비밀번호를 제외한 정보
      */
-    public MemberSignupDto signup(@Valid MemberSignupForm memberSignupForm) {
-        if(!Objects.equals(memberSignupForm.getPassword(), memberSignupForm.getConfirmPassword())) {
-            throw new CustomException(ErrorCode.CONFIRM_PASSWORD_MISMATCH);
-        }
-        String password = passwordEncoder.encode(memberSignupForm.getPassword());
-        String loginId = memberSignupForm.getLoginId();
+    public MemberSignupDto signup(@Valid MemberSignupForm form) {
+        String password = passwordEncoder.encode(form.getPassword());
+        String loginId = form.getLoginId();
         String emailAuthKey = UUID.randomUUID().toString();
-        String email = memberSignupForm.getEmail();
+        String email = form.getEmail();
         if(memberRepository.existsByEmail(email)){
             throw new CustomException(ErrorCode.ALREADY_REGISTER_EMAIL);
         }
         if(memberRepository.existsByLoginId(loginId)){
             throw new CustomException(ErrorCode.ALREADY_REGISTER_LOGIN_ID);
         }
-        Member member = Member.from(memberSignupForm, password, emailAuthKey);
+        Member member = Member.from(form, password, emailAuthKey);
         memberRepository.save(member);
 
-        sendEmail(memberSignupForm.getEmail(), emailAuthKey);
+        sendEmail(form.getEmail(), emailAuthKey);
         return new MemberSignupDto(member);
     }
 
@@ -72,7 +69,9 @@ public class MemberSignupService {
         String subject = "ZerobaseChallenge에 가입해 주셔서 감사합니다";
         String text = "<p>ZerobaseChallenge 사이트 가입을 축하드립니다.</p>" +
                 "<p>아래 링크를 클릭하셔서 가입을 완료하세요.</p>"
-                + "<div><a href='http://localhost:8080/api/member/email-auth?id=" + emailAuthKey +"'>클릭하여 이메일 인증 완료 하기</a></div>";
+                + "<div><a href='http://localhost:8080/api/member/email-auth?id="
+                + emailAuthKey +
+                "'>클릭하여 이메일 인증 완료 하기</a></div>";
         mailComponents.send(email, subject, text);
     }
 
@@ -84,16 +83,13 @@ public class MemberSignupService {
     @Transactional
     public MemberEmailAuthDto verifyEmail(String emailAuthKey) {
         Optional<Member> memberOptional = memberRepository.findByEmailAuthKey(emailAuthKey);
-
         if(memberOptional.isEmpty()){
             throw new CustomException(ErrorCode.NOT_FOUND_MEMBER);
         }
-
         Member member = memberOptional.get();
         if(member.isEmailVerified()){
             throw new CustomException(ErrorCode.ALREADY_VERIFY_EMAIL);
         }
-
         member.completeEmailAuth();
         return  new MemberEmailAuthDto(member);
     }
@@ -102,14 +98,15 @@ public class MemberSignupService {
      * 회원 탈퇴시 사용하는 서비스 메서드
      * 유저 탈퇴시 가지고 있던 리프레시 토큰 삭제
      * 아무런 정보도 가지고 있지 않은 쿠키 생성
-     * @param userDetails 로그인한 유저의 정보
+     * @param loginId 로그인한 유저의 정보
      * @return 정보가 없는 쿠키
      */
-    public ResponseCookie unregister(UserDetailsImpl userDetails) {
-        Member member = memberRepository.findByLoginId(userDetails.getUsername())
+    public ResponseCookie unregister(String loginId) {
+        Member member = memberRepository.findByLoginId(loginId)
                 .orElseThrow(() -> new CustomException(ErrorCode.NOT_FOUND_MEMBER));
         refreshTokenRepository.deleteByLoginId(member.getLoginId());
-        ResponseCookie responseCookie =  jwtUtil.createRefreshTokenCookie("", 0);
+        ResponseCookie responseCookie =
+                jwtUtil.createRefreshTokenCookie("", 0);
         memberRepository.delete(member);
         return responseCookie;
     }

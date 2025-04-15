@@ -1,6 +1,6 @@
 package com.zerobase.challengeproject.member.contoller;
 
-import com.zerobase.challengeproject.BaseResponseDto;
+import com.zerobase.challengeproject.HttpApiPageResponse;
 import com.zerobase.challengeproject.member.components.jwt.UserDetailsImpl;
 import com.zerobase.challengeproject.member.domain.dto.MemberProfileDto;
 import com.zerobase.challengeproject.member.domain.form.ChangePasswordForm;
@@ -25,11 +25,12 @@ public class MemberController {
      * @return 유저 정보(로그인아이디, 이름, 닉네임, 전화번호, 이메일주소)
      */
     @GetMapping("/profile")
-    public ResponseEntity<BaseResponseDto<MemberProfileDto>> getProfile (
+    public ResponseEntity<HttpApiPageResponse<MemberProfileDto>> getProfile (
             @AuthenticationPrincipal UserDetailsImpl userDetails){
+        String loginId = userDetails.getUsername();
         return ResponseEntity.ok(
-                new BaseResponseDto<>(
-                        memberService.getProfile(userDetails),
+                new HttpApiPageResponse<>(
+                        memberService.getProfile(loginId),
                         "회원 정보 불러오기를 성공했습니다",
                         HttpStatus.OK
                         ));
@@ -43,13 +44,14 @@ public class MemberController {
      * @return 수정한 유저의 정보
      */
     @PatchMapping("/profile")
-    public ResponseEntity<BaseResponseDto<MemberProfileDto>> updateProfile (
+    public ResponseEntity<HttpApiPageResponse<MemberProfileDto>> updateProfile (
             @RequestBody MemberProfileFrom form,
             @AuthenticationPrincipal UserDetailsImpl userDetails
             ) {
+        String loginId = userDetails.getUsername();
         return ResponseEntity.ok(
-                new BaseResponseDto<>(
-                        memberService.updateProfile(userDetails, form),
+                new HttpApiPageResponse<>(
+                        memberService.updateProfile(loginId, form),
                         "회원 정보 수정 성공했습니다",
                         HttpStatus.OK
                 )
@@ -63,13 +65,14 @@ public class MemberController {
      * @return 수정 성공한 유저의 아이디
      */
     @PatchMapping("/change-password")
-    public ResponseEntity<BaseResponseDto<String>> changePassword (
+    public ResponseEntity<HttpApiPageResponse<String>> changePassword (
             @RequestBody ChangePasswordForm form,
             @AuthenticationPrincipal UserDetailsImpl userDetails
     ) {
+        String loginId = userDetails.getUsername();
         return ResponseEntity.ok(
-                new BaseResponseDto<>(
-                        memberService.changePassword(userDetails, form),
+                new HttpApiPageResponse<>(
+                        memberService.changePassword(loginId, form),
                         "비밀 번호 수정 성공했습니다",
                         HttpStatus.OK
                 )

@@ -11,7 +11,6 @@ import com.zerobase.challengeproject.member.repository.MemberRepository;
 import com.zerobase.challengeproject.member.repository.RefreshTokenRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseCookie;
-import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
 import java.util.Optional;
@@ -22,7 +21,6 @@ public class MemberLoginService {
 
     private final JwtUtil jwtUtil;
     private final MemberRepository memberRepository;
-    private final PasswordEncoder passwordEncoder;
     private final RefreshTokenRepository refreshTokenRepository;
 
     /**
@@ -31,21 +29,12 @@ public class MemberLoginService {
      * 리프레시 토큰이 제공되지 않거나 유효하지 안으면 예외 처리
      * 리프레시 토큰이 유효할 경우 삭제
      * @param token JWT 액세스 토큰
-     * @param refreshToken 리프레시 토큰
      * @return 로그아웃 후 반환할 DTO 객체
      * @throws CustomException 토큰이 제공되지 않거나 유효하지 않은 경우 예외 발생
      */
-    public MemberLogoutDto logout(String token, String refreshToken) {
-        token = token.substring(7);
+    public MemberLogoutDto logout(String token) {
         String loginId = jwtUtil.extractLoginId(token);
-        if (refreshToken == null) {
-            throw new CustomException(ErrorCode.TOKEN_NOT_PROVIDED);
-        }
-        if (!jwtUtil.isTokenValid(refreshToken)) {
-            throw new CustomException(ErrorCode.TOKEN_IS_INVALID_OR_EXPIRED);
-        }
         refreshTokenRepository.deleteByLoginId(loginId);
-
         ResponseCookie responseCookie =  jwtUtil.createRefreshTokenCookie("", 0);
         return new MemberLogoutDto(loginId, responseCookie);
     }
@@ -56,9 +45,6 @@ public class MemberLoginService {
      * @throws CustomException 토큰이 유효하지 않거나 만료된 경우 예외 발생
      */
     public RefreshTokenDto refreshAccessToken(String refreshToken) {
-        if (refreshToken == null || !jwtUtil.isTokenValid(refreshToken)) {
-            throw new CustomException(ErrorCode.TOKEN_IS_INVALID_OR_EXPIRED);
-        }
 
         String loginId = jwtUtil.extractLoginId(refreshToken);
         Member member = memberRepository.findByLoginId(loginId)

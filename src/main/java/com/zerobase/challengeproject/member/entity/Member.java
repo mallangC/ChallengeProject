@@ -35,7 +35,7 @@ public class Member {
     @Column(length = 50, nullable = false)
     private String nickname;
     @Column(length = 20, nullable = false)
-    private String phoneNum;
+    private String phoneNumber;
 
     @Column(length = 50, nullable = false)
     private String email;
@@ -81,7 +81,7 @@ public class Member {
     }
 
     public void updateProfile( String phoneNum, String nickname) {
-        this.phoneNum = phoneNum;
+        this.phoneNumber = phoneNum;
         this.nickname = nickname;
     }
 
@@ -91,7 +91,7 @@ public class Member {
                 .memberName(form.getMemberName())
                 .password(password)
                 .nickname(form.getNickname())
-                .phoneNum(form.getPhoneNum())
+                .phoneNumber(form.getPhoneNum())
                 .emailAuthKey(emailAuthKey)
                 .isEmailVerified(false)
                 .memberType(MemberType.USER)

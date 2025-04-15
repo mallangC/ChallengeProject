@@ -1,6 +1,6 @@
 package com.zerobase.challengeproject.member.contoller;
 
-import com.zerobase.challengeproject.BaseResponseDto;
+import com.zerobase.challengeproject.HttpApiPageResponse;
 import com.zerobase.challengeproject.member.domain.form.BlackListRegisterForm;
 import com.zerobase.challengeproject.member.service.AdminBlacklistService;
 import lombok.RequiredArgsConstructor;
@@ -22,10 +22,10 @@ public class AdminBlackListController {
      * @return 블랙리스트 맴버 아이디
      */
     @PostMapping("/blacklist")
-    public ResponseEntity<BaseResponseDto> registerBlacklist(
+    public ResponseEntity<HttpApiPageResponse> registerBlacklist(
             @RequestBody BlackListRegisterForm form) {
         return ResponseEntity.ok(
-                new BaseResponseDto(
+                new HttpApiPageResponse(
                         adminBlacklistService.registerBlacklist(form),
                         form.getBlacklistUserLoginId() + "블랙리스트 등록 성공",
                         HttpStatus.OK
@@ -38,11 +38,11 @@ public class AdminBlackListController {
      * @return 블랙리스트가 헤제된 맴버 아이디
      */
     @PatchMapping("/blacklist")
-    public ResponseEntity<BaseResponseDto> unRegisterBlacklist(
+    public ResponseEntity<HttpApiPageResponse> unRegisterBlacklist(
             @RequestBody BlackListRegisterForm form
     ){
         return ResponseEntity.ok(
-                new BaseResponseDto(
+                new HttpApiPageResponse(
                         adminBlacklistService.unRegisterBlacklist(form),
                         form.getBlacklistUserLoginId() + "블랙리스트 해제 성공",
                         HttpStatus.OK

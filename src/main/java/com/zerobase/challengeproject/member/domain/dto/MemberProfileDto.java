@@ -17,7 +17,7 @@ public class MemberProfileDto {
         this.loginId = member.getLoginId();
         this.memberName = member.getMemberName();
         this.nickName = member.getNickname();
-        this.phoneNum = member.getPhoneNum();
+        this.phoneNum = member.getPhoneNumber();
         this.email = member.getEmail();
     }
 }

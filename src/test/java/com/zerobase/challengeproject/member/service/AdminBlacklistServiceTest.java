@@ -1,5 +1,6 @@
 package com.zerobase.challengeproject.member.service;
 
+import com.github.javafaker.Faker;
 import com.zerobase.challengeproject.exception.CustomException;
 import com.zerobase.challengeproject.exception.ErrorCode;
 import com.zerobase.challengeproject.member.domain.form.BlackListRegisterForm;
@@ -30,17 +31,19 @@ class AdminBlacklistServiceTest {
 
     private Member mockMember;
     private BlackListRegisterForm form;
+    private Faker faker;
 
     @BeforeEach
     void setUp() {
+        faker = new Faker();
         mockMember = Member.builder()
                 .id(1L)
-                .loginId("testId")
-                .memberName("testName")
-                .nickname("testNickname")
-                .email("testEmail@email.com")
-                .phoneNum("01011112222")
-                .password("encodedPassword")
+                .loginId(faker.funnyName().name())
+                .memberName(faker.name().fullName())
+                .nickname(faker.funnyName().name())
+                .email(faker.internet().emailAddress())
+                .phoneNumber("010"+faker.number().digits(8))
+                .password("testPassword")
                 .memberType(MemberType.USER)
                 .isBlackList(false)
                 .build();
@@ -80,7 +83,7 @@ class AdminBlacklistServiceTest {
                 .memberName("testName")
                 .nickname("testNickname")
                 .email("testEmail@email.com")
-                .phoneNum("01011112222")
+                .phoneNumber("01011112222")
                 .password("encodedPassword")
                 .memberType(MemberType.USER)
                 .isBlackList(true)
