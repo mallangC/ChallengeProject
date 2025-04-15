@@ -8,17 +8,17 @@ import lombok.Getter;
 @Builder
 public class CoteCommentDto {
   private Long id;
-  private String userId;
+  private String loginId;
   private Long coteChallengeId;
-  private String image;
+  private String imageUrl;
   private String content;
 
   public static CoteCommentDto from(CoteComment coteComment) {
     return CoteCommentDto.builder()
             .id(coteComment.getId())
-            .userId(coteComment.getMember().getLoginId())
+            .loginId(coteComment.getMember().getLoginId())
             .coteChallengeId(coteComment.getCoteChallenge().getId())
-            .image(coteComment.getImage())
+            .imageUrl(coteComment.getImageUrl())
             .content(coteComment.getContent())
             .build();
   }

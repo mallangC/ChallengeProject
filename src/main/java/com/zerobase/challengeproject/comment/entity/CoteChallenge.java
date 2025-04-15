@@ -1,8 +1,8 @@
 package com.zerobase.challengeproject.comment.entity;
 
 import com.zerobase.challengeproject.challenge.entity.Challenge;
-import com.zerobase.challengeproject.comment.domain.form.CoteChallengeForm;
-import com.zerobase.challengeproject.comment.domain.form.CoteChallengeUpdateForm;
+import com.zerobase.challengeproject.comment.domain.request.CoteChallengeRequest;
+import com.zerobase.challengeproject.comment.domain.request.CoteChallengeUpdateRequest;
 import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
@@ -34,7 +34,7 @@ public class CoteChallenge {
   @OneToMany(mappedBy = "coteChallenge", fetch = FetchType.LAZY)
   private List<CoteComment> comments;
 
-  public static CoteChallenge from(CoteChallengeForm form, Challenge challenge) {
+  public static CoteChallenge from(CoteChallengeRequest form, Challenge challenge) {
     return CoteChallenge.builder()
             .challenge(challenge)
             .title(form.getTitle())
@@ -44,7 +44,7 @@ public class CoteChallenge {
             .build();
   }
 
-  public void update(CoteChallengeUpdateForm form) {
+  public void update(CoteChallengeUpdateRequest form) {
     this.title = form.getTitle();
     this.question = form.getQuestion();
   }

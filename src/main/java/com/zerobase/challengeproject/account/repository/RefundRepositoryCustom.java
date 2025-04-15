@@ -1,15 +1,17 @@
 package com.zerobase.challengeproject.account.repository;
 
-import com.zerobase.challengeproject.account.domain.dto.RefundDto;
 import com.zerobase.challengeproject.account.entity.Refund;
 import org.springframework.data.domain.Page;
 
 import java.time.LocalDateTime;
+import java.util.Optional;
 
 public interface RefundRepositoryCustom {
-  Page<RefundDto> searchAllRefund(int page, LocalDateTime startAt, Boolean isDone, Boolean isRefunded);
+  Page<Refund> searchAllRefund(int page, LocalDateTime startAt, Boolean isDone, Boolean isRefunded);
 
-  Refund searchRefundById(Long id);
+  Optional<Refund> searchRefundById(Long id);
 
-  Page<RefundDto> searchAllMyRefund(int page, String userId);
+  Page<Refund> searchAllMyRefund(int page, String userId);
+
+  Optional<Refund> searchRefundByIdAndLoginId(Long refundId, String loginId);
 }

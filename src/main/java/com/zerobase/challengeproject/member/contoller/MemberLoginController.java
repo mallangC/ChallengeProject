@@ -1,6 +1,6 @@
 package com.zerobase.challengeproject.member.contoller;
 
-import com.zerobase.challengeproject.BaseResponseDto;
+import com.zerobase.challengeproject.HttpApiResponse;
 import com.zerobase.challengeproject.member.domain.dto.MemberLogoutDto;
 import com.zerobase.challengeproject.member.domain.dto.RefreshTokenDto;
 import com.zerobase.challengeproject.member.service.MemberLoginService;
@@ -24,7 +24,7 @@ public class MemberLoginController {
      * @return 로그인한 유저의 아이디, 아무정보도 없는 쿠키
      */
     @PostMapping("/logout")
-    public ResponseEntity<BaseResponseDto> logout(@RequestHeader("Authorization") String token,
+    public ResponseEntity<HttpApiResponse> logout(@RequestHeader("Authorization") String token,
                                                   @CookieValue(value = "refreshToken", required = false)
                                                   String refreshToken) {
 
@@ -32,7 +32,7 @@ public class MemberLoginController {
 
         return ResponseEntity.ok()
                 .header(HttpHeaders.SET_COOKIE, dto.getResponseCookie().toString())
-                .body(new BaseResponseDto<>(dto.getLoginId(), "로그아웃 성공했습니다.", HttpStatus.OK));
+                .body(new HttpApiResponse<>(dto.getLoginId(), "로그아웃 성공했습니다.", HttpStatus.OK));
     }
 
     /**
@@ -41,12 +41,12 @@ public class MemberLoginController {
      * @return AccessToken
      */
     @PostMapping("/token/refresh")
-    public ResponseEntity<BaseResponseDto> refreshAccessToken(@CookieValue(value = "refreshToken", required = false) String refreshToken  ) {
+    public ResponseEntity<HttpApiResponse> refreshAccessToken(@CookieValue(value = "refreshToken", required = false) String refreshToken  ) {
         RefreshTokenDto dto = memberLoginService.refreshAccessToken(refreshToken);
 
         return ResponseEntity.ok()
                 .header(HttpHeaders.AUTHORIZATION, "Bearer " + dto.getAccessToken())
                 .header(HttpHeaders.SET_COOKIE, dto.getRefreshToken())
-                .body(new BaseResponseDto<>(null, "토큰이 재 발행되었습니다", HttpStatus.OK));
+                .body(new HttpApiResponse<>(null, "토큰이 재 발행되었습니다", HttpStatus.OK));
     }
 }

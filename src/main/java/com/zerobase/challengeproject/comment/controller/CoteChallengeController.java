@@ -1,18 +1,19 @@
 package com.zerobase.challengeproject.comment.controller;
 
-import com.zerobase.challengeproject.BaseResponseDto;
-import com.zerobase.challengeproject.account.domain.dto.PageDto;
+import com.zerobase.challengeproject.HttpApiResponse;
+import com.zerobase.challengeproject.PaginatedResponse;
 import com.zerobase.challengeproject.comment.domain.dto.CoteChallengeDto;
 import com.zerobase.challengeproject.comment.domain.dto.CoteCommentDto;
-import com.zerobase.challengeproject.comment.domain.form.CoteChallengeForm;
-import com.zerobase.challengeproject.comment.domain.form.CoteChallengeUpdateForm;
-import com.zerobase.challengeproject.comment.domain.form.CoteCommentForm;
-import com.zerobase.challengeproject.comment.domain.form.CoteCommentUpdateForm;
+import com.zerobase.challengeproject.comment.domain.request.CoteChallengeRequest;
+import com.zerobase.challengeproject.comment.domain.request.CoteChallengeUpdateRequest;
+import com.zerobase.challengeproject.comment.domain.request.CoteCommentRequest;
+import com.zerobase.challengeproject.comment.domain.request.CoteCommentUpdateRequest;
 import com.zerobase.challengeproject.comment.service.CoteChallengeService;
 import com.zerobase.challengeproject.member.components.jwt.UserDetailsImpl;
 import jakarta.validation.Valid;
 import jakarta.validation.constraints.Min;
 import lombok.RequiredArgsConstructor;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.web.bind.annotation.*;
@@ -32,10 +33,13 @@ public class CoteChallengeController {
    * @return 추가한 코테 챌린지 정보
    */
   @PostMapping
-  public ResponseEntity<BaseResponseDto<CoteChallengeDto>> addCoteChallenge(
-          @RequestBody @Valid CoteChallengeForm form,
+  public ResponseEntity<HttpApiResponse<CoteChallengeDto>> addCoteChallenge(
+          @RequestBody @Valid CoteChallengeRequest form,
           @AuthenticationPrincipal UserDetailsImpl userDetails) {
-    return ResponseEntity.ok(coteChallengeService.addCoteChallenge(form, userDetails));
+    return ResponseEntity.ok(new HttpApiResponse<>(
+            coteChallengeService.addCoteChallenge(form, userDetails.getUsername()),
+            "코테 챌린지 생성 성공",
+            HttpStatus.OK));
   }
 
   /**
@@ -45,9 +49,12 @@ public class CoteChallengeController {
    * @return 댓글을 제외한 코테 챌린지의 정보
    */
   @GetMapping("/{coteChallengeId}")
-  public ResponseEntity<BaseResponseDto<CoteChallengeDto>> getCoteChallenge(
+  public ResponseEntity<HttpApiResponse<CoteChallengeDto>> getCoteChallenge(
           @PathVariable Long coteChallengeId) {
-    return ResponseEntity.ok(coteChallengeService.getCoteChallenge(coteChallengeId));
+    return ResponseEntity.ok(new HttpApiResponse<>(
+            coteChallengeService.getCoteChallenge(coteChallengeId),
+            "코테 챌린지 단건 조회 성공",
+            HttpStatus.OK));
   }
 
   /**
@@ -58,10 +65,13 @@ public class CoteChallengeController {
    * @return 댓글을 제외한 모든 코테 챌린지의 정보
    */
   @GetMapping
-  public ResponseEntity<BaseResponseDto<PageDto<CoteChallengeDto>>> getCoteChallenge(
+  public ResponseEntity<PaginatedResponse<CoteChallengeDto>> getCoteChallenge(
           @RequestParam @Min(1) int page,
           @RequestParam("id") Long challengeId) {
-    return ResponseEntity.ok(coteChallengeService.getAllCoteChallenge(page, challengeId));
+    return ResponseEntity.ok(PaginatedResponse.from(
+            coteChallengeService.getAllCoteChallenge(page, challengeId),
+            "코테 챌린지 전체 조회 성공(" + page + "페이지)",
+            HttpStatus.OK));
   }
 
   /**
@@ -72,10 +82,13 @@ public class CoteChallengeController {
    * @return 댓글을 제외한 수정된 코테 챌린지의 정보
    */
   @PatchMapping
-  public ResponseEntity<BaseResponseDto<CoteChallengeDto>> updateCoteChallenge(
-          @RequestBody @Valid CoteChallengeUpdateForm form,
+  public ResponseEntity<HttpApiResponse<CoteChallengeDto>> updateCoteChallenge(
+          @RequestBody @Valid CoteChallengeUpdateRequest form,
           @AuthenticationPrincipal UserDetailsImpl userDetails) {
-    return ResponseEntity.ok(coteChallengeService.updateCoteChallenge(form, userDetails));
+    return ResponseEntity.ok(new HttpApiResponse<>(
+            coteChallengeService.updateCoteChallenge(form, userDetails.getUsername()),
+            "코테 챌린지 수정 성공",
+            HttpStatus.OK));
   }
 
   /**
@@ -86,10 +99,13 @@ public class CoteChallengeController {
    * @return 삭제된 코테 챌린지의 정보
    */
   @DeleteMapping("/{coteChallengeId}")
-  public ResponseEntity<BaseResponseDto<CoteChallengeDto>> deleteCoteChallenge(
+  public ResponseEntity<HttpApiResponse<CoteChallengeDto>> deleteCoteChallenge(
           @PathVariable Long coteChallengeId,
           @AuthenticationPrincipal UserDetailsImpl userDetails) {
-    return ResponseEntity.ok(coteChallengeService.deleteCoteChallenge(coteChallengeId, userDetails));
+    return ResponseEntity.ok(new HttpApiResponse<>(
+            coteChallengeService.deleteCoteChallenge(coteChallengeId, userDetails.getUsername()),
+            "코테 챌린지 삭제 성공",
+            HttpStatus.OK));
   }
 
   /**
@@ -100,10 +116,13 @@ public class CoteChallengeController {
    * @return 인증 댓글 정보
    */
   @PostMapping("/comment")
-  public ResponseEntity<BaseResponseDto<CoteCommentDto>> addComment(
-          @RequestBody @Valid CoteCommentForm form,
+  public ResponseEntity<HttpApiResponse<CoteCommentDto>> addComment(
+          @RequestBody @Valid CoteCommentRequest form,
           @AuthenticationPrincipal UserDetailsImpl userDetails) {
-    return ResponseEntity.ok(coteChallengeService.addComment(form, userDetails));
+    return ResponseEntity.ok(new HttpApiResponse<>(
+            coteChallengeService.addComment(form, userDetails.getMember()),
+            "코테 댓글 추가 성공",
+            HttpStatus.OK));
   }
 
   /**
@@ -113,9 +132,12 @@ public class CoteChallengeController {
    * @return 인증 댓글 정보
    */
   @GetMapping("/comment/{commentId}")
-  public ResponseEntity<BaseResponseDto<CoteCommentDto>> getComment(
+  public ResponseEntity<HttpApiResponse<CoteCommentDto>> getComment(
           @PathVariable Long commentId) {
-    return ResponseEntity.ok(coteChallengeService.getComment(commentId));
+    return ResponseEntity.ok(new HttpApiResponse<>(
+            coteChallengeService.getComment(commentId),
+            "코테 댓글 조회 성공",
+            HttpStatus.OK));
   }
 
   /**
@@ -126,10 +148,13 @@ public class CoteChallengeController {
    * @return 수정된 인증 댓글 정보
    */
   @PatchMapping("/comment")
-  public ResponseEntity<BaseResponseDto<CoteCommentDto>> updateComment(
-          @RequestBody @Valid CoteCommentUpdateForm form,
+  public ResponseEntity<HttpApiResponse<CoteCommentDto>> updateComment(
+          @RequestBody @Valid CoteCommentUpdateRequest form,
           @AuthenticationPrincipal UserDetailsImpl userDetails) {
-    return ResponseEntity.ok(coteChallengeService.updateComment(form, userDetails));
+    return ResponseEntity.ok(new HttpApiResponse<>(
+            coteChallengeService.updateComment(form, userDetails.getUsername()),
+            "코테 댓글 수정 성공",
+            HttpStatus.OK));
   }
 
   /**
@@ -140,10 +165,13 @@ public class CoteChallengeController {
    * @return 삭제된 인증 댓글 정보
    */
   @DeleteMapping("/comment/{commentId}")
-  public ResponseEntity<BaseResponseDto<CoteCommentDto>> deleteComment(
+  public ResponseEntity<HttpApiResponse<CoteCommentDto>> deleteComment(
           @PathVariable Long commentId,
           @AuthenticationPrincipal UserDetailsImpl userDetails) {
-    return ResponseEntity.ok(coteChallengeService.deleteComment(commentId, userDetails));
+    return ResponseEntity.ok(new HttpApiResponse<>(
+            coteChallengeService.deleteComment(commentId, userDetails.getUsername()),
+            "코테 댓글 삭제 성공",
+            HttpStatus.OK));
   }
 
 }

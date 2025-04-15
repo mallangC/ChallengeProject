@@ -1,6 +1,6 @@
 package com.zerobase.challengeproject.member.contoller;
 
-import com.zerobase.challengeproject.BaseResponseDto;
+import com.zerobase.challengeproject.HttpApiResponse;
 import com.zerobase.challengeproject.member.components.jwt.UserDetailsImpl;
 import com.zerobase.challengeproject.member.domain.dto.MemberProfileDto;
 import com.zerobase.challengeproject.member.domain.form.ChangePasswordForm;
@@ -25,10 +25,10 @@ public class MemberController {
      * @return 유저 정보(로그인아이디, 이름, 닉네임, 전화번호, 이메일주소)
      */
     @GetMapping("/profile")
-    public ResponseEntity<BaseResponseDto<MemberProfileDto>> getProfile (
+    public ResponseEntity<HttpApiResponse<MemberProfileDto>> getProfile (
             @AuthenticationPrincipal UserDetailsImpl userDetails){
         return ResponseEntity.ok(
-                new BaseResponseDto<>(
+                new HttpApiResponse<>(
                         memberService.getProfile(userDetails),
                         "회원 정보 불러오기를 성공했습니다",
                         HttpStatus.OK
@@ -43,12 +43,12 @@ public class MemberController {
      * @return 수정한 유저의 정보
      */
     @PatchMapping("/profile")
-    public ResponseEntity<BaseResponseDto<MemberProfileDto>> updateProfile (
+    public ResponseEntity<HttpApiResponse<MemberProfileDto>> updateProfile (
             @RequestBody MemberProfileFrom form,
             @AuthenticationPrincipal UserDetailsImpl userDetails
             ) {
         return ResponseEntity.ok(
-                new BaseResponseDto<>(
+                new HttpApiResponse<>(
                         memberService.updateProfile(userDetails, form),
                         "회원 정보 수정 성공했습니다",
                         HttpStatus.OK
@@ -63,12 +63,12 @@ public class MemberController {
      * @return 수정 성공한 유저의 아이디
      */
     @PatchMapping("/change-password")
-    public ResponseEntity<BaseResponseDto<String>> changePassword (
+    public ResponseEntity<HttpApiResponse<String>> changePassword (
             @RequestBody ChangePasswordForm form,
             @AuthenticationPrincipal UserDetailsImpl userDetails
     ) {
         return ResponseEntity.ok(
-                new BaseResponseDto<>(
+                new HttpApiResponse<>(
                         memberService.changePassword(userDetails, form),
                         "비밀 번호 수정 성공했습니다",
                         HttpStatus.OK

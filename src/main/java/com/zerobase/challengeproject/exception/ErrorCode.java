@@ -33,6 +33,7 @@ public enum ErrorCode {
   ALREADY_DONE(HttpStatus.BAD_REQUEST, "이미 처리된 환불 신청입니다."),
   ALREADY_REFUND_REQUEST(HttpStatus.BAD_REQUEST, "이미 환불 신청한 내역입니다."),
   NOT_FOUND_REFUND(HttpStatus.BAD_REQUEST, "환불 신청을 찾을 수 없습니다."),
+  NOT_OWNER_OF_REFUND(HttpStatus.BAD_REQUEST, "환불 신청을 신청한 회원이 아닙니다."),
 
   //챌린지
   NOT_FOUND_CHALLENGES(HttpStatus.BAD_REQUEST, "챌린지를 찾을 수 없습니다."),
@@ -86,11 +87,4 @@ public enum ErrorCode {
   private final HttpStatus httpStatus;
   private final String message;
 
-  public HttpStatus getHttpStatus() {
-    return httpStatus;
-  }
-
-  public String getMessage() {
-    return message;
-  }
 }

@@ -10,16 +10,16 @@ public class WaterCommentDto {
   private Long id;
   private Long challengeId;
   private String longinId;
-  private Integer drinkingMl;
-  private String image;
+  private Integer drinkingIntake;
+  private String imageUrl;
 
   public static WaterCommentDto from(WaterComment waterComment) {
     return WaterCommentDto.builder()
             .id(waterComment.getId())
             .challengeId(waterComment.getWaterChallenge().getChallenge().getId())
             .longinId(waterComment.getMember().getLoginId())
-            .drinkingMl(waterComment.getDrinkingMl())
-            .image(waterComment.getImage())
+            .drinkingIntake(waterComment.getDrinkingIntake())
+            .imageUrl(waterComment.getImageUrl())
             .build();
   }
 }

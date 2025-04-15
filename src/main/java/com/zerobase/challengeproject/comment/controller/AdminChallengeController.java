@@ -1,7 +1,7 @@
 package com.zerobase.challengeproject.comment.controller;
 
-import com.zerobase.challengeproject.BaseResponseDto;
-import com.zerobase.challengeproject.account.domain.dto.PageDto;
+import com.zerobase.challengeproject.HttpApiResponse;
+import com.zerobase.challengeproject.PaginatedResponse;
 import com.zerobase.challengeproject.comment.domain.dto.*;
 import com.zerobase.challengeproject.comment.service.CoteChallengeService;
 import com.zerobase.challengeproject.comment.service.DietChallengeService;
@@ -9,6 +9,7 @@ import com.zerobase.challengeproject.comment.service.WaterChallengeService;
 import com.zerobase.challengeproject.member.components.jwt.UserDetailsImpl;
 import jakarta.validation.constraints.Min;
 import lombok.RequiredArgsConstructor;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.web.bind.annotation.*;
@@ -29,10 +30,14 @@ public class AdminChallengeController {
    * @return 삭제된 인증 댓글 정보
    */
   @DeleteMapping("/cote/comment/{commentId}")
-  public ResponseEntity<BaseResponseDto<CoteCommentDto>> adminDeleteComment(
+  public ResponseEntity<HttpApiResponse<CoteCommentDto>> adminDeleteComment(
           @PathVariable Long commentId,
           @AuthenticationPrincipal UserDetailsImpl userDetails) {
-    return ResponseEntity.ok(coteChallengeService.adminDeleteComment(commentId, userDetails));
+    return ResponseEntity.ok(new HttpApiResponse<>(
+            coteChallengeService.adminDeleteComment(commentId,
+                    userDetails.getMember().getMemberType()),
+            "관리자 권한으로 인증 댓글 삭제를 성공했습니다.",
+            HttpStatus.OK));
   }
 
   /**
@@ -43,12 +48,16 @@ public class AdminChallengeController {
    * @return 페이징이된 다이어트 챌린지 리스트
    */
   @GetMapping("/diet/{challengeId}")
-  public ResponseEntity<BaseResponseDto<PageDto<DietChallengeDto>>> getAllDietChallenge(
+  public ResponseEntity<PaginatedResponse<DietChallengeDto>> getAllDietChallenge(
           @RequestParam(defaultValue = "1") @Min(1) int page,
           @RequestParam(required = false, value = "pass") Boolean isPass,
           @PathVariable Long challengeId,
           @AuthenticationPrincipal UserDetailsImpl userDetails) {
-    return ResponseEntity.ok(dietChallengeService.getAllDietChallenge(page, challengeId, isPass, userDetails));
+    return ResponseEntity.ok(PaginatedResponse.from(
+            dietChallengeService.getAllDietChallenge(page, challengeId, isPass,
+                    userDetails.getMember().getMemberType()),
+            "다이어트 챌린지 전체 조회를 성공했습니다.(" + page + "페이지)",
+            HttpStatus.OK));
   }
 
   /**
@@ -59,10 +68,14 @@ public class AdminChallengeController {
    * @return 삭제된 다이어트 댓글 정보
    */
   @DeleteMapping("/diet/comment/{commentId}")
-  public ResponseEntity<BaseResponseDto<DietCommentDto>> deleteComment(
+  public ResponseEntity<HttpApiResponse<DietCommentDto>> deleteComment(
           @PathVariable Long commentId,
           @AuthenticationPrincipal UserDetailsImpl userDetails) {
-    return ResponseEntity.ok(dietChallengeService.adminDeleteDietComment(commentId, userDetails));
+    return ResponseEntity.ok(new HttpApiResponse<>(
+            dietChallengeService.adminDeleteDietComment(commentId,
+                    userDetails.getMember().getMemberType()),
+            "관리자 권한으로 다이어트 댓글 삭제를 성공했습니다.",
+            HttpStatus.OK));
   }
 
 
@@ -76,12 +89,17 @@ public class AdminChallengeController {
    * @return 페이징된 물마시기 챌린지
    */
   @GetMapping("/water/{challengeId}")
-  public ResponseEntity<BaseResponseDto<PageDto<WaterChallengeDto>>> getAllWaterChallenge(
+  public ResponseEntity<PaginatedResponse<WaterChallengeDto>> getAllWaterChallenge(
           @PathVariable Long challengeId,
           @RequestParam(defaultValue = "1") @Min(1) int page,
           @RequestParam(required = false, value = "pass") Boolean isPass,
           @AuthenticationPrincipal UserDetailsImpl userDetails) {
-    return ResponseEntity.ok(waterChallengeService.getAllWaterChallenge(page, challengeId, isPass, userDetails));
+    return ResponseEntity.ok(PaginatedResponse.from(
+            waterChallengeService
+                    .getAllWaterChallenge(page, challengeId, isPass,
+                            userDetails.getMember().getMemberType()),
+            "물마시기 챌린지 전체 조회를 성공했습니다.",
+            HttpStatus.OK));
   }
 
 
@@ -93,10 +111,14 @@ public class AdminChallengeController {
    * @return 삭제된 물마시기 댓글 정보
    */
   @DeleteMapping("/water/comment/{commentId}")
-  public ResponseEntity<BaseResponseDto<WaterCommentDto>> deleteWaterComment(
+  public ResponseEntity<HttpApiResponse<WaterCommentDto>> deleteWaterComment(
           @PathVariable Long commentId,
           @AuthenticationPrincipal UserDetailsImpl userDetails) {
-    return ResponseEntity.ok(waterChallengeService.adminDeleteWaterComment(commentId, userDetails));
+    return ResponseEntity.ok(new HttpApiResponse<>(
+            waterChallengeService.adminDeleteWaterComment(commentId,
+                    userDetails.getMember().getMemberType()),
+            "물마시기 댓글 삭제를 성공했습니다.",
+            HttpStatus.OK));
   }
 
 

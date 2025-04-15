@@ -1,15 +1,15 @@
 package com.zerobase.challengeproject.comment.service;
 
-import com.zerobase.challengeproject.BaseResponseDto;
+import com.github.javafaker.Faker;
 import com.zerobase.challengeproject.challenge.entity.Challenge;
 import com.zerobase.challengeproject.challenge.entity.MemberChallenge;
 import com.zerobase.challengeproject.challenge.repository.ChallengeRepository;
 import com.zerobase.challengeproject.comment.domain.dto.CoteChallengeDto;
 import com.zerobase.challengeproject.comment.domain.dto.CoteCommentDto;
-import com.zerobase.challengeproject.comment.domain.form.CoteChallengeForm;
-import com.zerobase.challengeproject.comment.domain.form.CoteChallengeUpdateForm;
-import com.zerobase.challengeproject.comment.domain.form.CoteCommentForm;
-import com.zerobase.challengeproject.comment.domain.form.CoteCommentUpdateForm;
+import com.zerobase.challengeproject.comment.domain.request.CoteChallengeRequest;
+import com.zerobase.challengeproject.comment.domain.request.CoteChallengeUpdateRequest;
+import com.zerobase.challengeproject.comment.domain.request.CoteCommentRequest;
+import com.zerobase.challengeproject.comment.domain.request.CoteCommentUpdateRequest;
 import com.zerobase.challengeproject.comment.entity.CoteChallenge;
 import com.zerobase.challengeproject.comment.entity.CoteComment;
 import com.zerobase.challengeproject.comment.repository.CoteChallengeRepository;
@@ -17,7 +17,6 @@ import com.zerobase.challengeproject.comment.repository.CoteCommentRepository;
 import com.zerobase.challengeproject.exception.CustomException;
 import com.zerobase.challengeproject.member.components.jwt.UserDetailsImpl;
 import com.zerobase.challengeproject.member.entity.Member;
-import com.zerobase.challengeproject.member.repository.MemberRepository;
 import com.zerobase.challengeproject.type.CategoryType;
 import com.zerobase.challengeproject.type.MemberType;
 import org.junit.jupiter.api.DisplayName;
@@ -26,7 +25,6 @@ import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
-import org.springframework.http.HttpStatus;
 
 import java.time.LocalDateTime;
 import java.util.ArrayList;
@@ -45,9 +43,6 @@ import static org.mockito.Mockito.verify;
 class CoteChallengeServiceTest {
 
   @Mock
-  private MemberRepository memberRepository;
-
-  @Mock
   private CoteChallengeRepository coteChallengeRepository;
 
   @Mock
@@ -59,15 +54,17 @@ class CoteChallengeServiceTest {
   @InjectMocks
   private CoteChallengeService coteChallengeService;
 
-  LocalDateTime startAt = LocalDateTime.parse("2025-04-04T00:00:00");
+  private final Faker faker = new Faker();
+
+  LocalDateTime startAt = LocalDateTime.now().plusDays(1);
 
   Member memberBase = Member.builder()
           .id(1L)
-          .loginId("test")
+          .loginId(faker.name().username())
           .memberType(MemberType.USER)
-          .memberName("testName")
-          .nickname("testNickname")
-          .email("test@test.com")
+          .memberName(faker.name().name())
+          .nickname(faker.name().username())
+          .email(faker.internet().emailAddress())
           .account(10000L)
           .memberChallenges(new ArrayList<>())
           .coteComments(new ArrayList<>())
@@ -77,18 +74,18 @@ class CoteChallengeServiceTest {
 
   Challenge challengeBase = Challenge.builder()
           .id(1L)
-          .title("challengeTitle")
-          .img("challengeImg")
+          .title(faker.name().username())
+          .img(faker.internet().domainName())
           .categoryType(CategoryType.COTE)
-          .description("challengeDescription")
+          .description(faker.lorem().sentence(15))
           .maxParticipant(10L)
           .currentParticipant(1L)
           .minDeposit(10L)
           .maxDeposit(50L)
-          .standard("challengeStandard")
+          .standard(faker.lorem().sentence(5))
           .member(memberBase)
           .startDate(startAt)
-          .endDate(LocalDateTime.parse("2025-05-10T00:00:00"))
+          .endDate(LocalDateTime.now().plusMonths(1))
           .coteChallenges(new ArrayList<>())
           .build();
 
@@ -96,24 +93,28 @@ class CoteChallengeServiceTest {
   CoteChallenge coteChallengeBase = CoteChallenge.builder()
           .id(1L)
           .challenge(challengeBase)
-          .title("coteChallengeTitle")
-          .question("문제 링크")
+          .title(faker.lorem().sentence(5))
+          .question(faker.internet().url())
           .startAt(startAt)
+          .comments(List.of(CoteComment.builder()
+                  .id(1L)
+                  .member(memberBase)
+                  .build()))
           .build();
 
   Challenge badChallenge = Challenge.builder()
           .id(1L)
-          .title("challengeTitle")
-          .img("challengeImg")
+          .title(faker.lorem().sentence(5))
+          .img(faker.internet().url())
           .categoryType(CategoryType.COTE)
-          .description("challengeDescription")
+          .description(faker.lorem().sentence(15))
           .maxParticipant(10L)
           .currentParticipant(1L)
           .minDeposit(10L)
           .maxDeposit(50L)
-          .standard("challengeStandard")
+          .standard(faker.lorem().sentence(5))
           .member(Member.builder()
-                  .loginId("틀리다")
+                  .loginId(faker.name().username())
                   .build())
           .coteChallenges(new ArrayList<>())
           .build();
@@ -122,8 +123,8 @@ class CoteChallengeServiceTest {
           .id(1L)
           .member(memberBase)
           .coteChallenge(coteChallengeBase)
-          .image("인증 댓글 이미지 링크")
-          .content("정말 어려웠다")
+          .imageUrl(faker.internet().url())
+          .content(faker.name().username())
           .build();
 
   UserDetailsImpl userDetailsBase = new UserDetailsImpl(memberBase);
@@ -133,23 +134,21 @@ class CoteChallengeServiceTest {
   void accCoteChallenge() {
     //given
     given(challengeRepository.searchChallengeWithCoteChallengeById(anyLong()))
-            .willReturn(challengeBase);
+            .willReturn(Optional.ofNullable(challengeBase));
 
-    CoteChallengeForm form = CoteChallengeForm.builder()
+    CoteChallengeRequest form = CoteChallengeRequest.builder()
             .challengeId(1L)
-            .title("문제 제목")
-            .question("코테 문제 링크")
-            .startAt(startAt)
+            .title(faker.name().username())
+            .question(faker.name().username())
+            .startAt(startAt.plusDays(1))
             .build();
     //when
-    BaseResponseDto<CoteChallengeDto> result =
-            coteChallengeService.addCoteChallenge(form, userDetailsBase);
+    CoteChallengeDto result =
+            coteChallengeService.addCoteChallenge(form, userDetailsBase.getUsername());
     //then
-    assertEquals(HttpStatus.OK, result.getStatus());
-    assertEquals("코테 챌린지 생성을 성공했습니다.", result.getMessage());
-    assertEquals(startAt, result.getData().getStartAt());
-    assertEquals("문제 제목", result.getData().getTitle());
-    assertEquals("코테 문제 링크", result.getData().getQuestion());
+    assertEquals(startAt.plusDays(1).toLocalDate(), result.getStartAt().toLocalDate());
+    assertEquals(form.getTitle(), result.getTitle());
+    assertEquals(form.getQuestion(), result.getQuestion());
     verify(coteChallengeRepository, times(1)).save(any());
   }
 
@@ -158,17 +157,17 @@ class CoteChallengeServiceTest {
   void accCoteChallengeFailure2() {
     //given
     given(challengeRepository.searchChallengeWithCoteChallengeById(anyLong()))
-            .willReturn(badChallenge);
+            .willReturn(Optional.ofNullable(badChallenge));
 
-    CoteChallengeForm form = CoteChallengeForm.builder()
+    CoteChallengeRequest form = CoteChallengeRequest.builder()
             .challengeId(1L)
-            .title("문제 제목")
-            .question("코테 문제 링크")
+            .title(faker.lorem().sentence(5))
+            .question(faker.internet().url())
             .startAt(startAt)
             .build();
     //when
     CustomException exception = assertThrows(CustomException.class, () ->
-            coteChallengeService.addCoteChallenge(form, userDetailsBase));
+            coteChallengeService.addCoteChallenge(form, userDetailsBase.getUsername()));
 
     //then
     assertEquals(NOT_OWNER_OF_CHALLENGE, exception.getErrorCode());
@@ -181,32 +180,32 @@ class CoteChallengeServiceTest {
   void accCoteChallengeFailure1() {
     //given
     given(challengeRepository.searchChallengeWithCoteChallengeById(anyLong()))
-            .willReturn((Challenge.builder()
+            .willReturn(Optional.ofNullable((Challenge.builder()
                     .id(1L)
-                    .title("challengeTitle")
-                    .img("challengeImg")
+                    .title(faker.lorem().sentence(5))
+                    .img(faker.internet().url())
                     .categoryType(CategoryType.DIET)
                     .maxParticipant(10L)
                     .currentParticipant(1L)
-                    .description("challengeDescription")
+                    .description(faker.lorem().sentence(15))
                     .minDeposit(10L)
                     .maxDeposit(50L)
-                    .standard("challengeStandard")
+                    .standard(faker.lorem().sentence(5))
                     .member(memberBase)
                     .coteChallenges(List.of(coteChallengeBase))
                     .startDate(startAt)
-                    .endDate(LocalDateTime.parse("2025-05-10T00:00:00"))
-                    .build()));
+                    .endDate(LocalDateTime.now().plusMonths(1))
+                    .build())));
 
-    CoteChallengeForm form = CoteChallengeForm.builder()
+    CoteChallengeRequest form = CoteChallengeRequest.builder()
             .challengeId(1L)
-            .title("문제 제목")
-            .question("코테 문제 링크")
+            .title(faker.lorem().sentence(5))
+            .question(faker.internet().url())
             .startAt(startAt)
             .build();
     //when
     CustomException exception = assertThrows(CustomException.class, () ->
-            coteChallengeService.addCoteChallenge(form, userDetailsBase));
+            coteChallengeService.addCoteChallenge(form, userDetailsBase.getUsername()));
 
     //then
     assertEquals(NOT_COTE_CHALLENGE, exception.getErrorCode());
@@ -218,32 +217,32 @@ class CoteChallengeServiceTest {
   void accCoteChallengeFailure3() {
     //given
     given(challengeRepository.searchChallengeWithCoteChallengeById(anyLong()))
-            .willReturn(Challenge.builder()
+            .willReturn(Optional.ofNullable(Challenge.builder()
                     .id(1L)
-                    .title("challengeTitle")
-                    .img("challengeImg")
+                    .title(faker.name().username())
+                    .img(faker.name().username())
                     .categoryType(CategoryType.COTE)
                     .maxParticipant(10L)
                     .currentParticipant(1L)
-                    .description("challengeDescription")
+                    .description(faker.name().username())
                     .minDeposit(10L)
                     .maxDeposit(50L)
-                    .standard("challengeStandard")
+                    .standard(faker.name().username())
                     .member(memberBase)
                     .coteChallenges(List.of(coteChallengeBase))
                     .startDate(startAt)
-                    .endDate(LocalDateTime.parse("2025-05-10T00:00:00"))
-                    .build());
+                    .endDate(LocalDateTime.now().plusMonths(1))
+                    .build()));
 
-    CoteChallengeForm form = CoteChallengeForm.builder()
+    CoteChallengeRequest form = CoteChallengeRequest.builder()
             .challengeId(1L)
-            .title("문제 제목")
-            .question("코테 문제 링크")
-            .startAt(LocalDateTime.parse("2025-05-11T00:00:00"))
+            .title(faker.lorem().sentence(5))
+            .question(faker.internet().url())
+            .startAt(LocalDateTime.now().plusMonths(2))
             .build();
     //when
     CustomException exception = assertThrows(CustomException.class, () ->
-            coteChallengeService.addCoteChallenge(form, userDetailsBase));
+            coteChallengeService.addCoteChallenge(form, userDetailsBase.getUsername()));
 
     //then
     assertEquals(NOT_ADDED_COTE_CHALLENGE, exception.getErrorCode());
@@ -255,32 +254,32 @@ class CoteChallengeServiceTest {
   void accCoteChallengeFailure4() {
     //given
     given(challengeRepository.searchChallengeWithCoteChallengeById(anyLong()))
-            .willReturn(Challenge.builder()
+            .willReturn(Optional.ofNullable(Challenge.builder()
                     .id(1L)
-                    .title("challengeTitle")
-                    .img("challengeImg")
+                    .title(faker.lorem().sentence(5))
+                    .img(faker.internet().url())
                     .categoryType(CategoryType.COTE)
                     .maxParticipant(10L)
                     .currentParticipant(1L)
-                    .description("challengeDescription")
+                    .description(faker.lorem().sentence(15))
                     .minDeposit(10L)
                     .maxDeposit(50L)
-                    .standard("challengeStandard")
+                    .standard(faker.lorem().sentence(5))
                     .member(memberBase)
                     .coteChallenges(List.of(coteChallengeBase))
                     .startDate(startAt)
-                    .endDate(LocalDateTime.parse("2025-05-10T00:00:00"))
-                    .build());
+                    .endDate(LocalDateTime.now().plusMonths(1))
+                    .build()));
 
-    CoteChallengeForm form = CoteChallengeForm.builder()
+    CoteChallengeRequest form = CoteChallengeRequest.builder()
             .challengeId(1L)
-            .title("문제 제목")
-            .question("코테 문제 링크")
+            .title(faker.lorem().sentence(5))
+            .question(faker.internet().url())
             .startAt(startAt)
             .build();
     //when
     CustomException exception = assertThrows(CustomException.class, () ->
-            coteChallengeService.addCoteChallenge(form, userDetailsBase));
+            coteChallengeService.addCoteChallenge(form, userDetailsBase.getUsername()));
 
     //then
     assertEquals(ALREADY_ADDED_THAT_DATE, exception.getErrorCode());
@@ -294,15 +293,13 @@ class CoteChallengeServiceTest {
     given(coteChallengeRepository.findById(anyLong()))
             .willReturn(Optional.of(coteChallengeBase));
     //when
-    BaseResponseDto<CoteChallengeDto> result =
+    CoteChallengeDto result =
             coteChallengeService.getCoteChallenge(1L);
     //then
-    assertEquals(HttpStatus.OK, result.getStatus());
-    assertEquals("코테 챌린지 단건 조회를 성공했습니다.", result.getMessage());
-    assertEquals(1L, result.getData().getChallengeId());
-    assertEquals(1L, result.getData().getId());
-    assertEquals(coteChallengeBase.getTitle(), result.getData().getTitle());
-    assertEquals(coteChallengeBase.getQuestion(), result.getData().getQuestion());
+    assertEquals(1L, result.getChallengeId());
+    assertEquals(1L, result.getId());
+    assertEquals(coteChallengeBase.getTitle(), result.getTitle());
+    assertEquals(coteChallengeBase.getQuestion(), result.getQuestion());
   }
 
   @Test
@@ -324,22 +321,20 @@ class CoteChallengeServiceTest {
   void updateCoteChallenge() {
     //given
     given(coteChallengeRepository.searchCoteChallengeById(anyLong()))
-            .willReturn(coteChallengeBase);
+            .willReturn(Optional.ofNullable(coteChallengeBase));
 
-    CoteChallengeUpdateForm form = CoteChallengeUpdateForm.builder()
+    CoteChallengeUpdateRequest form = CoteChallengeUpdateRequest.builder()
             .coteChallengeId(1L)
-            .title("업데이트 제목")
-            .question("업데이트 문제")
+            .title(faker.name().username())
+            .question(faker.name().username())
             .build();
     //when
-    BaseResponseDto<CoteChallengeDto> result =
-            coteChallengeService.updateCoteChallenge(form, userDetailsBase);
+    CoteChallengeDto result =
+            coteChallengeService.updateCoteChallenge(form, userDetailsBase.getUsername());
     //then
-    assertEquals(HttpStatus.OK, result.getStatus());
-    assertEquals("코테 챌린지 수정을 성공했습니다.", result.getMessage());
-    assertEquals(1L, result.getData().getChallengeId());
-    assertEquals("업데이트 제목", result.getData().getTitle());
-    assertEquals("업데이트 문제", result.getData().getQuestion());
+    assertEquals(1L, result.getChallengeId());
+    assertEquals(form.getTitle(), result.getTitle());
+    assertEquals(form.getQuestion(), result.getQuestion());
   }
 
   @Test
@@ -347,23 +342,23 @@ class CoteChallengeServiceTest {
   void updateCoteChallengeFailure() {
     //given
     given(coteChallengeRepository.searchCoteChallengeById(anyLong()))
-            .willReturn(CoteChallenge.builder()
+            .willReturn(Optional.ofNullable(CoteChallenge.builder()
                     .id(1L)
-                    .title("제목")
-                    .question("문제")
+                    .title(faker.name().username())
+                    .question(faker.name().username())
                     .startAt(startAt)
                     .challenge(badChallenge)
-                    .build());
+                    .build()));
 
-    CoteChallengeUpdateForm form = CoteChallengeUpdateForm.builder()
+    CoteChallengeUpdateRequest form = CoteChallengeUpdateRequest.builder()
             .coteChallengeId(1L)
-            .title("업데이트 제목")
-            .question("업데이트 문제")
+            .title(faker.name().username())
+            .question(faker.name().username())
             .build();
     //when
 
     CustomException exception = assertThrows(CustomException.class, () ->
-            coteChallengeService.updateCoteChallenge(form, userDetailsBase));
+            coteChallengeService.updateCoteChallenge(form, userDetailsBase.getUsername()));
     //then
     assertEquals(NOT_OWNER_OF_CHALLENGE, exception.getErrorCode());
   }
@@ -373,27 +368,28 @@ class CoteChallengeServiceTest {
   @DisplayName("코테 챌린지 삭제 성공")
   void deleteCoteChallenge() {
     //given
+    CoteChallenge cote = CoteChallenge.builder()
+            .id(1L)
+            .challenge(challengeBase)
+            .title(faker.name().username())
+            .question(faker.name().username())
+            .startAt(startAt)
+            .comments(new ArrayList<>())
+            .build();
+
     given(coteChallengeRepository.searchCoteChallengeById(anyLong()))
-            .willReturn(CoteChallenge.builder()
-                    .id(1L)
-                    .challenge(challengeBase)
-                    .title("삭제 제목")
-                    .question("삭제 문제 링크")
-                    .startAt(startAt)
-                    .comments(new ArrayList<>())
-                    .build());
+            .willReturn(Optional.ofNullable(cote));
+
     //when
-    BaseResponseDto<CoteChallengeDto> result =
-            coteChallengeService.deleteCoteChallenge(1L, userDetailsBase);
+    CoteChallengeDto result = coteChallengeService
+            .deleteCoteChallenge(1L, userDetailsBase.getUsername());
 
     //then
-    assertEquals(HttpStatus.OK, result.getStatus());
-    assertEquals("코테 챌린지 삭제를 성공했습니다.", result.getMessage());
-    assertEquals(1L, result.getData().getId());
-    assertEquals(1L, result.getData().getChallengeId());
-    assertEquals("삭제 제목", result.getData().getTitle());
-    assertEquals("삭제 문제 링크", result.getData().getQuestion());
-    assertEquals(startAt, result.getData().getStartAt());
+    assertEquals(1L, result.getId());
+    assertEquals(1L, result.getChallengeId());
+    assertEquals(cote.getTitle(), result.getTitle());
+    assertEquals(cote.getQuestion(), result.getQuestion());
+    assertEquals(startAt, result.getStartAt());
   }
 
 
@@ -402,17 +398,35 @@ class CoteChallengeServiceTest {
   void deleteCoteChallengeFailure1() {
     //given
     given(coteChallengeRepository.searchCoteChallengeById(anyLong()))
-            .willReturn(CoteChallenge.builder()
+            .willReturn(Optional.ofNullable(CoteChallenge.builder()
                     .id(1L)
-                    .challenge(badChallenge)
-                    .title("삭제 제목")
-                    .question("삭제 문제 링크")
+                    .challenge(Challenge.builder()
+                            .id(1L)
+                            .title(faker.name().username())
+                            .img(faker.internet().domainName())
+                            .categoryType(CategoryType.COTE)
+                            .description(faker.address().fullAddress())
+                            .maxParticipant(10L)
+                            .currentParticipant(1L)
+                            .minDeposit(10L)
+                            .maxDeposit(50L)
+                            .standard(faker.address().cityName())
+                            .member(Member.builder()
+                                    .id(2L)
+                                    .loginId(faker.name().username())
+                                    .build())
+                            .startDate(startAt)
+                            .endDate(LocalDateTime.now().plusMonths(1))
+                            .coteChallenges(new ArrayList<>())
+                            .build())
+                    .title(faker.name().username())
+                    .question(faker.name().username())
                     .startAt(startAt)
                     .comments(new ArrayList<>())
-                    .build());
+                    .build()));
     //when
     CustomException exception = assertThrows(CustomException.class, () ->
-            coteChallengeService.deleteCoteChallenge(1L, userDetailsBase));
+            coteChallengeService.deleteCoteChallenge(1L, userDetailsBase.getUsername()));
 
     //then
     assertEquals(NOT_OWNER_OF_CHALLENGE, exception.getErrorCode());
@@ -423,19 +437,10 @@ class CoteChallengeServiceTest {
   void deleteCoteChallengeFailure2() {
     //given
     given(coteChallengeRepository.searchCoteChallengeById(anyLong()))
-            .willReturn(CoteChallenge.builder()
-                    .id(1L)
-                    .challenge(challengeBase)
-                    .title("삭제 제목")
-                    .question("삭제 문제 링크")
-                    .startAt(startAt)
-                    .comments(List.of(CoteComment.builder()
-                            .id(1L)
-                            .build()))
-                    .build());
+            .willReturn(Optional.ofNullable(coteChallengeBase));
     //when
     CustomException exception = assertThrows(CustomException.class, () ->
-            coteChallengeService.deleteCoteChallenge(1L, userDetailsBase));
+            coteChallengeService.deleteCoteChallenge(1L, userDetailsBase.getUsername()));
     //then
     assertEquals(CANNOT_DELETE_HAVE_COMMENT, exception.getErrorCode());
   }
@@ -444,34 +449,40 @@ class CoteChallengeServiceTest {
   @DisplayName("인증 댓글 추가 성공")
   void addComment() {
     //given
-    given(memberRepository.searchByLoginId(anyString()))
-            .willReturn(Member.builder()
-                    .id(1L)
-                    .loginId("인증댓글추가멤버아이디")
-                    .memberChallenges(List.of(MemberChallenge.builder()
-                            .id(1L)
-                            .challenge(challengeBase)
-                            .build()))
-                    .build());
-    given(coteChallengeRepository.searchCoteChallengeByStartAt(anyLong(), anyString(), any()))
-            .willReturn(coteChallengeBase);
+    CoteChallenge coteChallenge = CoteChallenge.builder()
+            .id(1L)
+            .challenge(challengeBase)
+            .title(faker.name().username())
+            .question(faker.name().username())
+            .startAt(startAt.plusMonths(1).minusDays(20))
+            .comments(new ArrayList<>())
+            .build();
 
-    CoteCommentForm form = CoteCommentForm.builder()
+    given(coteChallengeRepository.searchCoteChallengeByStartAt(anyLong(), anyString(), any()))
+            .willReturn(Optional.ofNullable(coteChallenge));
+
+    CoteCommentRequest form = CoteCommentRequest.builder()
             .challengeId(1L)
-            .image("이미지 링크")
-            .content("어렵다 어려워")
+            .imageUrl(faker.name().username())
+            .content(faker.name().username())
+            .build();
+
+    Member member = Member.builder()
+            .id(1L)
+            .loginId(faker.name().username())
+            .memberChallenges(List.of(MemberChallenge.builder()
+                    .challenge(challengeBase)
+                    .build()))
             .build();
 
     //when
-    BaseResponseDto<CoteCommentDto> result =
-            coteChallengeService.addComment(form, userDetailsBase);
+    CoteCommentDto result =
+            coteChallengeService.addComment(form, member);
     //then
-    assertEquals(HttpStatus.OK, result.getStatus());
-    assertEquals("인증 댓글 추가를 성공했습니다.", result.getMessage());
-    assertEquals("이미지 링크", result.getData().getImage());
-    assertEquals("어렵다 어려워", result.getData().getContent());
-    assertEquals("인증댓글추가멤버아이디", result.getData().getUserId());
-    assertEquals(1L, result.getData().getCoteChallengeId());
+    assertEquals(form.getImageUrl(), result.getImageUrl());
+    assertEquals(form.getContent(), result.getContent());
+    assertEquals(member.getLoginId(), result.getLoginId());
+    assertEquals(1L, result.getCoteChallengeId());
     verify(coteCommentRepository, times(1)).save(any());
   }
 
@@ -480,25 +491,29 @@ class CoteChallengeServiceTest {
   @DisplayName("인증 댓글 추가 실패(챌린지에 참여하지 않은 회원)")
   void addCommentFailure1() {
     //given
-    given(memberRepository.searchByLoginId(anyString()))
-            .willReturn(Member.builder()
-                    .id(1L)
-                    .loginId("인증댓글추가멤버아이디")
-                    .memberChallenges(new ArrayList<>())
-                    .build());
-    given(coteChallengeRepository.searchCoteChallengeByStartAt(anyLong(), anyString(), any()))
-            .willReturn(coteChallengeBase);
 
-    CoteCommentForm form = CoteCommentForm.builder()
+    CoteChallenge coteChallenge = CoteChallenge.builder()
+            .id(1L)
+            .challenge(challengeBase)
+            .title(faker.name().username())
+            .question(faker.name().username())
+            .startAt(startAt.plusMonths(1).minusDays(20))
+            .comments(new ArrayList<>())
+            .build();
+
+    given(coteChallengeRepository.searchCoteChallengeByStartAt(anyLong(), anyString(), any()))
+            .willReturn(Optional.ofNullable(coteChallenge));
+
+    CoteCommentRequest form = CoteCommentRequest.builder()
             .challengeId(1L)
-            .image("이미지 링크")
+            .imageUrl("이미지 링크")
             .content("어렵다 어려워")
             .build();
 
     //when
 
     CustomException exception = assertThrows(CustomException.class, () ->
-            coteChallengeService.addComment(form, userDetailsBase));
+            coteChallengeService.addComment(form, userDetailsBase.getMember()));
     //then
     assertEquals(NOT_ENTERED_CHALLENGE, exception.getErrorCode());
     verify(coteCommentRepository, times(0)).save(any());
@@ -512,14 +527,12 @@ class CoteChallengeServiceTest {
     given(coteCommentRepository.findById(anyLong()))
             .willReturn(Optional.of(commentBase));
     //when
-    BaseResponseDto<CoteCommentDto> result = coteChallengeService.getComment(1L);
+    CoteCommentDto result = coteChallengeService.getComment(1L);
     //then
-    assertEquals(HttpStatus.OK, result.getStatus());
-    assertEquals("인증 댓글 조회를 성공했습니다.", result.getMessage());
-    assertEquals(1L, result.getData().getCoteChallengeId());
-    assertEquals("test", result.getData().getUserId());
-    assertEquals("인증 댓글 이미지 링크", result.getData().getImage());
-    assertEquals("정말 어려웠다", result.getData().getContent());
+    assertEquals(1L, result.getCoteChallengeId());
+    assertEquals(commentBase.getMember().getLoginId(), result.getLoginId());
+    assertEquals(commentBase.getImageUrl(), result.getImageUrl());
+    assertEquals(commentBase.getContent(), result.getContent());
   }
 
 
@@ -528,23 +541,21 @@ class CoteChallengeServiceTest {
   void updateComment() {
     //given
     given(coteCommentRepository.searchCoteCommentById(anyLong()))
-            .willReturn(commentBase);
-    CoteCommentUpdateForm form = CoteCommentUpdateForm.builder()
+            .willReturn(Optional.ofNullable(commentBase));
+    CoteCommentUpdateRequest form = CoteCommentUpdateRequest.builder()
             .commentId(1L)
-            .content("수정한 내용")
-            .image("수정한 이미지 링크")
+            .content(faker.name().username())
+            .imageUrl(faker.internet().url())
             .build();
     //when
-    BaseResponseDto<CoteCommentDto> result =
-            coteChallengeService.updateComment(form, userDetailsBase);
+    CoteCommentDto result =
+            coteChallengeService.updateComment(form, userDetailsBase.getUsername());
 
     //then
-    assertEquals(HttpStatus.OK, result.getStatus());
-    assertEquals("인증 댓글 수정을 성공했습니다.", result.getMessage());
-    assertEquals("test", result.getData().getUserId());
-    assertEquals("수정한 이미지 링크", result.getData().getImage());
-    assertEquals("수정한 내용", result.getData().getContent());
-    assertEquals(1L, result.getData().getCoteChallengeId());
+    assertEquals(userDetailsBase.getUsername(), result.getLoginId());
+    assertEquals(form.getImageUrl(), result.getImageUrl());
+    assertEquals(form.getContent(), result.getContent());
+    assertEquals(1L, result.getCoteChallengeId());
   }
 
   @Test
@@ -552,21 +563,21 @@ class CoteChallengeServiceTest {
   void updateCommentFailure1() {
     //given
     given(coteCommentRepository.searchCoteCommentById(anyLong()))
-            .willReturn(CoteComment.builder()
+            .willReturn(Optional.ofNullable(CoteComment.builder()
                     .id(1L)
                     .member(Member.builder()
                             .id(1L)
                             .loginId("실패멤버아이디")
                             .build())
-                    .build());
-    CoteCommentUpdateForm form = CoteCommentUpdateForm.builder()
+                    .build()));
+    CoteCommentUpdateRequest form = CoteCommentUpdateRequest.builder()
             .commentId(1L)
             .content("수정한 내용")
-            .image("수정한 이미지 링크")
+            .imageUrl("수정한 이미지 링크")
             .build();
     //when
     CustomException exception = assertThrows(CustomException.class, () ->
-            coteChallengeService.updateComment(form, userDetailsBase));
+            coteChallengeService.updateComment(form, userDetailsBase.getUsername()));
 
     //then
     assertEquals(NOT_OWNER_OF_COMMENT, exception.getErrorCode());
@@ -577,16 +588,15 @@ class CoteChallengeServiceTest {
   void deleteComment() {
     //given
     given(coteCommentRepository.searchCoteCommentById(anyLong()))
-            .willReturn(commentBase);
+            .willReturn(Optional.ofNullable(commentBase));
     //when
-    BaseResponseDto<CoteCommentDto> result = coteChallengeService.deleteComment(1L, userDetailsBase);
+    CoteCommentDto result = coteChallengeService
+            .deleteComment(1L, userDetailsBase.getUsername());
     //then
-    assertEquals(HttpStatus.OK, result.getStatus());
-    assertEquals("인증 댓글 삭제를 성공했습니다.", result.getMessage());
-    assertEquals("test", result.getData().getUserId());
-    assertEquals("인증 댓글 이미지 링크", result.getData().getImage());
-    assertEquals("정말 어려웠다", result.getData().getContent());
-    assertEquals(1L, result.getData().getCoteChallengeId());
+    assertEquals(commentBase.getMember().getLoginId(), result.getLoginId());
+    assertEquals(commentBase.getImageUrl(), result.getImageUrl());
+    assertEquals(commentBase.getContent(), result.getContent());
+    assertEquals(1L, result.getCoteChallengeId());
   }
 
 
@@ -595,16 +605,16 @@ class CoteChallengeServiceTest {
   void deleteCommentFailure() {
     //given
     given(coteCommentRepository.searchCoteCommentById(anyLong()))
-            .willReturn(CoteComment.builder()
+            .willReturn(Optional.ofNullable(CoteComment.builder()
                     .id(1L)
                     .member(Member.builder()
                             .id(1L)
                             .loginId("실패멤버아이디")
                             .build())
-                    .build());
+                    .build()));
     //when
     CustomException exception = assertThrows(CustomException.class, () ->
-            coteChallengeService.deleteComment(1L, userDetailsBase));
+            coteChallengeService.deleteComment(1L, userDetailsBase.getUsername()));
     //then
     assertEquals(NOT_OWNER_OF_COMMENT, exception.getErrorCode());
   }
@@ -615,19 +625,14 @@ class CoteChallengeServiceTest {
     //given
     given(coteCommentRepository.findById(anyLong())).willReturn(Optional.ofNullable(commentBase));
 
-    UserDetailsImpl userDetails = new UserDetailsImpl(Member.builder()
-            .id(1L)
-            .memberType(MemberType.ADMIN)
-            .build());
     //when
-    BaseResponseDto<CoteCommentDto> result = coteChallengeService.adminDeleteComment(1L, userDetails);
+    CoteCommentDto result = coteChallengeService
+            .adminDeleteComment(1L, MemberType.ADMIN);
     //then
-    assertEquals(HttpStatus.OK, result.getStatus());
-    assertEquals("관리자 권한으로 인증 댓글 삭제를 성공했습니다.", result.getMessage());
-    assertEquals("test", result.getData().getUserId());
-    assertEquals("인증 댓글 이미지 링크", result.getData().getImage());
-    assertEquals("정말 어려웠다", result.getData().getContent());
-    assertEquals(1L, result.getData().getCoteChallengeId());
+    assertEquals(commentBase.getMember().getLoginId(), result.getLoginId());
+    assertEquals(commentBase.getImageUrl(), result.getImageUrl());
+    assertEquals(commentBase.getContent(), result.getContent());
+    assertEquals(1L, result.getCoteChallengeId());
   }
 
   @Test
@@ -638,7 +643,7 @@ class CoteChallengeServiceTest {
 
     //when
     CustomException exception = assertThrows(CustomException.class, () ->
-            coteChallengeService.adminDeleteComment(1L, userDetailsBase));
+            coteChallengeService.adminDeleteComment(1L, MemberType.USER));
     //then
     assertEquals(NOT_MEMBER_TYPE_ADMIN, exception.getErrorCode());
   }

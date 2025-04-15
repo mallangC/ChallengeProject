@@ -11,7 +11,10 @@ import com.zerobase.challengeproject.type.AccountType;
 import com.zerobase.challengeproject.type.MemberType;
 import com.zerobase.challengeproject.type.SocialProvider;
 import jakarta.persistence.*;
-import lombok.*;
+import lombok.AllArgsConstructor;
+import lombok.Builder;
+import lombok.Getter;
+import lombok.NoArgsConstructor;
 
 import java.time.LocalDateTime;
 import java.util.List;
@@ -131,7 +134,7 @@ public class Member {
             throw new CustomException(ErrorCode.ALREADY_REFUNDED);
         }
         detail.refundTrue();
-        refund.refundTrue();
+        refund.approveRefund();
         this.account -= detail.getAmount();
     }
 

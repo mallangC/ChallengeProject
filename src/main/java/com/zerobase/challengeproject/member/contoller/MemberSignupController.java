@@ -1,6 +1,6 @@
 package com.zerobase.challengeproject.member.contoller;
 
-import com.zerobase.challengeproject.BaseResponseDto;
+import com.zerobase.challengeproject.HttpApiResponse;
 import com.zerobase.challengeproject.member.components.jwt.UserDetailsImpl;
 import com.zerobase.challengeproject.member.domain.dto.MemberEmailAuthDto;
 import com.zerobase.challengeproject.member.domain.dto.MemberSignupDto;
@@ -28,8 +28,8 @@ public class MemberSignupController {
      * @return 회원 가입한 유저의 비밀번호를 제외한 정보
      */
     @PostMapping("/sign-up")
-    public ResponseEntity<BaseResponseDto<MemberSignupDto>> signUp(@Valid @RequestBody MemberSignupForm memberSignupForm) {
-        return ResponseEntity.ok(new BaseResponseDto<>(memberService.signup(memberSignupForm), "회원 가입 요청 성공했습니다.", HttpStatus.OK));
+    public ResponseEntity<HttpApiResponse<MemberSignupDto>> signUp(@Valid @RequestBody MemberSignupForm memberSignupForm) {
+        return ResponseEntity.ok(new HttpApiResponse<>(memberService.signup(memberSignupForm), "회원 가입 요청 성공했습니다.", HttpStatus.OK));
     }
 
     /**
@@ -38,8 +38,8 @@ public class MemberSignupController {
      * @return 유저의 아이디, 인증 확인, 인증 날짜
      */
     @GetMapping("/email-auth")
-    public ResponseEntity<BaseResponseDto<MemberEmailAuthDto>> verifyEmail(@RequestParam("id") String emailAuthKey){
-        return ResponseEntity.ok(new BaseResponseDto<>(memberService.verifyEmail(emailAuthKey),"이메일 인증 완료되었습니다.", HttpStatus.OK));
+    public ResponseEntity<HttpApiResponse<MemberEmailAuthDto>> verifyEmail(@RequestParam("id") String emailAuthKey){
+        return ResponseEntity.ok(new HttpApiResponse<>(memberService.verifyEmail(emailAuthKey),"이메일 인증 완료되었습니다.", HttpStatus.OK));
     }
 
     /**
@@ -48,10 +48,10 @@ public class MemberSignupController {
      * @return 아무 정보도 없는 쿠키, 회원 탈퇴 성공 메세지
      */
     @DeleteMapping("/unregister")
-    public ResponseEntity<BaseResponseDto> unregister(@AuthenticationPrincipal UserDetailsImpl userDetails) {
+    public ResponseEntity<HttpApiResponse> unregister(@AuthenticationPrincipal UserDetailsImpl userDetails) {
         ResponseCookie cookie = memberService.unregister(userDetails);
         return ResponseEntity.ok()
                 .header(HttpHeaders.SET_COOKIE,cookie.toString())
-                .body(new BaseResponseDto<>(null,"회원 탈퇴 성공했습니다.", HttpStatus.OK));
+                .body(new HttpApiResponse<>(null,"회원 탈퇴 성공했습니다.", HttpStatus.OK));
     }
 }
