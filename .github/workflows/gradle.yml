@@ -33,6 +33,9 @@ jobs:
           distribution: 'temurin'  # Adoptium에서 제공하는 JDK
           java-version: '17'
 
+      - name: gradlew 실행 권한 추가
+        run: chmod +x ./gradlew
+
       - name: 테스트 실행
         run: ./gradlew test
 
