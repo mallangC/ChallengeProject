@@ -1,0 +1,47 @@
+name: Run Tests on Push and PR
+
+on:  # 어떤 이벤트에 반응할지 설정
+  push:
+    branches: [ main, dev ]  # main, develop 브랜치에 push가 있을 때 실행
+  pull_request:
+    branches: [ main, dev]  # main, develop 브랜치로 PR 보낼 때 실행
+
+jobs:
+  test:
+    runs-on: ubuntu-latest  # GitHub가 제공하는 우분투 환경에서 실행
+
+    env:
+      JWT_SECRET_KEY: ${{ secrets.JWT_SECRET_KEY }}
+
+    steps:
+      - name: 코드 체크아웃
+        uses: actions/checkout@v3  # 깃허브 코드 받아오기
+
+      - name: Gradle 캐시 설정
+        uses: actions/cache@v3
+        with:
+          path:
+            ~/.gradle/caches
+            ~/.gradle/wrapper
+          key: ${{ runner.os }}-gradle-${{ hashFiles('**/*.gradle*', '**/gradle-wrapper.properties') }}
+          restore-keys: |
+            ${{ runner.os }}-gradle-
+
+      - name: Java 17 설정
+        uses: actions/setup-java@v4
+        with:
+          distribution: 'temurin'  # Adoptium에서 제공하는 JDK
+          java-version: '17'
+
+      - name: gradlew 실행 권한 추가
+        run: chmod +x ./gradlew
+
+      - name: 테스트 실행
+        run: ./gradlew test
+
+      - name: 테스트 리포트 업로드
+        if: always() # 테스트가 실패해도 리포트를 업로드
+        uses: actions/upload-artifact@v4
+        with:
+          name: test-report
+          path: build/reports/tests/test
