@@ -1,6 +1,6 @@
 package com.zerobase.challengeproject.comment.service;
 
-import com.zerobase.challengeproject.BaseResponseDto;
+import com.zerobase.challengeproject.HttpApiPageResponse;
 import com.zerobase.challengeproject.challenge.entity.Challenge;
 import com.zerobase.challengeproject.challenge.entity.MemberChallenge;
 import com.zerobase.challengeproject.challenge.repository.ChallengeRepository;
@@ -142,7 +142,7 @@ class CoteChallengeServiceTest {
             .startAt(startAt)
             .build();
     //when
-    BaseResponseDto<CoteChallengeDto> result =
+    HttpApiPageResponse<CoteChallengeDto> result =
             coteChallengeService.addCoteChallenge(form, userDetailsBase);
     //then
     assertEquals(HttpStatus.OK, result.getStatus());
@@ -294,7 +294,7 @@ class CoteChallengeServiceTest {
     given(coteChallengeRepository.findById(anyLong()))
             .willReturn(Optional.of(coteChallengeBase));
     //when
-    BaseResponseDto<CoteChallengeDto> result =
+    HttpApiPageResponse<CoteChallengeDto> result =
             coteChallengeService.getCoteChallenge(1L);
     //then
     assertEquals(HttpStatus.OK, result.getStatus());
@@ -332,7 +332,7 @@ class CoteChallengeServiceTest {
             .question("업데이트 문제")
             .build();
     //when
-    BaseResponseDto<CoteChallengeDto> result =
+    HttpApiPageResponse<CoteChallengeDto> result =
             coteChallengeService.updateCoteChallenge(form, userDetailsBase);
     //then
     assertEquals(HttpStatus.OK, result.getStatus());
@@ -383,7 +383,7 @@ class CoteChallengeServiceTest {
                     .comments(new ArrayList<>())
                     .build());
     //when
-    BaseResponseDto<CoteChallengeDto> result =
+    HttpApiPageResponse<CoteChallengeDto> result =
             coteChallengeService.deleteCoteChallenge(1L, userDetailsBase);
 
     //then
@@ -463,7 +463,7 @@ class CoteChallengeServiceTest {
             .build();
 
     //when
-    BaseResponseDto<CoteCommentDto> result =
+    HttpApiPageResponse<CoteCommentDto> result =
             coteChallengeService.addComment(form, userDetailsBase);
     //then
     assertEquals(HttpStatus.OK, result.getStatus());
@@ -512,7 +512,7 @@ class CoteChallengeServiceTest {
     given(coteCommentRepository.findById(anyLong()))
             .willReturn(Optional.of(commentBase));
     //when
-    BaseResponseDto<CoteCommentDto> result = coteChallengeService.getComment(1L);
+    HttpApiPageResponse<CoteCommentDto> result = coteChallengeService.getComment(1L);
     //then
     assertEquals(HttpStatus.OK, result.getStatus());
     assertEquals("인증 댓글 조회를 성공했습니다.", result.getMessage());
@@ -535,7 +535,7 @@ class CoteChallengeServiceTest {
             .image("수정한 이미지 링크")
             .build();
     //when
-    BaseResponseDto<CoteCommentDto> result =
+    HttpApiPageResponse<CoteCommentDto> result =
             coteChallengeService.updateComment(form, userDetailsBase);
 
     //then
@@ -579,7 +579,7 @@ class CoteChallengeServiceTest {
     given(coteCommentRepository.searchCoteCommentById(anyLong()))
             .willReturn(commentBase);
     //when
-    BaseResponseDto<CoteCommentDto> result = coteChallengeService.deleteComment(1L, userDetailsBase);
+    HttpApiPageResponse<CoteCommentDto> result = coteChallengeService.deleteComment(1L, userDetailsBase);
     //then
     assertEquals(HttpStatus.OK, result.getStatus());
     assertEquals("인증 댓글 삭제를 성공했습니다.", result.getMessage());
@@ -620,7 +620,7 @@ class CoteChallengeServiceTest {
             .memberType(MemberType.ADMIN)
             .build());
     //when
-    BaseResponseDto<CoteCommentDto> result = coteChallengeService.adminDeleteComment(1L, userDetails);
+    HttpApiPageResponse<CoteCommentDto> result = coteChallengeService.adminDeleteComment(1L, userDetails);
     //then
     assertEquals(HttpStatus.OK, result.getStatus());
     assertEquals("관리자 권한으로 인증 댓글 삭제를 성공했습니다.", result.getMessage());

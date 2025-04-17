@@ -156,7 +156,7 @@ public class ChallengeServiceTest {
                 .loginId("member123")
                 .memberName("user123")
                 .account(1000000L)
-                .phoneNum("123-456-7890")
+                .phoneNumber("123-456-7890")
                 .email("test@example.com")
                 .build();
 

@@ -1,6 +1,6 @@
 package com.zerobase.challengeproject.account.service;
 
-import com.zerobase.challengeproject.BaseResponseDto;
+import com.zerobase.challengeproject.HttpApiPageResponse;
 import com.zerobase.challengeproject.account.domain.dto.AccountDetailDto;
 import com.zerobase.challengeproject.account.domain.dto.PageDto;
 import com.zerobase.challengeproject.account.domain.dto.RefundDto;
@@ -91,7 +91,7 @@ class AccountServiceTest {
             .willReturn(Optional.of(memberBase));
 
     //when
-    BaseResponseDto<AccountDetailDto> responseDto = accountService.addAmount(accountAddForm, userDetails);
+    HttpApiPageResponse<AccountDetailDto> responseDto = accountService.addAmount(accountAddForm, userDetails);
 
     //then
     assertEquals(HttpStatus.OK, responseDto.getStatus());
@@ -131,7 +131,7 @@ class AccountServiceTest {
             .willReturn(memberSearch);
 
     //when
-    BaseResponseDto<RefundDto> result = accountService.addRefund(refundAddForm, userDetails);
+    HttpApiPageResponse<RefundDto> result = accountService.addRefund(refundAddForm, userDetails);
 
     //then
     assertEquals(1L, result.getData().getAccountDetailId());
@@ -182,7 +182,7 @@ class AccountServiceTest {
     given(refundRepository.searchAllMyRefund(anyInt(), anyString()))
             .willReturn(pageRefundDtos);
     //when
-    BaseResponseDto<PageDto<RefundDto>> result = accountService.getAllMyRefund(1, userDetails);
+    HttpApiPageResponse<PageDto<RefundDto>> result = accountService.getAllMyRefund(1, userDetails);
 
     //then
     assertEquals(HttpStatus.OK, result.getStatus());
@@ -214,7 +214,7 @@ class AccountServiceTest {
                     .isRefunded(false)
                     .build()));
     //when
-    BaseResponseDto<RefundDto> result = accountService.cancelRefund(1L);
+    HttpApiPageResponse<RefundDto> result = accountService.cancelRefund(1L);
     //then
     assertEquals(HttpStatus.OK, result.getStatus());
     assertEquals("환불 신청을 취소했습니다.", result.getMessage());
@@ -294,7 +294,7 @@ class AccountServiceTest {
             .build();
 
     //when
-    BaseResponseDto<RefundDto> result = accountService.refundDecision(
+    HttpApiPageResponse<RefundDto> result = accountService.refundDecision(
             true, refundUpdateForm);
 
     //then
@@ -329,7 +329,7 @@ class AccountServiceTest {
             .build();
 
     //when
-    BaseResponseDto<RefundDto> result = accountService.refundDecision(
+    HttpApiPageResponse<RefundDto> result = accountService.refundDecision(
             false, refundUpdateForm);
 
     //then

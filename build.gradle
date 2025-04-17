@@ -45,6 +45,15 @@ dependencies {
     implementation 'io.jsonwebtoken:jjwt-impl:0.11.5'
     implementation 'io.jsonwebtoken:jjwt-orgjson:0.11.5'
 
+
+    testImplementation 'org.springframework.boot:spring-boot-starter-test'
+    testImplementation 'org.springframework.security:spring-security-test'
+    testImplementation 'com.h2database:h2'
+    testImplementation('com.github.javafaker:javafaker:1.0.2') {
+        exclude group: 'org.yaml', module: 'snakeyaml'
+    }
+    testRuntimeOnly 'org.junit.platform:junit-platform-launcher'
+
     //Redis
     implementation 'org.springframework.boot:spring-boot-starter-data-redis'
     implementation 'org.springframework.boot:spring-boot-starter-cache'

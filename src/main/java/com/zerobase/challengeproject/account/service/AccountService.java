@@ -1,6 +1,6 @@
 package com.zerobase.challengeproject.account.service;
 
-import com.zerobase.challengeproject.BaseResponseDto;
+import com.zerobase.challengeproject.HttpApiPageResponse;
 import com.zerobase.challengeproject.account.domain.dto.AccountDetailDto;
 import com.zerobase.challengeproject.account.domain.dto.PageDto;
 import com.zerobase.challengeproject.account.domain.dto.RefundDto;
@@ -45,9 +45,9 @@ public class AccountService {
    * @param page 찾은 계좌 내역 페이지
    * @return 계좌 내역과 총 갯수, 총페이지, 현재 페이지, 한페이지에 표시되는 계좌내역의 갯수 정보
    */
-  public BaseResponseDto<PageDto<AccountDetailDto>> getAllAccounts(int page, UserDetailsImpl userDetails) {
+  public HttpApiPageResponse<PageDto<AccountDetailDto>> getAllAccounts(int page, UserDetailsImpl userDetails) {
     Page<AccountDetailDto> paging = accountDetailRepository.searchAllAccountDetail(page - 1, userDetails.getUsername());
-    return new BaseResponseDto<>(PageDto.from(paging)
+    return new HttpApiPageResponse<>(PageDto.from(paging)
             , "계좌 내역 조회에 성공했습니다.(" + page + "페이지)"
             , HttpStatus.OK);
   }
@@ -61,7 +61,7 @@ public class AccountService {
    * @return id, updateAt을 제외한 모든 충전내역
    */
   @Transactional
-  public BaseResponseDto<AccountDetailDto> addAmount(AccountAddForm form, UserDetailsImpl userDetails) {
+  public HttpApiPageResponse<AccountDetailDto> addAmount(AccountAddForm form, UserDetailsImpl userDetails) {
     String userId = userDetails.getUsername();
     Member member = searchMember(userId);
 
@@ -70,7 +70,7 @@ public class AccountService {
     accountDetailRepository.save(detail);
 
     member.chargeAccount(amount);
-    return new BaseResponseDto<>(
+    return new HttpApiPageResponse<>(
             AccountDetailDto.from(detail),
             amount + "원 충전을 성공했습니다.",
             HttpStatus.OK);
@@ -83,7 +83,7 @@ public class AccountService {
    * @param form 환불 신청할 내역id, 환불 사유
    * @return 환불 신청에 대한 정보 (id 제외)
    */
-  public BaseResponseDto<RefundDto> addRefund(RefundAddForm form, UserDetailsImpl userDetails) {
+  public HttpApiPageResponse<RefundDto> addRefund(RefundAddForm form, UserDetailsImpl userDetails) {
     String userId = userDetails.getUsername();
     boolean isExist = refundRepository.existsByAccountDetail_Id(form.getAccountId());
     if (isExist) {
@@ -94,16 +94,16 @@ public class AccountService {
     Refund refund = Refund.from(form.getContent(), member);
     refundRepository.save(refund);
 
-    return new BaseResponseDto<>(RefundDto.from(refund),
+    return new HttpApiPageResponse<>(RefundDto.from(refund),
             "환불 신청을 성공했습니다.",
             HttpStatus.OK);
   }
 
 
-  public BaseResponseDto<PageDto<RefundDto>> getAllMyRefund(int page, UserDetailsImpl userDetails) {
+  public HttpApiPageResponse<PageDto<RefundDto>> getAllMyRefund(int page, UserDetailsImpl userDetails) {
     String userId = userDetails.getUsername();
     Page<RefundDto> paging = refundRepository.searchAllMyRefund(page - 1, userId);
-    return new BaseResponseDto<>(PageDto.from(paging)
+    return new HttpApiPageResponse<>(PageDto.from(paging)
             , "회원의 환불신청 조회에 성공했습니다.(" + page + "페이지)"
             , HttpStatus.OK);
   }
@@ -116,7 +116,7 @@ public class AccountService {
    * @return 취소하기 전 환불 신청 정보
    */
   @Transactional
-  public BaseResponseDto<RefundDto> cancelRefund(Long refundId) {
+  public HttpApiPageResponse<RefundDto> cancelRefund(Long refundId) {
     Refund refund = refundRepository.findById(refundId)
             .orElseThrow(() -> new CustomException(ErrorCode.NOT_FOUND_REFUND));
 
@@ -125,7 +125,7 @@ public class AccountService {
     }
 
     refundRepository.delete(refund);
-    return new BaseResponseDto<>(RefundDto.from(refund),
+    return new HttpApiPageResponse<>(RefundDto.from(refund),
             "환불 신청을 취소했습니다.",
             HttpStatus.OK);
   }
@@ -138,9 +138,9 @@ public class AccountService {
    * @param form 검색 기준이 되는 날짜(문자열 예- 2025-03-31 00), 두개의 boolean
    * @return paging된 검색 기준에 맞는 Refund 정보
    */
-  public BaseResponseDto<PageDto<RefundDto>> getAllRefund(int page, RefundSearchForm form) {
+  public HttpApiPageResponse<PageDto<RefundDto>> getAllRefund(int page, RefundSearchForm form) {
     Page<RefundDto> paging = refundRepository.searchAllRefund(page - 1, form.getStartAtStr(), form.getDone(), form.getRefunded());
-    return new BaseResponseDto<>(PageDto.from(paging)
+    return new HttpApiPageResponse<>(PageDto.from(paging)
             , "환불 신청 조회에 성공했습니다.(" + page + "페이지)"
             , HttpStatus.OK);
   }
@@ -162,7 +162,7 @@ public class AccountService {
    * @return updateAt을 제외한 모든 환불 내역
    */
   @Transactional
-  public BaseResponseDto<RefundDto> refundDecision(boolean approval, RefundUpdateForm form) {
+  public HttpApiPageResponse<RefundDto> refundDecision(boolean approval, RefundUpdateForm form) {
     Refund refund = refundRepository.searchRefundById(form.getRefundId());
     AccountDetail accountDetail = refund.getAccountDetail();
     if (accountDetail.getAccountType() != AccountType.CHARGE) {
@@ -175,12 +175,12 @@ public class AccountService {
       AccountDetail refundDetail = AccountDetail.refund(member, accountDetail.getAmount());
       accountDetailRepository.save(refundDetail);
       member.refundAccount(accountDetail, refund);
-      return new BaseResponseDto<>(RefundDto.from(refund),
+      return new HttpApiPageResponse<>(RefundDto.from(refund),
               "환불 승인을 성공했습니다.",
               HttpStatus.OK);
     }
     refund.refundFalse(form);
-    return new BaseResponseDto<>(RefundDto.from(refund),
+    return new HttpApiPageResponse<>(RefundDto.from(refund),
             "환불 비승인을 성공했습니다.",
             HttpStatus.OK);
   }

@@ -1,5 +1,6 @@
 package com.zerobase.challengeproject.member.service;
 
+import com.github.javafaker.Faker;
 import com.zerobase.challengeproject.exception.CustomException;
 import com.zerobase.challengeproject.exception.ErrorCode;
 import com.zerobase.challengeproject.member.components.MailComponents;
@@ -11,6 +12,7 @@ import com.zerobase.challengeproject.member.domain.form.MemberSignupForm;
 import com.zerobase.challengeproject.member.entity.Member;
 import com.zerobase.challengeproject.member.repository.MemberRepository;
 import com.zerobase.challengeproject.member.repository.RefreshTokenRepository;
+import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
@@ -46,16 +48,23 @@ class MemberSignupServiceTest {
     @InjectMocks
     private MemberSignupService memberService;
 
+    private Faker faker;
+
+    @BeforeEach
+    void setUp() {
+        faker = new Faker();
+    }
+
     @Test
     @DisplayName("회원 가입 성공")
     void signup() {
         //given
         MemberSignupForm memberSignupForm = MemberSignupForm.builder()
-                .loginId("testId")
-                .memberName("testName")
-                .nickname("testNickname")
-                .email("testEmail@email.com")
-                .phoneNum("01011112222")
+                .loginId(faker.name().username())
+                .memberName(faker.name().username())
+                .nickname(faker.funnyName().name())
+                .email(faker.internet().emailAddress())
+                .phoneNum("010"+faker.number().digits(8))
                 .password("testtest1!")
                 .confirmPassword("testtest1!")
                 .build();
@@ -69,11 +78,12 @@ class MemberSignupServiceTest {
         //then
         verify(memberRepository, times(1)).save(any(Member.class));
         verify(mailComponents, times(1)).send(eq(memberSignupForm.getEmail()), anyString(), anyString());
+        verify(passwordEncoder, times(1)).encode(memberSignupForm.getPassword());
         assertNotNull(dto);
         assertEquals(dto.getLoginId(), memberSignupForm.getLoginId());
         assertEquals(dto.getMemberName(), memberSignupForm.getMemberName());
         assertEquals(dto.getEmail(), memberSignupForm.getEmail());
-        assertEquals(dto.getPhoneNum(), memberSignupForm.getPhoneNum());
+        assertEquals(dto.getPhoneNumber(), memberSignupForm.getPhoneNum());
     }
 
     @Test
@@ -81,11 +91,11 @@ class MemberSignupServiceTest {
     void signupFailure() {
         // given
         MemberSignupForm memberSignupForm = MemberSignupForm.builder()
-                .loginId("testId")
-                .memberName("testName")
-                .nickname("testNickname")
-                .email("testEmail@email.com")
-                .phoneNum("01011112222")
+                .loginId(faker.name().username())
+                .memberName(faker.name().username())
+                .nickname(faker.funnyName().name())
+                .email(faker.internet().emailAddress())
+                .phoneNum("010"+faker.number().digits(8))
                 .password("testtest1!")
                 .confirmPassword("differentPassword!")
                 .build();
@@ -103,7 +113,7 @@ class MemberSignupServiceTest {
         // given
         String emailAuthKey = "valid-key";
         Member member = Member.builder()
-                .emailAuthYn(false)
+                .isEmailVerified(false)
                 .emailAuthKey(emailAuthKey)
                 .build();
         when(memberRepository.findByEmailAuthKey(emailAuthKey)).thenReturn(Optional.of(member));
@@ -112,7 +122,7 @@ class MemberSignupServiceTest {
         MemberEmailAuthDto authDto = memberService.verifyEmail(emailAuthKey);
 
         // then
-        assertTrue(member.isEmailAuthYn());
+        assertTrue(member.isEmailVerified());
         assertNotNull(authDto);
     }
 
@@ -122,7 +132,7 @@ class MemberSignupServiceTest {
         // given
         String emailAuthKey = "verified-key";
         Member member = Member.builder()
-                .emailAuthYn(true)
+                .isEmailVerified(true)
                 .emailAuthKey(emailAuthKey)
                 .build();
         when(memberRepository.findByEmailAuthKey(emailAuthKey)).thenReturn(Optional.of(member));
@@ -150,14 +160,14 @@ class MemberSignupServiceTest {
 
     @Test
     @DisplayName("회원 탈퇴 - 정상 동작")
-    void unregister_Success() {
+    void unregister() {
         // given
         Member member = Member.builder()
                 .loginId("testId")
                 .memberName("testName")
                 .nickname("testNickname")
                 .email("testEmail@email.com")
-                .phoneNum("01011112222")
+                .phoneNumber("01011112222")
                 .build();
         UserDetailsImpl userDetails = mock(UserDetailsImpl.class);
         when(userDetails.getUsername()).thenReturn(member.getLoginId());
@@ -168,7 +178,7 @@ class MemberSignupServiceTest {
         when(jwtUtil.createRefreshTokenCookie("", 0)).thenReturn(mockCookie);
 
         // when
-        ResponseCookie responseCookie = memberService.unregister(userDetails);
+        ResponseCookie responseCookie = memberService.unregister(userDetails.getUsername());
 
         // Then
         assertNotNull(responseCookie);
@@ -180,7 +190,7 @@ class MemberSignupServiceTest {
 
     @Test
     @DisplayName("회원 탈퇴 - 회원이 존재하지 않을 경우 예외 발생")
-    void unregister_MemberNotFound() {
+    void unregisterFailure() {
         //given
         String memberId = "nonExistentUser";
         UserDetailsImpl userDetails = mock(UserDetailsImpl.class);
@@ -189,7 +199,7 @@ class MemberSignupServiceTest {
 
         //when & then
         CustomException exception = assertThrows(CustomException.class, () -> {
-            memberService.unregister(userDetails);
+            memberService.unregister(userDetails.getUsername());
         });
 
         assertEquals(ErrorCode.NOT_FOUND_MEMBER, exception.getErrorCode());

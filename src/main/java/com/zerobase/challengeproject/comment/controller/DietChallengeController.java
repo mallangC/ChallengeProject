@@ -1,6 +1,6 @@
 package com.zerobase.challengeproject.comment.controller;
 
-import com.zerobase.challengeproject.BaseResponseDto;
+import com.zerobase.challengeproject.HttpApiPageResponse;
 import com.zerobase.challengeproject.comment.domain.dto.DietChallengeDto;
 import com.zerobase.challengeproject.comment.domain.dto.DietCommentDto;
 import com.zerobase.challengeproject.comment.domain.form.DietChallengeAddForm;
@@ -30,7 +30,7 @@ public class DietChallengeController {
    * @return 다이어트 챌린지 정보
    */
   @PostMapping
-  public ResponseEntity<BaseResponseDto<DietChallengeDto>> addDietChallenge(
+  public ResponseEntity<HttpApiPageResponse<DietChallengeDto>> addDietChallenge(
           @RequestBody @Valid DietChallengeAddForm form,
           @AuthenticationPrincipal UserDetailsImpl userDetails) {
     return ResponseEntity.ok(dietChallengeService.addDietChallenge(form, userDetails));
@@ -44,7 +44,7 @@ public class DietChallengeController {
    * @return 다이어트 챌린지 정보
    */
   @GetMapping("/{challengeId}")
-  public ResponseEntity<BaseResponseDto<DietChallengeDto>> getDietChallenge(
+  public ResponseEntity<HttpApiPageResponse<DietChallengeDto>> getDietChallenge(
           @PathVariable Long challengeId,
           @AuthenticationPrincipal UserDetailsImpl userDetails) {
     return ResponseEntity.ok(dietChallengeService.getDietChallenge(challengeId, userDetails));
@@ -59,7 +59,7 @@ public class DietChallengeController {
    * @return 수정된 다이어트 챌린지 정보
    */
   @PatchMapping
-  public ResponseEntity<BaseResponseDto<DietChallengeDto>> updateDietChallenge(
+  public ResponseEntity<HttpApiPageResponse<DietChallengeDto>> updateDietChallenge(
           @RequestBody @Valid DietChallengeUpdateForm form,
           @AuthenticationPrincipal UserDetailsImpl userDetails) {
     return ResponseEntity.ok(dietChallengeService.updateDietChallenge(form, userDetails));
@@ -74,7 +74,7 @@ public class DietChallengeController {
    * @return 추가된 다이어트 댓글 정보
    */
   @PostMapping("/comment")
-  public ResponseEntity<BaseResponseDto<DietCommentDto>> addComment(
+  public ResponseEntity<HttpApiPageResponse<DietCommentDto>> addComment(
           @RequestBody @Valid DietCommentAddForm form,
           @AuthenticationPrincipal UserDetailsImpl userDetails) {
     return ResponseEntity.ok(dietChallengeService.addDietComment(form, userDetails));
@@ -87,7 +87,7 @@ public class DietChallengeController {
    * @return 조회한 다이어트 댓글 정보
    */
   @GetMapping("/comment/{commentId}")
-  public ResponseEntity<BaseResponseDto<DietCommentDto>> getComment(
+  public ResponseEntity<HttpApiPageResponse<DietCommentDto>> getComment(
           @PathVariable Long commentId) {
     return ResponseEntity.ok(dietChallengeService.getDietComment(commentId));
   }
@@ -100,7 +100,7 @@ public class DietChallengeController {
    * @return 수정한 다이어트 댓글 정보
    */
   @PatchMapping("/comment")
-  public ResponseEntity<BaseResponseDto<DietCommentDto>> updateComment(
+  public ResponseEntity<HttpApiPageResponse<DietCommentDto>> updateComment(
           @RequestBody @Valid DietCommentUpdateForm form,
           @AuthenticationPrincipal UserDetailsImpl userDetails) {
     return ResponseEntity.ok(dietChallengeService.updateDietComment(form, userDetails));
@@ -115,7 +115,7 @@ public class DietChallengeController {
    * @return 삭제된 다이어트 댓글 정보
    */
   @DeleteMapping("/comment/{commentId}")
-  public ResponseEntity<BaseResponseDto<DietCommentDto>> deleteComment(
+  public ResponseEntity<HttpApiPageResponse<DietCommentDto>> deleteComment(
           @PathVariable Long commentId,
           @AuthenticationPrincipal UserDetailsImpl userDetails) {
     return ResponseEntity.ok(dietChallengeService.deleteDietComment(commentId, userDetails));
