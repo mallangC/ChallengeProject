@@ -572,8 +572,8 @@ class CoteChallengeServiceTest {
                     .build()));
     CoteCommentUpdateRequest form = CoteCommentUpdateRequest.builder()
             .commentId(1L)
-            .content("수정한 내용")
-            .imageUrl("수정한 이미지 링크")
+            .content(faker.lorem().sentence(5))
+            .imageUrl(faker.internet().url())
             .build();
     //when
     CustomException exception = assertThrows(CustomException.class, () ->
@@ -609,7 +609,7 @@ class CoteChallengeServiceTest {
                     .id(1L)
                     .member(Member.builder()
                             .id(1L)
-                            .loginId("실패멤버아이디")
+                            .loginId(faker.name().username())
                             .build())
                     .build()));
     //when
