@@ -91,8 +91,6 @@ public class ChallengeService {
         return userChallenges.map(GetChallengeDto::new);
     }
 
-
-
     /**
      * 사용자가 참여중인 챌린지 조회
      */
@@ -163,7 +161,6 @@ public class ChallengeService {
                     .orElseThrow(() -> new CustomException(ErrorCode.NOT_FOUND_DIET_CHALLENGE));
             dietChallengeRepository.delete(dietChallenge);
         }
-
         Long refundAmount = memberChallenge.getMemberDeposit();
         AccountDetail refundRecord = AccountDetail.depositBack(member, refundAmount);
 
@@ -208,11 +205,10 @@ public class ChallengeService {
      */
     public GetChallengeDto updateChallenge(Long challengeId, UpdateChallengeRequest form) {
         Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
-        UserDetailsImpl userDetails = (UserDetailsImpl) authentication.getPrincipal();  // 현재 로그인된 유저 정보
+        UserDetailsImpl userDetails = (UserDetailsImpl) authentication.getPrincipal();
 
         Challenge challenge = challengeRepository.findById(challengeId)
                 .orElseThrow(() -> new CustomException(ErrorCode.NOT_FOUND_CHALLENGE));
-
 
         if (!challenge.getMember().getId().equals(userDetails.getMember().getId())) {
             throw new CustomException(ErrorCode.FORBIDDEN_UPDATE_CHALLENGE);
