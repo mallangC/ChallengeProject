@@ -94,7 +94,7 @@ class DietChallengeServiceTest {
           .maxDeposit(50L)
           .standard("challengeStandard")
           .member(memberBase)
-          .startDate(LocalDateTime.parse("2025-04-10T00:00:00"))
+          .startDate(LocalDateTime.now().plusDays(1))
           .coteChallenges(new ArrayList<>())
           .dietChallenges(new ArrayList<>())
           .build();

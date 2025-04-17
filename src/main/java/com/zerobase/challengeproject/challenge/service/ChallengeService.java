@@ -14,11 +14,8 @@ import com.zerobase.challengeproject.challenge.repository.MemberChallengeReposit
 import com.zerobase.challengeproject.comment.entity.CoteChallenge;
 import com.zerobase.challengeproject.comment.entity.CoteComment;
 import com.zerobase.challengeproject.comment.entity.DietChallenge;
-import com.zerobase.challengeproject.comment.entity.DietComment;
-import com.zerobase.challengeproject.comment.repository.CoteChallengeRepository;
-import com.zerobase.challengeproject.comment.repository.CoteCommentRepository;
-import com.zerobase.challengeproject.comment.repository.DietChallengeRepository;
-import com.zerobase.challengeproject.comment.repository.DietCommentRepository;
+import com.zerobase.challengeproject.comment.entity.WaterChallenge;
+import com.zerobase.challengeproject.comment.repository.*;
 import com.zerobase.challengeproject.exception.CustomException;
 import com.zerobase.challengeproject.exception.ErrorCode;
 import com.zerobase.challengeproject.member.components.jwt.UserDetailsImpl;
@@ -39,8 +36,6 @@ import org.springframework.web.bind.annotation.RequestBody;
 
 import java.time.LocalDate;
 import java.time.LocalDateTime;
-import java.util.ArrayList;
-import java.util.Comparator;
 import java.util.List;
 
 @Service
@@ -57,6 +52,7 @@ public class ChallengeService {
   private final CoteCommentRepository coteCommentRepository;
   private final DietChallengeRepository dietChallengeRepository;
   private final DietCommentRepository dietCommentRepository;
+  private final WaterChallengeRepository waterChallengeRepository;
 
     /**
      * 전체 챌린지조회
@@ -119,9 +115,6 @@ public class ChallengeService {
         Member member = userDetails.getMember();
         EnterChallengeDto enterChallengeDto = new EnterChallengeDto(challenge, form.getMemberDeposit());
 
-        /**
-         * 이미 참여한 경우 예외
-         */
         boolean isAlreadyEntered = memberChallengeRepository.existsByChallengeAndMember(challenge, member);
         if (isAlreadyEntered) {
             throw new CustomException(ErrorCode.ALREADY_ENTERED_CHALLENGE);
@@ -203,7 +196,6 @@ public class ChallengeService {
          * 보증금차감 및 저장
          */
         AccountDetail depositDetail = AccountDetail.deposit(member, form.getMemberDeposit());
-
         member.depositAccount(form.getMemberDeposit());
         memberRepository.save(member);
         challengeRepository.save(challenge);
@@ -263,8 +255,7 @@ public class ChallengeService {
         Challenge challenge = challengeRepository.findById(challengeId)
                 .orElseThrow(() -> new CustomException(ErrorCode.NOT_FOUND_CHALLENGE));
         DepositBackDto depositBackDto = new DepositBackDto();
-
-        //validateChallengeEnded(challenge);
+        validateChallengeEnded(challenge);
 
         if(challenge.getCategoryType().equals(CategoryType.COTE)){
             List<CoteChallenge> coteChallenges = coteChallengeRepository.findAllByChallengeId(challengeId);
@@ -276,7 +267,7 @@ public class ChallengeService {
             List<CoteComment> coteComments = coteCommentRepository
                     .findAllByCoteChallengeIdInAndMemberId(coteChallengeIds, member.getId());
             int matchedCount = 0;
-            for (CoteChallenge coteChallenge :  coteChallenges) {
+            for (CoteChallenge coteChallenge : coteChallenges) {
                 LocalDate coteDate = coteChallenge.getStartAt().toLocalDate();
 
                 boolean hasMatchingComment = coteComments.stream()
@@ -289,9 +280,7 @@ public class ChallengeService {
                 }
             }
             // 성공 여부 판단, 매일 올라온 코테챌린지날짜와 인증작성날짜가 모두 매칭되면 인증성공
-            boolean isSuccess = matchedCount == coteChallenges.size();
-
-            if(!isSuccess){
+            if(matchedCount != coteChallenges.size()){
                 throw new CustomException(ErrorCode.CHALLENGE_FAIL);
             }
             MemberChallenge memberChallenge = memberChallengeRepository.findByChallengeAndMember(challenge, member)
@@ -303,25 +292,9 @@ public class ChallengeService {
             Long depositBackAmount = depositBackProcess(memberChallenge, member);
             depositBackDto.setDepositBackDto(challengeId, depositBackAmount, member.getAccount());
 
-
         }else if (challenge.getCategoryType().equals(CategoryType.DIET)) {
-
             DietChallenge dietChallenge = dietChallengeRepository.findByChallengeId(challengeId);
-            List<DietComment> dietComments = dietCommentRepository.findByDietChallengeIdAndMemberId(dietChallenge.getId(), member.getId());
-
-            if (dietComments.isEmpty()) {
-                throw new CustomException(ErrorCode.NO_DIET_COMMENT);
-            }
-            // 최신 몸무게를 기준으로 판단
-            DietComment latestComment = dietComments.stream()
-                    .max(Comparator.comparing(DietComment::getCreatedAt))
-                    .orElseThrow(() -> new CustomException(ErrorCode.NO_DIET_COMMENT));
-
-            Float finalWeight = latestComment.getCurrentWeight();  // 사용자 최종 몸무게
-            Float targetWeight = dietChallenge.getGoalWeight();  // 목표 몸무게
-
-            boolean isSuccess = finalWeight <= targetWeight;
-            if (!isSuccess) {
+            if(dietChallenge.getCurrentWeight() > dietChallenge.getGoalWeight()){
                 throw new CustomException(ErrorCode.CHALLENGE_FAIL);
             }
             MemberChallenge memberChallenge = memberChallengeRepository.findByChallengeAndMember(challenge, member)
@@ -332,6 +305,23 @@ public class ChallengeService {
             Long depositBackAmount = depositBackProcess(memberChallenge, member);
             depositBackDto.setDepositBackDto(challengeId, depositBackAmount, member.getAccount());
 
+        }else{
+
+            List<WaterChallenge> waterChallenges = waterChallengeRepository.findAllByChallengeIdAndMember(challengeId, member);
+            boolean allDaysMetGoal = waterChallenges.stream()
+                    .allMatch(wc -> wc.getCurrentMl() >= wc.getGoalMl());
+            if (!allDaysMetGoal) {
+                throw new CustomException(ErrorCode.NOT_MET_CHALLENGE_GOAL);
+            }
+            MemberChallenge memberChallenge = memberChallengeRepository.findByChallengeAndMember(challenge, member)
+                    .orElseThrow(() -> new CustomException(ErrorCode.NOT_FOUND_CHALLENGE));
+
+            if (memberChallenge.isDepositBack()) {
+                throw new CustomException(ErrorCode.ALREADY_REFUNDED);
+            }
+
+            Long depositBackAmount = depositBackProcess(memberChallenge, member);
+            depositBackDto.setDepositBackDto(challengeId, depositBackAmount, member.getAccount());
         }
 
         return ResponseEntity.ok(new BaseResponseDto<DepositBackDto>(depositBackDto, "챌린지 환급 성공", HttpStatus.OK));

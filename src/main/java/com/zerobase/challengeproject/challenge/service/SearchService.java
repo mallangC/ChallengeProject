@@ -28,7 +28,6 @@ public class SearchService {
         Page<GetChallengeDto> searchResult = challenges.map(challenge -> new GetChallengeDto(challenge));
 
         return ResponseEntity.ok(new BaseResponseDto<>(searchResult, "제목검색 성공", HttpStatus.OK));
-
     }
 
     /**

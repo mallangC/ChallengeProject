@@ -17,7 +17,7 @@ public class WaterCommentDto {
     return WaterCommentDto.builder()
             .id(waterComment.getId())
             .challengeId(waterComment.getWaterChallenge().getChallenge().getId())
-            .longinId(waterComment.getMember().getMemberId())
+            .longinId(waterComment.getMember().getLoginId())
             .drinkingMl(waterComment.getDrinkingMl())
             .image(waterComment.getImage())
             .build();
