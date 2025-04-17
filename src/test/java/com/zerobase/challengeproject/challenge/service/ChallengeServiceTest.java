@@ -25,6 +25,7 @@ import com.zerobase.challengeproject.exception.ErrorCode;
 import com.zerobase.challengeproject.member.components.jwt.UserDetailsImpl;
 import com.zerobase.challengeproject.member.entity.Member;
 import com.zerobase.challengeproject.member.repository.MemberRepository;
+import com.zerobase.challengeproject.type.MemberType;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
@@ -36,6 +37,7 @@ import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageImpl;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
+import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContext;
 import org.springframework.security.core.context.SecurityContextHolder;
@@ -144,7 +146,6 @@ public class ChallengeServiceTest {
 
     @BeforeEach
     void setUp() {
-
         createChallengeRequest = createChallengeRequest();
         updateChallengeRequest = updateChallengeRequest();
         challengeId = 1L;
@@ -157,8 +158,13 @@ public class ChallengeServiceTest {
                 .account(1000000L)
                 .phoneNum("123-456-7890")
                 .email("test@example.com")
+                .memberType(MemberType.USER) // 👈 이 부분 추가!
                 .build();
-
+        UserDetailsImpl mockUserDetails = new UserDetailsImpl(member);
+        Authentication authentication = new UsernamePasswordAuthenticationToken(mockUserDetails, null, mockUserDetails.getAuthorities());
+        SecurityContext context = SecurityContextHolder.createEmptyContext();
+        context.setAuthentication(authentication);
+        SecurityContextHolder.setContext(context);
     }
 
     @Test
@@ -289,7 +295,7 @@ public class ChallengeServiceTest {
 
     @Test
     @DisplayName("챌린지 수정 성공")
-    void updateChallenge() {
+    void updateChallengeSuccess() {
         // Given
         Challenge existingChallenge = createChallenge(challengeId, "기존 제목");
         given(challengeRepository.findById(challengeId)).willReturn(Optional.of(existingChallenge));
@@ -298,6 +304,7 @@ public class ChallengeServiceTest {
         GetChallengeDto response = challengeService.updateChallenge(challengeId, updateChallengeRequest);
 
         // Then
+        assertThat(response).isNotNull();
         assertThat(response.getTitle()).isEqualTo(updateChallengeRequest.getTitle());
         assertThat(response.getDescription()).isEqualTo(updateChallengeRequest.getDescription());
     }

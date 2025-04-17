@@ -68,7 +68,6 @@ public class ChallengeController {
     @GetMapping("/participation")
     public ResponseEntity<PagenatedResponseDto<ParticipationChallengeDto>> getOngoingChallenges(Pageable pageable,
                                                                                                  @AuthenticationPrincipal UserDetailsImpl userDetails) {
-
         Long memberId = userDetails.getMember().getId();
         Page<ParticipationChallengeDto> challengeDtos = challengeService.getOngoingChallenges(pageable, memberId);
 
