@@ -32,7 +32,6 @@ public class QMember extends EntityPathBase<Member> {
 
     public final StringPath emailAuthKey = createString("emailAuthKey");
 
-
     public final NumberPath<Long> id = createNumber("id", Long.class);
 
     public final BooleanPath isBlackList = createBoolean("isBlackList");
