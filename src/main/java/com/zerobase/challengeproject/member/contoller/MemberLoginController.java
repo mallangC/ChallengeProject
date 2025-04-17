@@ -21,7 +21,9 @@ import org.springframework.web.bind.annotation.*;
 public class MemberLoginController {
 
     private final MemberLoginService memberLoginService;
+
     private final JwtUtil jwtUtil;
+
     /**
      * 로그인한 유저가 로그 아웃을 시도할 때 사용하는 컨트롤러 메서드
      * @param token 로그인시 발핼한 AccessToken

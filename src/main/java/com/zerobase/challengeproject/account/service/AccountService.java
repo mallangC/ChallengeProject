@@ -1,6 +1,5 @@
 package com.zerobase.challengeproject.account.service;
 
-import com.zerobase.challengeproject.HttpApiResponse;
 import com.zerobase.challengeproject.account.domain.dto.AccountDetailDto;
 import com.zerobase.challengeproject.account.domain.dto.RefundDto;
 import com.zerobase.challengeproject.account.domain.request.AccountAddRequest;
@@ -39,7 +38,6 @@ public class AccountService {
             memberRepository.findByLoginId(userDetails.getUsername())
                     .orElseThrow(() -> new CustomException(ErrorCode.NOT_FOUND_MEMBER)));
   }
-
 
   /**
    * 회원이 금액을 충전하기 위한 서비스 메서드
