@@ -6,10 +6,7 @@ import com.zerobase.challengeproject.member.service.AdminBlacklistService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 
 @RestController
 @RequiredArgsConstructor
@@ -41,11 +38,11 @@ public class AdminBlackListController {
      * @return 블랙리스트가 헤제된 맴버 아이디
      */
     @PatchMapping("/blacklist")
-    public ResponseEntity<HttpApiPageResponse> unRegisterBlacklist(
+    public ResponseEntity<HttpApiResponse> unRegisterBlacklist(
             @RequestBody BlackListRegisterForm form
     ){
         return ResponseEntity.ok(
-                new HttpApiPageResponse(
+                new HttpApiResponse(
                         adminBlacklistService.unRegisterBlacklist(form),
                         form.getBlacklistUserLoginId() + "블랙리스트 해제 성공",
                         HttpStatus.OK
