@@ -27,11 +27,11 @@ public class QWaterComment extends EntityPathBase<WaterComment> {
     //inherited
     public final DateTimePath<java.time.LocalDateTime> createdAt = _super.createdAt;
 
-    public final NumberPath<Integer> drinkingMl = createNumber("drinkingMl", Integer.class);
+    public final NumberPath<Integer> drinkingIntake = createNumber("drinkingIntake", Integer.class);
 
     public final NumberPath<Long> id = createNumber("id", Long.class);
 
-    public final StringPath image = createString("image");
+    public final StringPath imageUrl = createString("imageUrl");
 
     public final com.zerobase.challengeproject.member.entity.QMember member;
 

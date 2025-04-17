@@ -32,11 +32,12 @@ public class QMember extends EntityPathBase<Member> {
 
     public final StringPath emailAuthKey = createString("emailAuthKey");
 
-    public final BooleanPath emailAuthYn = createBoolean("emailAuthYn");
 
     public final NumberPath<Long> id = createNumber("id", Long.class);
 
     public final BooleanPath isBlackList = createBoolean("isBlackList");
+
+    public final BooleanPath isEmailVerified = createBoolean("isEmailVerified");
 
     public final StringPath loginId = createString("loginId");
 
@@ -50,7 +51,7 @@ public class QMember extends EntityPathBase<Member> {
 
     public final StringPath password = createString("password");
 
-    public final StringPath phoneNum = createString("phoneNum");
+    public final StringPath phoneNumber = createString("phoneNumber");
 
     public final StringPath previousEmail = createString("previousEmail");
 

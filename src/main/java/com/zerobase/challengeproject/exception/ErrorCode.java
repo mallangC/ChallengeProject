@@ -18,6 +18,7 @@ public enum ErrorCode {
   MATCHES_PREVIOUS_PASSWORD(HttpStatus.BAD_REQUEST, "이전 비밀번호와 동일합니다."),
   NOT_MEMBER_TYPE_ADMIN(HttpStatus.BAD_REQUEST, "회원 유형이 관리자가 아닙니다."),
   MEMBER_IS_BLACKLIST(HttpStatus.UNAUTHORIZED,"블랙리스트 등록된 회원입니다. 관리자에게 문의하세요"),
+  MEMBER_IS_UNBLACKLIST(HttpStatus.BAD_REQUEST, "블랙리스트 회원이 아닙니다." ),
   //토큰
   INCORRECT_PASSWORD(HttpStatus.BAD_REQUEST, "비밀번호가 틀렸습니다."),
   TOKEN_IS_EXPIRATION(HttpStatus.UNAUTHORIZED, "토큰이 만료되었습니다."),
@@ -33,6 +34,7 @@ public enum ErrorCode {
   ALREADY_DONE(HttpStatus.BAD_REQUEST, "이미 처리된 환불 신청입니다."),
   ALREADY_REFUND_REQUEST(HttpStatus.BAD_REQUEST, "이미 환불 신청한 내역입니다."),
   NOT_FOUND_REFUND(HttpStatus.BAD_REQUEST, "환불 신청을 찾을 수 없습니다."),
+  NOT_OWNER_OF_REFUND(HttpStatus.BAD_REQUEST, "환불 신청을 신청한 회원이 아닙니다."),
 
   //챌린지
   NOT_FOUND_CHALLENGES(HttpStatus.BAD_REQUEST, "챌린지를 찾을 수 없습니다."),
@@ -86,11 +88,4 @@ public enum ErrorCode {
   private final HttpStatus httpStatus;
   private final String message;
 
-  public HttpStatus getHttpStatus() {
-    return httpStatus;
-  }
-
-  public String getMessage() {
-    return message;
-  }
 }

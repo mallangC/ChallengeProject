@@ -10,7 +10,7 @@ public class DietCommentDto {
   private Long id;
   private Long dietChallengeId;
   private String loginId;
-  private String image;
+  private String imageUrl;
   private String content;
 
   public static DietCommentDto from(DietComment dietComment) {
@@ -18,7 +18,7 @@ public class DietCommentDto {
             .id(dietComment.getId())
             .dietChallengeId(dietComment.getDietChallenge().getId())
             .loginId(dietComment.getMember().getLoginId())
-            .image(dietComment.getImage())
+            .imageUrl(dietComment.getImageUrl())
             .content(dietComment.getContent())
             .build();
   }

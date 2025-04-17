@@ -2,9 +2,9 @@ package com.zerobase.challengeproject.comment.repository;
 
 import com.querydsl.jpa.impl.JPAQueryFactory;
 import com.zerobase.challengeproject.comment.entity.DietComment;
-import com.zerobase.challengeproject.exception.CustomException;
-import com.zerobase.challengeproject.exception.ErrorCode;
 import lombok.RequiredArgsConstructor;
+
+import java.util.Optional;
 
 import static com.zerobase.challengeproject.challenge.entity.QChallenge.challenge;
 import static com.zerobase.challengeproject.comment.entity.QDietChallenge.dietChallenge;
@@ -26,20 +26,14 @@ public class DietCommentRepositoryCustomImpl implements DietCommentRepositoryCus
    */
 
   @Override
-  public DietComment searchDietCommentById(Long commentId) {
-
+  public Optional<DietComment> searchDietCommentById(Long commentId) {
     DietComment findDietComment = queryFactory.selectFrom(dietComment)
             .join(dietComment.dietChallenge, dietChallenge).fetchJoin()
             .join(dietComment.dietChallenge.challenge, challenge).fetchJoin()
             .join(dietComment.member, member).fetchJoin()
             .where(dietComment.id.eq(commentId))
             .fetchOne();
-
-    if (findDietComment == null) {
-      throw new CustomException(ErrorCode.NOT_FOUND_DIET_COMMENT);
-    }
-
-    return findDietComment;
+    return Optional.ofNullable(findDietComment);
   }
 }
 

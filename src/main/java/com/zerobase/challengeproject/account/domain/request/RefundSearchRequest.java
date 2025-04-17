@@ -1,4 +1,4 @@
-package com.zerobase.challengeproject.account.domain.form;
+package com.zerobase.challengeproject.account.domain.request;
 
 import lombok.AllArgsConstructor;
 import lombok.Builder;
@@ -11,7 +11,7 @@ import java.time.LocalDateTime;
 @Builder
 @NoArgsConstructor
 @AllArgsConstructor
-public class RefundSearchForm {
+public class RefundSearchRequest {
   private LocalDateTime startAtStr;
   private Boolean done;
   private Boolean refunded;

@@ -11,7 +11,10 @@ import com.zerobase.challengeproject.type.AccountType;
 import com.zerobase.challengeproject.type.MemberType;
 import com.zerobase.challengeproject.type.SocialProvider;
 import jakarta.persistence.*;
-import lombok.*;
+import lombok.AllArgsConstructor;
+import lombok.Builder;
+import lombok.Getter;
+import lombok.NoArgsConstructor;
 
 import java.time.LocalDateTime;
 import java.util.List;
@@ -35,12 +38,12 @@ public class Member {
     @Column(length = 50, nullable = false)
     private String nickname;
     @Column(length = 20, nullable = false)
-    private String phoneNum;
+    private String phoneNumber;
 
     @Column(length = 50, nullable = false)
     private String email;
     private LocalDateTime registerDate;
-    private boolean emailAuthYn;
+    private boolean isEmailVerified;
     private LocalDateTime emailAuthDate;
     private String emailAuthKey;
     @Column(length = 50)
@@ -74,14 +77,14 @@ public class Member {
      * 이메일 인증을 완료하는 메서드. 이미 인증된 경우 처리 생략
      */
     public void completeEmailAuth() {
-        if (!this.emailAuthYn) {
-            this.emailAuthYn = true;
+        if (!this.isEmailVerified) {
+            this.isEmailVerified = true;
             this.emailAuthDate = LocalDateTime.now();
         }
     }
 
     public void updateProfile( String phoneNum, String nickname) {
-        this.phoneNum = phoneNum;
+        this.phoneNumber = phoneNum;
         this.nickname = nickname;
     }
 
@@ -91,9 +94,9 @@ public class Member {
                 .memberName(form.getMemberName())
                 .password(password)
                 .nickname(form.getNickname())
-                .phoneNum(form.getPhoneNum())
+                .phoneNumber(form.getPhoneNum())
                 .emailAuthKey(emailAuthKey)
-                .emailAuthYn(false)
+                .isEmailVerified(false)
                 .memberType(MemberType.USER)
                 .registerDate(LocalDateTime.now())
                 .email(form.getEmail())
@@ -131,7 +134,7 @@ public class Member {
             throw new CustomException(ErrorCode.ALREADY_REFUNDED);
         }
         detail.refundTrue();
-        refund.refundTrue();
+        refund.approveRefund();
         this.account -= detail.getAmount();
     }
 
@@ -142,4 +145,9 @@ public class Member {
     public void registerBlacklist() {
         this.isBlackList = true;
     }
+
+    public void unRegisterBlacklist() {
+        this.isBlackList = false;
+    }
+
 }

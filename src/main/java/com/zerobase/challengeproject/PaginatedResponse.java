@@ -1,10 +1,11 @@
-package com.zerobase.challengeproject.account.domain.dto;
+package com.zerobase.challengeproject;
 
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import org.springframework.data.domain.Page;
+import org.springframework.http.HttpStatus;
 
 import java.util.List;
 
@@ -12,20 +13,24 @@ import java.util.List;
 @Builder
 @AllArgsConstructor
 @NoArgsConstructor
-public class PageDto<T> {
+public class PaginatedResponse<T> {
   private List<T> content;
   private long totalElements;
   private int totalPages;
   private int number;
   private int size;
+  private String message;
+  private HttpStatus status;
 
-  public static <T> PageDto<T> from(Page<T> page){
-    return PageDto.<T>builder()
+  public static <T> PaginatedResponse<T> from(Page<T> page, String message, HttpStatus status) {
+    return PaginatedResponse.<T>builder()
             .content(page.getContent())
             .totalElements(page.getTotalElements())
             .totalPages(page.getTotalPages())
             .number(page.getNumber())
             .size(page.getSize())
+            .message(message)
+            .status(status)
             .build();
   }
 

@@ -3,11 +3,11 @@ package com.zerobase.challengeproject.member.repository;
 import com.zerobase.challengeproject.member.entity.Member;
 
 import java.time.LocalDateTime;
+import java.util.Optional;
 
 public interface MemberRepositoryCustom {
-  Member searchByLoginIdAndAccountDetailsToDate(String loginId, LocalDateTime searchByDate);
+  Optional<Member> searchByLoginIdAndAccountDetailsToDate(String loginId, LocalDateTime searchByDate);
 
-  Member searchByLoginIdAndAccountDetailId(String loginId, Long accountId);
+  Optional<Member> searchByLoginIdAndAccountDetailId(String loginId, Long accountId);
 
-  Member searchByLoginId(String loginId);
 }

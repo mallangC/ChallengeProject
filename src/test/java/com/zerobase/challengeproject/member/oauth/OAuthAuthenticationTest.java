@@ -39,7 +39,7 @@ public class OAuthAuthenticationTest {
                 .nickname("testNickname")
                 .email("test@gmail.com")
                 .memberName("memberName")
-                .phoneNum("01012345678")
+                .phoneNumber("01012345678")
                 .memberType(MemberType.USER)
                 .build());
     }

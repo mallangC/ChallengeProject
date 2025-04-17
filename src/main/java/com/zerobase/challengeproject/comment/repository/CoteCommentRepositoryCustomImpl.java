@@ -2,9 +2,9 @@ package com.zerobase.challengeproject.comment.repository;
 
 import com.querydsl.jpa.impl.JPAQueryFactory;
 import com.zerobase.challengeproject.comment.entity.CoteComment;
-import com.zerobase.challengeproject.exception.CustomException;
-import com.zerobase.challengeproject.exception.ErrorCode;
 import lombok.RequiredArgsConstructor;
+
+import java.util.Optional;
 
 import static com.zerobase.challengeproject.comment.entity.QCoteComment.coteComment;
 import static com.zerobase.challengeproject.member.entity.QMember.member;
@@ -22,17 +22,11 @@ public class CoteCommentRepositoryCustomImpl implements CoteCommentRepositoryCus
    * @return 코테 댓글 객체
    */
   @Override
-  public CoteComment searchCoteCommentById(Long commentId) {
-
+  public Optional<CoteComment> searchCoteCommentById(Long commentId) {
     CoteComment findCoteComment = queryFactory.selectFrom(coteComment)
             .join(coteComment.member, member).fetchJoin()
             .where(coteComment.id.eq(commentId))
             .fetchOne();
-
-    if (findCoteComment == null) {
-      throw new CustomException(ErrorCode.NOT_FOUND_COTE_COMMENT);
-    }
-
-    return findCoteComment;
+    return Optional.ofNullable(findCoteComment);
   }
 }

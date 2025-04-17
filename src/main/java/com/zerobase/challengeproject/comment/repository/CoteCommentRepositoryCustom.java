@@ -2,7 +2,9 @@ package com.zerobase.challengeproject.comment.repository;
 
 import com.zerobase.challengeproject.comment.entity.CoteComment;
 
+import java.util.Optional;
+
 public interface CoteCommentRepositoryCustom {
 
-  CoteComment searchCoteCommentById(Long coteCommentId);
+  Optional<CoteComment> searchCoteCommentById(Long coteCommentId);
 }

@@ -1,8 +1,8 @@
 package com.zerobase.challengeproject.comment.entity;
 
 import com.zerobase.challengeproject.account.entity.BaseEntity;
-import com.zerobase.challengeproject.comment.domain.form.WaterCommentAddForm;
-import com.zerobase.challengeproject.comment.domain.form.WaterCommentUpdateForm;
+import com.zerobase.challengeproject.comment.domain.request.WaterCommentAddRequest;
+import com.zerobase.challengeproject.comment.domain.request.WaterCommentUpdateRequest;
 import com.zerobase.challengeproject.member.entity.Member;
 import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
@@ -26,24 +26,24 @@ public class WaterComment extends BaseEntity {
   @JoinColumn(name = "member_id", nullable = false)
   private Member member;
   @Column(nullable = false)
-  private Integer drinkingMl;
+  private Integer drinkingIntake;
   @Column(nullable = false)
-  private String image;
+  private String imageUrl;
 
-  public static WaterComment from(WaterCommentAddForm form,
+  public static WaterComment from(WaterCommentAddRequest form,
                                   WaterChallenge waterChallenge,
                                   Member member) {
     return WaterComment.builder()
             .waterChallenge(waterChallenge)
             .member(member)
-            .drinkingMl(form.getDrinkingMl())
-            .image(form.getImage())
+            .drinkingIntake(form.getDrinkingIntake())
+            .imageUrl(form.getImageUrl())
             .build();
   }
 
-  public void update(WaterCommentUpdateForm form) {
-    this.waterChallenge.updateCurrentMl(form.getDrinkingMl() - this.drinkingMl);
-    this.drinkingMl = form.getDrinkingMl();
-    this.image = form.getImage();
+  public void update(WaterCommentUpdateRequest form) {
+    this.waterChallenge.updateCurrentIntake(form.getDrinkingIntake() - this.drinkingIntake);
+    this.drinkingIntake = form.getDrinkingIntake();
+    this.imageUrl = form.getImageUrl();
   }
 }

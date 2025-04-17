@@ -7,7 +7,9 @@ import com.zerobase.challengeproject.challenge.domain.dto.DepositBackDto;
 import com.zerobase.challengeproject.challenge.domain.dto.GetChallengeDto;
 import com.zerobase.challengeproject.challenge.domain.request.CreateChallengeRequest;
 import com.zerobase.challengeproject.challenge.domain.request.UpdateChallengeRequest;
+import com.zerobase.challengeproject.challenge.entity.Challenge;
 import com.zerobase.challengeproject.challenge.entity.MemberChallenge;
+import com.zerobase.challengeproject.challenge.repository.ChallengeRepository;
 import com.zerobase.challengeproject.challenge.repository.MemberChallengeRepository;
 import com.zerobase.challengeproject.comment.entity.CoteChallenge;
 import com.zerobase.challengeproject.comment.entity.CoteComment;
@@ -17,14 +19,12 @@ import com.zerobase.challengeproject.comment.repository.CoteChallengeRepository;
 import com.zerobase.challengeproject.comment.repository.CoteCommentRepository;
 import com.zerobase.challengeproject.comment.repository.DietChallengeRepository;
 import com.zerobase.challengeproject.comment.repository.WaterChallengeRepository;
-import com.zerobase.challengeproject.type.CategoryType;
-import com.zerobase.challengeproject.challenge.entity.Challenge;
-import com.zerobase.challengeproject.challenge.repository.ChallengeRepository;
 import com.zerobase.challengeproject.exception.CustomException;
 import com.zerobase.challengeproject.exception.ErrorCode;
 import com.zerobase.challengeproject.member.components.jwt.UserDetailsImpl;
 import com.zerobase.challengeproject.member.entity.Member;
 import com.zerobase.challengeproject.member.repository.MemberRepository;
+import com.zerobase.challengeproject.type.CategoryType;
 import com.zerobase.challengeproject.type.MemberType;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
@@ -158,7 +158,7 @@ public class ChallengeServiceTest {
                 .account(1000000L)
                 .phoneNum("123-456-7890")
                 .email("test@example.com")
-                .memberType(MemberType.USER) // 👈 이 부분 추가!
+                .memberType(MemberType.USER)
                 .build();
         UserDetailsImpl mockUserDetails = new UserDetailsImpl(member);
         Authentication authentication = new UsernamePasswordAuthenticationToken(mockUserDetails, null, mockUserDetails.getAuthorities());
@@ -295,7 +295,7 @@ public class ChallengeServiceTest {
 
     @Test
     @DisplayName("챌린지 수정 성공")
-    void updateChallengeSuccess() {
+    void updateChallenge() {
         // Given
         Challenge existingChallenge = createChallenge(challengeId, "기존 제목");
         given(challengeRepository.findById(challengeId)).willReturn(Optional.of(existingChallenge));
@@ -536,8 +536,8 @@ public class ChallengeServiceTest {
 
         List<WaterChallenge> waterChallenges = List.of(
                 WaterChallenge.builder()
-                        .goalMl(1500)
-                        .currentMl(800)
+                        .goalIntake(1500)
+                        .currentIntake(800)
                         .build()
         );
         given(challengeRepository.findById(challengeId)).willReturn(Optional.of(challenge));

@@ -1,13 +1,14 @@
 package com.zerobase.challengeproject.account.controller;
 
 import com.zerobase.challengeproject.HttpApiResponse;
-import com.zerobase.challengeproject.account.domain.dto.PageDto;
+import com.zerobase.challengeproject.PaginatedResponse;
 import com.zerobase.challengeproject.account.domain.dto.RefundDto;
-import com.zerobase.challengeproject.account.domain.form.RefundSearchForm;
-import com.zerobase.challengeproject.account.domain.form.RefundUpdateForm;
+import com.zerobase.challengeproject.account.domain.request.RefundSearchRequest;
+import com.zerobase.challengeproject.account.domain.request.RefundUpdateRequest;
 import com.zerobase.challengeproject.account.service.AccountService;
 import jakarta.validation.constraints.Min;
 import lombok.RequiredArgsConstructor;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
@@ -24,10 +25,13 @@ public class AccountAdminController {
    */
   @PreAuthorize("hasRole('ROLE_ADMIN')")
   @GetMapping("/refund")
-  public ResponseEntity<HttpApiResponse<PageDto<RefundDto>>> getAllRefund(
+  public ResponseEntity<PaginatedResponse<RefundDto>> getAllRefund(
           @RequestParam @Min(1) int page,
-          @RequestBody RefundSearchForm form) {
-    return ResponseEntity.ok(accountService.getAllRefund(page, form));
+          @RequestBody RefundSearchRequest form) {
+    return ResponseEntity.ok(PaginatedResponse.from(
+            accountService.getAllRefundForAdmin(page, form),
+            "환불 내역 확인 성공",
+            HttpStatus.OK));
   }
 
 
@@ -38,7 +42,11 @@ public class AccountAdminController {
   @PatchMapping("/refund")
   public ResponseEntity<HttpApiResponse<RefundDto>> refundApproval(
           @RequestParam boolean approval,
-          @RequestBody RefundUpdateForm form) {
-    return ResponseEntity.ok(accountService.refundDecision(approval, form));
+          @RequestBody RefundUpdateRequest form) {
+    String decision = approval ? "승인" : "비승인";
+    return ResponseEntity.ok(new HttpApiResponse<>(
+            accountService.refundDecision(approval, form),
+            "환불 " + decision + " 성공",
+            HttpStatus.OK));
   }
 }

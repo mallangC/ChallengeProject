@@ -34,7 +34,7 @@ public class QDietComment extends EntityPathBase<DietComment> {
 
     public final NumberPath<Long> id = createNumber("id", Long.class);
 
-    public final StringPath image = createString("image");
+    public final StringPath imageUrl = createString("imageUrl");
 
     public final com.zerobase.challengeproject.member.entity.QMember member;
 

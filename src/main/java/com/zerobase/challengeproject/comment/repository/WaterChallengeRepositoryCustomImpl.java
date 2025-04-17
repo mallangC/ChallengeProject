@@ -2,10 +2,7 @@ package com.zerobase.challengeproject.comment.repository;
 
 import com.querydsl.core.types.dsl.BooleanExpression;
 import com.querydsl.jpa.impl.JPAQueryFactory;
-import com.zerobase.challengeproject.comment.domain.dto.WaterChallengeDto;
 import com.zerobase.challengeproject.comment.entity.WaterChallenge;
-import com.zerobase.challengeproject.exception.CustomException;
-import com.zerobase.challengeproject.exception.ErrorCode;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageImpl;
@@ -17,6 +14,7 @@ import java.time.LocalDateTime;
 import java.time.LocalTime;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Optional;
 
 import static com.zerobase.challengeproject.challenge.entity.QChallenge.challenge;
 import static com.zerobase.challengeproject.comment.entity.QWaterChallenge.waterChallenge;
@@ -36,7 +34,7 @@ public class WaterChallengeRepositoryCustomImpl implements WaterChallengeReposit
    * @return 물마시기 챌린지 객체
    */
   @Override
-  public WaterChallenge searchWaterChallengeByChallengeIdAndLoginId(Long challengeId, String loginId) {
+  public Optional<WaterChallenge> searchWaterChallengeByChallengeIdAndLoginId(Long challengeId, String loginId) {
     LocalDate today = LocalDate.now();
     LocalDateTime startOfDay = today.atStartOfDay();
     LocalDateTime endOfDay = today.atTime(LocalTime.MAX);
@@ -47,10 +45,7 @@ public class WaterChallengeRepositoryCustomImpl implements WaterChallengeReposit
                     .and(waterChallenge.member.loginId.eq(loginId))
                     .and(waterChallenge.createdAt.between(startOfDay, endOfDay)))
             .fetchOne();
-    if (findWaterChallenge == null) {
-      throw new CustomException(ErrorCode.NOT_FOUND_WATER_CHALLENGE);
-    }
-    return findWaterChallenge;
+    return Optional.ofNullable(findWaterChallenge);
   }
 
   /**
@@ -63,7 +58,7 @@ public class WaterChallengeRepositoryCustomImpl implements WaterChallengeReposit
    * @return 페이징된 물마시기 챌린지 정보
    */
   @Override
-  public Page<WaterChallengeDto> searchAllWaterChallengeByChallengeId(int page, Long challengeId, Boolean isPass) {
+  public Page<WaterChallenge> searchAllWaterChallengeByChallengeId(int page, Long challengeId, Boolean isPass) {
     LocalDate today = LocalDate.now();
     LocalDateTime startOfDay = today.atStartOfDay();
     LocalDateTime endOfDay = today.atTime(LocalTime.MAX);
@@ -72,9 +67,9 @@ public class WaterChallengeRepositoryCustomImpl implements WaterChallengeReposit
     BooleanExpression expression = null;
     if (isPass != null) {
       if (isPass) {
-        expression = waterChallenge.currentMl.goe(waterChallenge.goalMl);
+        expression = waterChallenge.currentIntake.goe(waterChallenge.goalIntake);
       } else {
-        expression = waterChallenge.currentMl.lt(waterChallenge.goalMl);
+        expression = waterChallenge.currentIntake.lt(waterChallenge.goalIntake);
       }
     }
 
@@ -99,10 +94,6 @@ public class WaterChallengeRepositoryCustomImpl implements WaterChallengeReposit
             .offset(pageable.getOffset())
             .fetch();
 
-    List<WaterChallengeDto> waterChallengeDtos = findWaterChallenges.stream()
-            .map(WaterChallengeDto::fromWithoutComment)
-            .toList();
-
-    return new PageImpl<>(waterChallengeDtos, pageable, total);
+    return new PageImpl<>(findWaterChallenges, pageable, total);
   }
 }

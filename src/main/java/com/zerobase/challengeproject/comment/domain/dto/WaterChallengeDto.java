@@ -13,8 +13,8 @@ public class WaterChallengeDto {
   private Long id;
   private String loginId;
   private Long challengeId;
-  private Integer goalMl;
-  private Integer currentMl;
+  private Integer goalIntake;
+  private Integer currentIntake;
   private List<WaterCommentDto> comments;
 
   public static WaterChallengeDto from(WaterChallenge waterChallenge) {
@@ -22,8 +22,8 @@ public class WaterChallengeDto {
             .id(waterChallenge.getId())
             .loginId(waterChallenge.getMember().getLoginId())
             .challengeId(waterChallenge.getId())
-            .goalMl(waterChallenge.getGoalMl())
-            .currentMl(waterChallenge.getCurrentMl())
+            .goalIntake(waterChallenge.getGoalIntake())
+            .currentIntake(waterChallenge.getCurrentIntake())
             .comments(waterChallenge.getComments().stream()
                     .map(WaterCommentDto::from)
                     .toList())
@@ -35,8 +35,8 @@ public class WaterChallengeDto {
             .id(waterChallenge.getId())
             .loginId(waterChallenge.getMember().getLoginId())
             .challengeId(waterChallenge.getChallenge().getId())
-            .goalMl(waterChallenge.getGoalMl())
-            .currentMl(waterChallenge.getCurrentMl())
+            .goalIntake(waterChallenge.getGoalIntake())
+            .currentIntake(waterChallenge.getCurrentIntake())
             .comments(new ArrayList<>())
             .build();
   }

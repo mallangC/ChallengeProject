@@ -31,9 +31,9 @@ public class QWaterChallenge extends EntityPathBase<WaterChallenge> {
     //inherited
     public final DateTimePath<java.time.LocalDateTime> createdAt = _super.createdAt;
 
-    public final NumberPath<Integer> currentMl = createNumber("currentMl", Integer.class);
+    public final NumberPath<Integer> currentIntake = createNumber("currentIntake", Integer.class);
 
-    public final NumberPath<Integer> goalMl = createNumber("goalMl", Integer.class);
+    public final NumberPath<Integer> goalIntake = createNumber("goalIntake", Integer.class);
 
     public final NumberPath<Long> id = createNumber("id", Long.class);
 
