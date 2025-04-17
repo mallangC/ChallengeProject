@@ -7,7 +7,9 @@ import com.zerobase.challengeproject.challenge.domain.dto.DepositBackDto;
 import com.zerobase.challengeproject.challenge.domain.dto.GetChallengeDto;
 import com.zerobase.challengeproject.challenge.domain.request.CreateChallengeRequest;
 import com.zerobase.challengeproject.challenge.domain.request.UpdateChallengeRequest;
+import com.zerobase.challengeproject.challenge.entity.Challenge;
 import com.zerobase.challengeproject.challenge.entity.MemberChallenge;
+import com.zerobase.challengeproject.challenge.repository.ChallengeRepository;
 import com.zerobase.challengeproject.challenge.repository.MemberChallengeRepository;
 import com.zerobase.challengeproject.comment.entity.CoteChallenge;
 import com.zerobase.challengeproject.comment.entity.CoteComment;
@@ -17,14 +19,12 @@ import com.zerobase.challengeproject.comment.repository.CoteChallengeRepository;
 import com.zerobase.challengeproject.comment.repository.CoteCommentRepository;
 import com.zerobase.challengeproject.comment.repository.DietChallengeRepository;
 import com.zerobase.challengeproject.comment.repository.WaterChallengeRepository;
-import com.zerobase.challengeproject.type.CategoryType;
-import com.zerobase.challengeproject.challenge.entity.Challenge;
-import com.zerobase.challengeproject.challenge.repository.ChallengeRepository;
 import com.zerobase.challengeproject.exception.CustomException;
 import com.zerobase.challengeproject.exception.ErrorCode;
 import com.zerobase.challengeproject.member.components.jwt.UserDetailsImpl;
 import com.zerobase.challengeproject.member.entity.Member;
 import com.zerobase.challengeproject.member.repository.MemberRepository;
+import com.zerobase.challengeproject.type.CategoryType;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
@@ -36,9 +36,6 @@ import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageImpl;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
-import org.springframework.security.core.Authentication;
-import org.springframework.security.core.context.SecurityContext;
-import org.springframework.security.core.context.SecurityContextHolder;
 
 import java.time.LocalDateTime;
 import java.util.List;
@@ -529,8 +526,8 @@ public class ChallengeServiceTest {
 
         List<WaterChallenge> waterChallenges = List.of(
                 WaterChallenge.builder()
-                        .goalMl(1500)
-                        .currentMl(800)
+                        .goalIntake(1500)
+                        .currentIntake(800)
                         .build()
         );
         given(challengeRepository.findById(challengeId)).willReturn(Optional.of(challenge));

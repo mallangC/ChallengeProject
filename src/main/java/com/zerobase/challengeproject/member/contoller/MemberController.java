@@ -29,7 +29,7 @@ public class MemberController {
             @AuthenticationPrincipal UserDetailsImpl userDetails){
         return ResponseEntity.ok(
                 new HttpApiResponse<>(
-                        memberService.getProfile(userDetails),
+                        memberService.getProfile(userDetails.getUsername()),
                         "회원 정보 불러오기를 성공했습니다",
                         HttpStatus.OK
                         ));
@@ -49,7 +49,7 @@ public class MemberController {
             ) {
         return ResponseEntity.ok(
                 new HttpApiResponse<>(
-                        memberService.updateProfile(userDetails, form),
+                        memberService.updateProfile(userDetails.getUsername(), form),
                         "회원 정보 수정 성공했습니다",
                         HttpStatus.OK
                 )
@@ -69,7 +69,7 @@ public class MemberController {
     ) {
         return ResponseEntity.ok(
                 new HttpApiResponse<>(
-                        memberService.changePassword(userDetails, form),
+                        memberService.changePassword(userDetails.getUsername(), form),
                         "비밀 번호 수정 성공했습니다",
                         HttpStatus.OK
                 )

@@ -17,6 +17,8 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.web.bind.annotation.*;
 
+import java.util.Objects;
+
 @RestController
 @RequiredArgsConstructor
 @RequestMapping("/api/member")
@@ -37,7 +39,7 @@ public class MemberSignupController {
             throw new CustomException(ErrorCode.CONFIRM_PASSWORD_MISMATCH);
         }
         return ResponseEntity.ok(
-                new HttpApiPageResponse<>(
+                new HttpApiResponse<>(
                         memberService.signup(memberSignupForm),
                         "회원 가입 요청 성공했습니다.",
                         HttpStatus.OK));
@@ -52,7 +54,7 @@ public class MemberSignupController {
     public ResponseEntity<HttpApiResponse<MemberEmailAuthDto>> verifyEmail(
             @RequestParam("id") String emailAuthKey){
         return ResponseEntity.ok(
-                new HttpApiPageResponse<>(
+                new HttpApiResponse<>(
                         memberService.verifyEmail(emailAuthKey),
                         "이메일 인증 완료되었습니다.",
                         HttpStatus.OK)

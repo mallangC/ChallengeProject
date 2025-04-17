@@ -316,7 +316,7 @@ public class ChallengeService {
         } else {
             List<WaterChallenge> waterChallenges = waterChallengeRepository.findAllByChallengeIdAndMember(challengeId, member);
             boolean allDaysMetGoal = waterChallenges.stream()
-                    .allMatch(wc -> wc.getCurrentMl() >= wc.getGoalMl());
+                    .allMatch(wc -> wc.getCurrentIntake() >= wc.getGoalIntake());
 
             if (!allDaysMetGoal) {
                 throw new CustomException(ErrorCode.NOT_MET_CHALLENGE_GOAL);
