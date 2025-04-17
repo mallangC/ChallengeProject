@@ -30,7 +30,7 @@ public class Challenge {
   @JoinColumn(name = "member_id", nullable = false)
   private Member member;
 
-  @OneToMany(mappedBy = "challenge")
+  @OneToMany(mappedBy = "challenge", cascade = CascadeType.REMOVE, orphanRemoval = true)
   private List<MemberChallenge> memberChallenges;
 
   @Column(nullable = false)

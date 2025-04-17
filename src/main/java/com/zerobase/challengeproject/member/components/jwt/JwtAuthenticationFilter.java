@@ -107,7 +107,7 @@ public class JwtAuthenticationFilter extends UsernamePasswordAuthenticationFilte
         String message = failed.getMessage();
 
         if(failed instanceof BadCredentialsException){
-            message = "아이디 또는 비밀번호가 잘못되었습니다";
+            message = "아이디 또는 비밀번호가 잘못되었습니다.";
         } else if (failed instanceof BlacklistedMemberException) {
             BlacklistedMemberException ex = (BlacklistedMemberException) failed;
             message = ex.getMessage();
