@@ -21,19 +21,16 @@ import org.springframework.web.bind.annotation.*;
 public class MemberLoginController {
 
     private final MemberLoginService memberLoginService;
-
+    private final JwtUtil jwtUtil;
     /**
      * 로그인한 유저가 로그 아웃을 시도할 때 사용하는 컨트롤러 메서드
      * @param token 로그인시 발핼한 AccessToken
-     * @param refreshToken refreshToken이 들어있는 cookie
      * @return 로그인한 유저의 아이디, 아무정보도 없는 쿠키
      */
     @PostMapping("/logout")
-    public ResponseEntity<HttpApiResponse> logout(@RequestHeader("Authorization") String token,
-                                                  @CookieValue(value = "refreshToken", required = false)
-                                                  String refreshToken) {
+    public ResponseEntity<HttpApiResponse> logout(@RequestHeader("Authorization") String token) {
 
-        MemberLogoutDto dto = memberLoginService.logout(token,refreshToken);
+        MemberLogoutDto dto = memberLoginService.logout(token);
 
         return ResponseEntity.ok()
                 .header(HttpHeaders.SET_COOKIE, dto.getResponseCookie().toString())

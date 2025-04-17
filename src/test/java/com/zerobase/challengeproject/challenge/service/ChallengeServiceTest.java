@@ -529,8 +529,8 @@ public class ChallengeServiceTest {
 
         List<WaterChallenge> waterChallenges = List.of(
                 WaterChallenge.builder()
-                        .goalMl(1500)
-                        .currentMl(800)
+                        .goalIntake(1500)
+                        .currentIntake(800)
                         .build()
         );
         given(challengeRepository.findById(challengeId)).willReturn(Optional.of(challenge));
