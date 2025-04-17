@@ -1,7 +1,8 @@
 package com.zerobase.challengeproject.challenge.controller;
 
 
-import com.zerobase.challengeproject.PagenatedResponseDto;
+import com.zerobase.challengeproject.HttpApiResponse;
+import com.zerobase.challengeproject.PaginatedResponse;
 import com.zerobase.challengeproject.challenge.domain.dto.*;
 import com.zerobase.challengeproject.challenge.domain.request.CreateChallengeRequest;
 import com.zerobase.challengeproject.challenge.domain.request.RegistrationChallengeRequest;
@@ -31,11 +32,11 @@ public class ChallengeController {
      * 챌린지 전체 조회
      */
     @GetMapping
-    public ResponseEntity<PagenatedResponseDto<GetChallengeDto>> getAllChallenges(Pageable pageable) {
+    public ResponseEntity<PaginatedResponse<GetChallengeDto>> getAllChallenges(Pageable pageable) {
         List<GetChallengeDto> challengeList = challengeService.getAllChallenges(pageable);
 
         Page<GetChallengeDto> challengePage = new PageImpl<>(challengeList, pageable, challengeList.size());
-        return ResponseEntity.ok(PagenatedResponseDto.from(challengePage, "전체 챌린지 조회 성공", HttpStatus.OK));
+        return ResponseEntity.ok(PaginatedResponse.from(challengePage, "전체 챌린지 조회 성공", HttpStatus.OK));
     }
 
 
@@ -52,13 +53,13 @@ public class ChallengeController {
      * 사용자가 생성한 챌린지 조회
      */
     @GetMapping("/my-challenge")
-    public ResponseEntity<PagenatedResponseDto<GetChallengeDto>> getChallengesMadeByUser(Pageable pageable,
-                                                                                               @AuthenticationPrincipal UserDetailsImpl userDetails) {
+    public ResponseEntity<PaginatedResponse<GetChallengeDto>> getChallengesMadeByUser(Pageable pageable,
+                                                                                         @AuthenticationPrincipal UserDetailsImpl userDetails) {
 
         Long memberId = userDetails.getMember().getId();
         Page<GetChallengeDto> usersChallengePages = challengeService.getChallengesMadeByUser(pageable, memberId);
 
-        return ResponseEntity.ok(PagenatedResponseDto.from(usersChallengePages, "유저가 생성한 챌린지 조회 성공", HttpStatus.OK));
+        return ResponseEntity.ok(PaginatedResponse.from(usersChallengePages, "유저가 생성한 챌린지 조회 성공", HttpStatus.OK));
 
     }
 
@@ -66,13 +67,13 @@ public class ChallengeController {
      * 사용자가 참여중인 챌린지 조회
      */
     @GetMapping("/participation")
-    public ResponseEntity<PagenatedResponseDto<ParticipationChallengeDto>> getOngoingChallenges(Pageable pageable,
-                                                                                                 @AuthenticationPrincipal UserDetailsImpl userDetails) {
+    public ResponseEntity<PaginatedResponse<ParticipationChallengeDto>> getOngoingChallenges(Pageable pageable,
+                                                                                                @AuthenticationPrincipal UserDetailsImpl userDetails) {
 
         Long memberId = userDetails.getMember().getId();
         Page<ParticipationChallengeDto> challengeDtos = challengeService.getOngoingChallenges(pageable, memberId);
 
-        return ResponseEntity.ok(PagenatedResponseDto.from(challengeDtos, "유저가 참여중인 챌린지 조회 성공", HttpStatus.OK)
+        return ResponseEntity.ok(PaginatedResponse.from(challengeDtos, "유저가 참여중인 챌린지 조회 성공", HttpStatus.OK)
         );
     }
 
@@ -132,7 +133,7 @@ public class ChallengeController {
             @AuthenticationPrincipal UserDetailsImpl userDetails) {
 
         GetChallengeDto updatedChallenge = challengeService.updateChallenge(challengeId, form);
-        return ResponseEntity.ok(new HttpApiResponse<GetChallengeDto>(updatedChallenge, "챌린지 수정 성공", HttpStatus.OK)
+        return ResponseEntity.ok(new HttpApiResponse<>(updatedChallenge, "챌린지 수정 성공", HttpStatus.OK)
         );
     }
 

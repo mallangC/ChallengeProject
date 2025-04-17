@@ -1,7 +1,6 @@
 package com.zerobase.challengeproject.challenge.controller;
 
-import com.zerobase.challengeproject.PagenatedResponseDto;
-import com.zerobase.challengeproject.challenge.domain.dto.HttpApiResponse;
+import com.zerobase.challengeproject.PaginatedResponse;
 import com.zerobase.challengeproject.challenge.domain.dto.GetChallengeDto;
 import com.zerobase.challengeproject.challenge.service.SearchService;
 import com.zerobase.challengeproject.type.CategoryType;
@@ -25,23 +24,23 @@ public class SearchController {
      * 제목으로 챌린지 검색
      */
     @GetMapping("/title")
-    public ResponseEntity<PagenatedResponseDto<GetChallengeDto>> searchByTitle(
+    public ResponseEntity<PaginatedResponse<GetChallengeDto>> searchByTitle(
             @RequestParam String title,
             Pageable pageable
     ) {
         Page<GetChallengeDto> result = searchService.searchChallengesByTitle(title, pageable);
-        return ResponseEntity.ok(PagenatedResponseDto.from(result, "제목검색 성공", HttpStatus.OK));
+        return ResponseEntity.ok(PaginatedResponse.from(result, "제목검색 성공", HttpStatus.OK));
     }
 
     /**
      * 카테고리로 챌린지 검색
      */
     @GetMapping("/category")
-    public ResponseEntity<PagenatedResponseDto<GetChallengeDto>> searchByCategory(
+    public ResponseEntity<PaginatedResponse<GetChallengeDto>> searchByCategory(
             @RequestParam CategoryType categoryType,
             Pageable pageable
     ) {
         Page<GetChallengeDto> result = searchService.searchChallengesByCategory(categoryType, pageable);
-        return ResponseEntity.ok(PagenatedResponseDto.from(result, "카테고리검색 성공", HttpStatus.OK));
+        return ResponseEntity.ok(PaginatedResponse.from(result, "카테고리검색 성공", HttpStatus.OK));
     }
 }
