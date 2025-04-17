@@ -1,12 +1,9 @@
 package com.zerobase.challengeproject.member.service;
 
-import com.zerobase.challengeproject.exception.CustomException;
-import com.zerobase.challengeproject.exception.ErrorCode;
+import com.github.javafaker.Faker;
 import com.zerobase.challengeproject.member.components.jwt.JwtUtil;
-import com.zerobase.challengeproject.member.domain.dto.MemberLoginResponse;
 import com.zerobase.challengeproject.member.domain.dto.MemberLogoutDto;
 import com.zerobase.challengeproject.member.domain.dto.RefreshTokenDto;
-import com.zerobase.challengeproject.member.domain.form.MemberLoginForm;
 import com.zerobase.challengeproject.member.entity.Member;
 import com.zerobase.challengeproject.member.entity.RefreshToken;
 import com.zerobase.challengeproject.member.repository.MemberRepository;
@@ -24,7 +21,8 @@ import org.springframework.security.crypto.password.PasswordEncoder;
 import java.time.Instant;
 import java.util.Optional;
 
-import static org.junit.jupiter.api.Assertions.*;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertNotNull;
 import static org.mockito.Mockito.*;
 
 
@@ -46,21 +44,23 @@ class MemberLoginServiceTest {
     private MemberLoginService memberLoginService;
 
     private Member mockMember;
+    private Faker faker;
     private RefreshToken existingRefreshToken;
     private final String mockAccessToken = "mockAccessToken";
     private final String mockRefreshToken = "mockRefreshToken";
 
     @BeforeEach
     void setUp() {
+        faker = new Faker();
         // Mock Member 생성
         mockMember = Member.builder()
                 .id(1L)
-                .loginId("testId")
-                .memberName("testName")
-                .nickname("testNickname")
-                .email("testEmail@email.com")
-                .phoneNum("01011112222")
-                .password("encodedPassword")
+                .loginId(faker.funnyName().name())
+                .memberName(faker.name().fullName())
+                .nickname(faker.funnyName().name())
+                .email(faker.internet().emailAddress())
+                .phoneNumber("010"+faker.number().digits(8))
+                .password("testPassword")
                 .memberType(MemberType.USER)
                 .isBlackList(false)
                 .build();
@@ -78,12 +78,9 @@ class MemberLoginServiceTest {
     @DisplayName("로그아웃 성공 - 리프레시 토큰이 들어있는 쿠키 삭제")
     public void logout() {
         //given
-        String accessToken = "Bearer " + mockAccessToken;
-
         when(jwtUtil.extractLoginId(mockAccessToken)).thenReturn(mockMember.getLoginId());
-        when(jwtUtil.isTokenValid(mockRefreshToken)).thenReturn(true);
         //when
-        MemberLogoutDto result = memberLoginService.logout(accessToken, mockRefreshToken);
+        MemberLogoutDto result = memberLoginService.logout(mockAccessToken);
         //then
         assertNotNull(result);
         assertEquals(mockMember.getLoginId(), result.getLoginId());
@@ -91,21 +88,10 @@ class MemberLoginServiceTest {
     }
 
     @Test
-    @DisplayName("로그아웃 실패 - 토큰이 제공 되지 않음")
-    void logoutFailure() {
-        // Arrange
-        String invalidToken = null;
-
-        // Act & Assert
-        assertThrows(CustomException.class, () -> memberLoginService.logout(mockAccessToken, invalidToken));
-    }
-
-    @Test
     @DisplayName("엑세스 토큰 발급 성공 - 리프레시 토큰으로 엑세스 토큰 재발급")
     void refreshAccessToken() {
         //given
         String newAccessToken = "newAccessToken";
-        when(jwtUtil.isTokenValid(mockRefreshToken)).thenReturn(true);
         when(jwtUtil.extractLoginId(mockRefreshToken)).thenReturn(mockMember.getLoginId());
         when(memberRepository.findByLoginId(mockMember.getLoginId())).thenReturn(Optional.of(mockMember));
         when(refreshTokenRepository.findByToken(mockRefreshToken)).thenReturn(Optional.of(existingRefreshToken));
@@ -115,14 +101,5 @@ class MemberLoginServiceTest {
         //then
         assertNotNull(result);
         assertEquals(newAccessToken, result.getAccessToken());
-    }
-    @Test
-    @DisplayName("토큰 재발급 - 토큰이 유효하지 않음")
-    void refreshAccessTokenFailure() {
-        // given
-        when(jwtUtil.isTokenValid(existingRefreshToken.getToken())).thenReturn(false);
-
-        // when & then
-        assertThrows(CustomException.class, () -> memberLoginService.refreshAccessToken(existingRefreshToken.getToken()));
     }
 }

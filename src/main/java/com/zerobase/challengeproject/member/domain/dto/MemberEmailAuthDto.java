@@ -10,12 +10,12 @@ import java.time.LocalDateTime;
 @NoArgsConstructor
 public class MemberEmailAuthDto {
     private String loginId;
-    private boolean emailAuthYn;
+    private boolean isEmailVerified;
     private LocalDateTime emailAuthDate;
 
     public MemberEmailAuthDto(Member member) {
         this.loginId = member.getLoginId();
-        this.emailAuthYn = member.isEmailAuthYn();
+        this.isEmailVerified = member.isEmailVerified();
         this.emailAuthDate = LocalDateTime.now();
     }
 

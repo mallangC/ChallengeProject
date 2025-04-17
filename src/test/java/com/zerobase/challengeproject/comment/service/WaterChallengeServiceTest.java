@@ -82,7 +82,7 @@ class WaterChallengeServiceTest {
           .maxDeposit(50L)
           .standard("challengeStandard")
           .member(memberBase)
-          .startDate(LocalDateTime.of(2025, 4, 10, 0, 0, 0))
+          .startDate(LocalDateTime.now().plusDays(1))
           .coteChallenges(new ArrayList<>())
           .build();
 
@@ -199,7 +199,7 @@ class WaterChallengeServiceTest {
     CustomException exception = assertThrows(CustomException.class, () ->
             waterChallengeService.addWaterChallenge(form, userDetailsBase));
     //then
-    assertEquals(ALREADY_ADDED_DIET_CHALLENGE, exception.getErrorCode());
+    assertEquals(ALREADY_ADDED_WATER_CHALLENGE, exception.getErrorCode());
   }
 
   @Test
@@ -429,6 +429,5 @@ class WaterChallengeServiceTest {
     //then
     assertEquals(NOT_MEMBER_TYPE_ADMIN, exception.getErrorCode());
   }
-
 
 }

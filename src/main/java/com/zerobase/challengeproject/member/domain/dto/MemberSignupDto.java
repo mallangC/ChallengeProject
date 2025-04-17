@@ -11,14 +11,14 @@ public class MemberSignupDto {
     private String loginId;
     private String memberName;
     private String nickName;
-    private String phoneNum;
+    private String phoneNumber;
     private String email;
 
     public MemberSignupDto(Member member) {
         this.loginId = member.getLoginId();
         this.memberName = member.getMemberName();
         this.nickName = member.getNickname();
-        this.phoneNum = member.getPhoneNum();
+        this.phoneNumber = member.getPhoneNumber();
         this.email = member.getEmail();
     }
 

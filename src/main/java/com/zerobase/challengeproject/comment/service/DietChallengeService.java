@@ -1,6 +1,7 @@
 package com.zerobase.challengeproject.comment.service;
 
 import com.zerobase.challengeproject.HttpApiResponse;
+
 import com.zerobase.challengeproject.account.domain.dto.PageDto;
 import com.zerobase.challengeproject.challenge.entity.Challenge;
 import com.zerobase.challengeproject.challenge.repository.ChallengeRepository;
@@ -118,6 +119,7 @@ public class DietChallengeService {
     }
     Page<DietChallengeDto> dietChallengeDtos =
             dietChallengeRepository.searchAllDietChallengeByChallengeId(page - 1, challengeId, isPass);
+
     return new HttpApiResponse<>(PageDto.from(dietChallengeDtos),
             "다이어트 챌린지 전체 조회를 성공했습니다.(" + page + "페이지)",
             HttpStatus.OK);

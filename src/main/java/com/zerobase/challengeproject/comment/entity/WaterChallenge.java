@@ -34,11 +34,20 @@ public class WaterChallenge extends BaseEntity {
   @OneToMany(mappedBy = "waterChallenge", cascade = CascadeType.REMOVE, orphanRemoval = true)
   private List<WaterComment> comments;
 
-  public static WaterChallenge from(WaterChallengeForm form, Challenge challenge, Member member) {
+  public static WaterChallenge fromForm(WaterChallengeForm form, Challenge challenge, Member member) {
     return WaterChallenge.builder()
             .member(member)
             .challenge(challenge)
             .goalMl(form.getGoalMl())
+            .currentMl(0)
+            .build();
+  }
+
+  public static WaterChallenge fromWaterChallenge(WaterChallenge waterChallenge) {
+    return WaterChallenge.builder()
+            .member(waterChallenge.getMember())
+            .challenge(waterChallenge.getChallenge())
+            .goalMl(waterChallenge.getGoalMl())
             .currentMl(0)
             .build();
   }

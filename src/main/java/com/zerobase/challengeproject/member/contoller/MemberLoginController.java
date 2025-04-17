@@ -1,6 +1,11 @@
 package com.zerobase.challengeproject.member.contoller;
 
+
 import com.zerobase.challengeproject.HttpApiResponse;
+import com.zerobase.challengeproject.exception.CustomException;
+import com.zerobase.challengeproject.exception.ErrorCode;
+import com.zerobase.challengeproject.member.components.jwt.JwtUtil;
+
 import com.zerobase.challengeproject.member.domain.dto.MemberLogoutDto;
 import com.zerobase.challengeproject.member.domain.dto.RefreshTokenDto;
 import com.zerobase.challengeproject.member.service.MemberLoginService;
@@ -16,6 +21,7 @@ import org.springframework.web.bind.annotation.*;
 public class MemberLoginController {
 
     private final MemberLoginService memberLoginService;
+    private final JwtUtil jwtUtil;
 
     /**
      * 로그인한 유저가 로그 아웃을 시도할 때 사용하는 컨트롤러 메서드
@@ -27,8 +33,14 @@ public class MemberLoginController {
     public ResponseEntity<HttpApiResponse> logout(@RequestHeader("Authorization") String token,
                                                   @CookieValue(value = "refreshToken", required = false)
                                                   String refreshToken) {
-
-        MemberLogoutDto dto = memberLoginService.logout(token,refreshToken);
+        token = token.substring(7);
+        if (refreshToken == null) {
+            throw new CustomException(ErrorCode.TOKEN_NOT_PROVIDED);
+        }
+        if (!jwtUtil.isTokenValid(refreshToken)) {
+            throw new CustomException(ErrorCode.TOKEN_IS_INVALID_OR_EXPIRED);
+        }
+        MemberLogoutDto dto = memberLoginService.logout(token);
 
         return ResponseEntity.ok()
                 .header(HttpHeaders.SET_COOKIE, dto.getResponseCookie().toString())
@@ -41,7 +53,11 @@ public class MemberLoginController {
      * @return AccessToken
      */
     @PostMapping("/token/refresh")
-    public ResponseEntity<HttpApiResponse> refreshAccessToken(@CookieValue(value = "refreshToken", required = false) String refreshToken  ) {
+    public ResponseEntity<HttpApiResponse> refreshAccessToken(
+            @CookieValue(value = "refreshToken", required = false) String refreshToken) {
+        if (refreshToken == null || !jwtUtil.isTokenValid(refreshToken)) {
+            throw new CustomException(ErrorCode.TOKEN_IS_INVALID_OR_EXPIRED);
+        }
         RefreshTokenDto dto = memberLoginService.refreshAccessToken(refreshToken);
 
         return ResponseEntity.ok()

@@ -25,7 +25,10 @@ import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.time.LocalDate;
 import java.time.LocalDateTime;
+import java.util.Comparator;
+import java.util.List;
 
 @Service
 @RequiredArgsConstructor
@@ -36,7 +39,6 @@ public class WaterChallengeService {
   private final WaterCommentRepository waterCommentRepository;
 
   //DB호출 횟수에서 제일 처음 회원호출은 언제나 호출되기 때문에 제외
-
 
   /**
    * 물마시기 챌린지 추가 서비스 메서드
@@ -62,7 +64,7 @@ public class WaterChallengeService {
       throw new CustomException(ErrorCode.ALREADY_ADDED_WATER_CHALLENGE);
     }
 
-    WaterChallenge waterChallenge = WaterChallenge.from(form, challenge, member);
+    WaterChallenge waterChallenge = WaterChallenge.fromForm(form, challenge, member);
     waterChallengeRepository.save(waterChallenge);
 
     return new HttpApiResponse<>(WaterChallengeDto.fromWithoutComment(waterChallenge)
@@ -70,7 +72,44 @@ public class WaterChallengeService {
             , HttpStatus.OK);
   }
 
-  //TODO batch를 사용해서 매일 00시에 그날 물마시기 챌린지가 추가 기능 구현
+  /**
+   * 스케쥴러를 사용해서 매일 00시에 그날 물마시기 챌린지가 추가 기능 구현
+   */
+  public void addAllWaterChallenge() {
+    LocalDate now = LocalDate.now();
+    LocalDateTime today = now.atStartOfDay();
+    LocalDateTime yesterdayStart = now.atStartOfDay().minusDays(1);
+
+    List<Challenge> challenges = challengeRepository.searchAllChallenge();
+    for (Challenge challenge : challenges) {
+      //오늘이 시작날이면 waterChallenges에 있는 WaterChallenge(참여할 때 작성됨)를 바탕으로 오늘 WaterChallenge 만들기
+      if (challenge.getStartDate().equals(today)) {
+        for (WaterChallenge waterChallenge : challenge.getWaterChallenges()) {
+          //참여할 때 작성된 WaterChallenge를 기준으로 새로운 WaterChallenge를 생성 후 저장
+          waterChallengeRepository.save(WaterChallenge.fromWaterChallenge(waterChallenge));
+        }
+      } else {
+        //이미 진행 중인 챌린지는 waterChallenges에 있는 어제 날짜로 만들어진 WaterChallenge를 바탕으로 오늘 WaterChallenge 만들기
+        List<WaterChallenge> waterChallenges = challenge.getWaterChallenges();
+        //최근에 생성된 순으로 정렬
+        waterChallenges.sort(Comparator.comparing(WaterChallenge::getCreatedAt).reversed());
+        System.out.println(waterChallenges);
+        //최근에 생성된 WaterChallenge가 오늘 생성되었다면 이미 이 함수가 실행됐다고 판단하고 예외 발생
+        if (waterChallenges.get(0).getCreatedAt().toLocalDate().equals(today.toLocalDate())) {
+          throw new CustomException(ErrorCode.ALREADY_ADDED_WATER_CHALLENGE);
+        }
+        for (WaterChallenge waterChallenge : challenge.getWaterChallenges()) {
+          //어제 날짜의 데이터를 기준으로 새로운 WaterChallenge를 생성 후 저장
+          if (waterChallenge.getCreatedAt().toLocalDate().equals(yesterdayStart.toLocalDate())) {
+            waterChallengeRepository.save(WaterChallenge.fromWaterChallenge(waterChallenge));
+          } else {
+            //정렬 했기 때문에 어제 이후 WaterChallenge는 무시
+            return;
+          }
+        }
+      }
+    }
+  }
 
   /**
    * 오늘의 물마시기 챌린지 조회 서비스 메서드
@@ -92,7 +131,7 @@ public class WaterChallengeService {
   }
 
   /**
-   * 관리자 물마시기 챌린지 전체 확인 서비스 메서드
+   * (관리자) 물마시기 챌린지 전체 확인 서비스 메서드
    * (DB호출 2회) 호출 2
    *
    * @param page        페이지 숫자

@@ -27,6 +27,7 @@ public class MemberController {
     @GetMapping("/profile")
     public ResponseEntity<HttpApiResponse<MemberProfileDto>> getProfile (
             @AuthenticationPrincipal UserDetailsImpl userDetails){
+        String loginId = userDetails.getUsername();
         return ResponseEntity.ok(
                 new HttpApiResponse<>(
                         memberService.getProfile(userDetails),
@@ -47,6 +48,7 @@ public class MemberController {
             @RequestBody MemberProfileFrom form,
             @AuthenticationPrincipal UserDetailsImpl userDetails
             ) {
+        String loginId = userDetails.getUsername();
         return ResponseEntity.ok(
                 new HttpApiResponse<>(
                         memberService.updateProfile(userDetails, form),
@@ -67,6 +69,7 @@ public class MemberController {
             @RequestBody ChangePasswordForm form,
             @AuthenticationPrincipal UserDetailsImpl userDetails
     ) {
+        String loginId = userDetails.getUsername();
         return ResponseEntity.ok(
                 new HttpApiResponse<>(
                         memberService.changePassword(userDetails, form),

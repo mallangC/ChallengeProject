@@ -1,6 +1,7 @@
 package com.zerobase.challengeproject.account.service;
 
 import com.zerobase.challengeproject.HttpApiResponse;
+
 import com.zerobase.challengeproject.account.domain.dto.AccountDetailDto;
 import com.zerobase.challengeproject.account.domain.dto.PageDto;
 import com.zerobase.challengeproject.account.domain.dto.RefundDto;
@@ -176,11 +177,13 @@ public class AccountService {
       accountDetailRepository.save(refundDetail);
       member.refundAccount(accountDetail, refund);
       return new HttpApiResponse<>(RefundDto.from(refund),
+
               "환불 승인을 성공했습니다.",
               HttpStatus.OK);
     }
     refund.refundFalse(form);
     return new HttpApiResponse<>(RefundDto.from(refund),
+
             "환불 비승인을 성공했습니다.",
             HttpStatus.OK);
   }
