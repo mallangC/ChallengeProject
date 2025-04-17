@@ -1,6 +1,8 @@
 package com.zerobase.challengeproject.account.controller;
 
-import com.zerobase.challengeproject.HttpApiPageResponse;
+
+import com.zerobase.challengeproject.HttpApiResponse;
+
 import com.zerobase.challengeproject.account.domain.dto.PageDto;
 import com.zerobase.challengeproject.account.domain.dto.RefundDto;
 import com.zerobase.challengeproject.account.domain.form.RefundSearchForm;
@@ -24,7 +26,7 @@ public class AccountAdminController {
    */
   @PreAuthorize("hasRole('ROLE_ADMIN')")
   @GetMapping("/refund")
-  public ResponseEntity<HttpApiPageResponse<PageDto<RefundDto>>> getAllRefund(
+  public ResponseEntity<HttpApiResponse<PageDto<RefundDto>>> getAllRefund(
           @RequestParam @Min(1) int page,
           @RequestBody RefundSearchForm form) {
     return ResponseEntity.ok(accountService.getAllRefund(page, form));
@@ -36,7 +38,7 @@ public class AccountAdminController {
    */
   @PreAuthorize("hasRole('ROLE_ADMIN')")
   @PatchMapping("/refund")
-  public ResponseEntity<HttpApiPageResponse<RefundDto>> refundApproval(
+  public ResponseEntity<HttpApiResponse<RefundDto>> refundApproval(
           @RequestParam boolean approval,
           @RequestBody RefundUpdateForm form) {
     return ResponseEntity.ok(accountService.refundDecision(approval, form));

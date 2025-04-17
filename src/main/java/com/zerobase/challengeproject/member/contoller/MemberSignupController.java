@@ -1,6 +1,8 @@
 package com.zerobase.challengeproject.member.contoller;
 
-import com.zerobase.challengeproject.HttpApiPageResponse;
+
+
+import com.zerobase.challengeproject.HttpApiResponse;
 import com.zerobase.challengeproject.exception.CustomException;
 import com.zerobase.challengeproject.exception.ErrorCode;
 import com.zerobase.challengeproject.member.components.jwt.UserDetailsImpl;
@@ -32,7 +34,7 @@ public class MemberSignupController {
      * @return 회원 가입한 유저의 비밀번호를 제외한 정보
      */
     @PostMapping("/sign-up")
-    public ResponseEntity<HttpApiPageResponse<MemberSignupDto>> signUp(
+    public ResponseEntity<HttpApiResponse<MemberSignupDto>> signUp(
             @Valid @RequestBody MemberSignupForm memberSignupForm) {
         if(!Objects.equals(memberSignupForm.getPassword(),
                 memberSignupForm.getConfirmPassword())) {
@@ -51,7 +53,7 @@ public class MemberSignupController {
      * @return 유저의 아이디, 인증 확인, 인증 날짜
      */
     @GetMapping("/email-auth")
-    public ResponseEntity<HttpApiPageResponse<MemberEmailAuthDto>> verifyEmail(
+    public ResponseEntity<HttpApiResponse<MemberEmailAuthDto>> verifyEmail(
             @RequestParam("id") String emailAuthKey){
         return ResponseEntity.ok(
                 new HttpApiPageResponse<>(
@@ -67,7 +69,7 @@ public class MemberSignupController {
      * @return 아무 정보도 없는 쿠키, 회원 탈퇴 성공 메세지
      */
     @DeleteMapping("/unregister")
-    public ResponseEntity<HttpApiPageResponse<Void>> unregister(
+    public ResponseEntity<HttpApiResponse<Void>> unregister(
             @AuthenticationPrincipal UserDetailsImpl userDetails) {
         ResponseCookie cookie = memberService.unregister(userDetails.getUsername());
         return ResponseEntity.ok()

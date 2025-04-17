@@ -1,6 +1,6 @@
 package com.zerobase.challengeproject.comment.service;
 
-import com.zerobase.challengeproject.BaseResponseDto;
+import com.zerobase.challengeproject.HttpApiResponse;
 import com.zerobase.challengeproject.account.domain.dto.PageDto;
 import com.zerobase.challengeproject.challenge.entity.Challenge;
 import com.zerobase.challengeproject.challenge.repository.ChallengeRepository;
@@ -50,7 +50,7 @@ public class WaterChallengeService {
    * @param userDetails 회원 정보
    * @return 추가한 물마시기 챌린지 정보
    */
-  public BaseResponseDto<WaterChallengeDto> addWaterChallenge(WaterChallengeForm form,
+  public HttpApiResponse<WaterChallengeDto> addWaterChallenge(WaterChallengeForm form,
                                                               UserDetailsImpl userDetails) {
     Member member = userDetails.getMember();
     Challenge challenge = challengeRepository.searchChallengeWithWaterChallengeById(form.getChallengeId());
@@ -67,7 +67,7 @@ public class WaterChallengeService {
     WaterChallenge waterChallenge = WaterChallenge.fromForm(form, challenge, member);
     waterChallengeRepository.save(waterChallenge);
 
-    return new BaseResponseDto<>(WaterChallengeDto.fromWithoutComment(waterChallenge)
+    return new HttpApiResponse<>(WaterChallengeDto.fromWithoutComment(waterChallenge)
             , "물마시기 챌린지 추가를 성공했습니다."
             , HttpStatus.OK);
   }
@@ -120,12 +120,12 @@ public class WaterChallengeService {
    * @param userDetails 회원 정보
    * @return 물마시기 챌린지 정보
    */
-  public BaseResponseDto<WaterChallengeDto> getWaterChallenge(Long challengeId,
+  public HttpApiResponse<WaterChallengeDto> getWaterChallenge(Long challengeId,
                                                               UserDetailsImpl userDetails) {
     Member member = userDetails.getMember();
     WaterChallenge waterChallenge = waterChallengeRepository
             .searchWaterChallengeByChallengeIdAndLoginId(challengeId, member.getLoginId());
-    return new BaseResponseDto<>(WaterChallengeDto.fromWithoutComment(waterChallenge),
+    return new HttpApiResponse<>(WaterChallengeDto.fromWithoutComment(waterChallenge),
             "오늘의 물마시기 챌린지 조회를 성공했습니다."
             , HttpStatus.OK);
   }
@@ -141,7 +141,7 @@ public class WaterChallengeService {
    * @return 페이징된 물마시기 챌린지
    */
   //물마시기 챌린지 전체 확인(관리자)(challengeId, userDetails) (DB호출 2회) 호출 2
-  public BaseResponseDto<PageDto<WaterChallengeDto>> getAllWaterChallenge(int page,
+  public HttpApiResponse<PageDto<WaterChallengeDto>> getAllWaterChallenge(int page,
                                                                           Long challengeId,
                                                                           Boolean isPass,
                                                                           UserDetailsImpl userDetails) {
@@ -150,7 +150,7 @@ public class WaterChallengeService {
     Page<WaterChallengeDto> waterChallenges =
             waterChallengeRepository.searchAllWaterChallengeByChallengeId(
                     page - 1, challengeId, isPass);
-    return new BaseResponseDto<>(PageDto.from(waterChallenges),
+    return new HttpApiResponse<>(PageDto.from(waterChallenges),
             "물마시기 챌린지 전체 조회를 성공했습니다."
             , HttpStatus.OK);
   }
@@ -165,7 +165,7 @@ public class WaterChallengeService {
    * @return 수정된 물마시기 챌린지 정보
    */
   @Transactional
-  public BaseResponseDto<WaterChallengeDto> updateWaterChallenge(WaterChallengeForm form,
+  public HttpApiResponse<WaterChallengeDto> updateWaterChallenge(WaterChallengeForm form,
                                                                  UserDetailsImpl userDetails) {
     Member member = userDetails.getMember();
     WaterChallenge waterChallenge = waterChallengeRepository.
@@ -175,7 +175,7 @@ public class WaterChallengeService {
       throw new CustomException(ErrorCode.CANNOT_UPDATE_AFTER_START_CHALLENGE);
     }
     waterChallenge.updateGoalMl(form.getGoalMl());
-    return new BaseResponseDto<>(WaterChallengeDto.fromWithoutComment(waterChallenge),
+    return new HttpApiResponse<>(WaterChallengeDto.fromWithoutComment(waterChallenge),
             "물마시기 챌린지 수정을 성공했습니다."
             , HttpStatus.OK);
   }
@@ -189,7 +189,7 @@ public class WaterChallengeService {
    * @param userDetails 회원 정보
    * @return 추가된 물마시기 댓글 정보
    */
-  public BaseResponseDto<WaterCommentDto> addWaterComment(WaterCommentAddForm form,
+  public HttpApiResponse<WaterCommentDto> addWaterComment(WaterCommentAddForm form,
                                                           UserDetailsImpl userDetails) {
     Member member = userDetails.getMember();
     WaterChallenge waterChallenge = waterChallengeRepository.
@@ -197,7 +197,7 @@ public class WaterChallengeService {
     WaterComment waterComment = WaterComment.from(form, waterChallenge, member);
     waterChallenge.updateCurrentMl(form.getDrinkingMl());
     waterCommentRepository.save(waterComment);
-    return new BaseResponseDto<>(WaterCommentDto.from(waterComment),
+    return new HttpApiResponse<>(WaterCommentDto.from(waterComment),
             "물마시기 댓글 추가를 성공했습니다."
             , HttpStatus.OK);
   }
@@ -210,9 +210,9 @@ public class WaterChallengeService {
    * @param commentId 댓글 아이디
    * @return 물마시기 댓글 정보
    */
-  public BaseResponseDto<WaterCommentDto> getWaterComment(Long commentId) {
+  public HttpApiResponse<WaterCommentDto> getWaterComment(Long commentId) {
     WaterComment waterComment = waterCommentRepository.searchWaterCommentById(commentId);
-    return new BaseResponseDto<>(WaterCommentDto.from(waterComment),
+    return new HttpApiResponse<>(WaterCommentDto.from(waterComment),
             "물마시기 댓글 단건 조회를 성공했습니다."
             , HttpStatus.OK);
   }
@@ -227,7 +227,7 @@ public class WaterChallengeService {
    * @return 수정된 물마시기 댓글 정보
    */
   @Transactional
-  public BaseResponseDto<WaterCommentDto> updateWaterComment(WaterCommentUpdateForm form,
+  public HttpApiResponse<WaterCommentDto> updateWaterComment(WaterCommentUpdateForm form,
                                                              UserDetailsImpl userDetails) {
     Member member = userDetails.getMember();
     WaterComment waterComment = waterCommentRepository.searchWaterCommentById(form.getCommentId());
@@ -235,7 +235,7 @@ public class WaterChallengeService {
       throw new CustomException(ErrorCode.NOT_OWNER_OF_COMMENT);
     }
     waterComment.update(form);
-    return new BaseResponseDto<>(WaterCommentDto.from(waterComment),
+    return new HttpApiResponse<>(WaterCommentDto.from(waterComment),
             "물마시기 댓글 수정을 성공했습니다."
             , HttpStatus.OK);
   }
@@ -250,14 +250,14 @@ public class WaterChallengeService {
    * @return 삭제된 물마시기 댓글 정보
    */
   @Transactional
-  public BaseResponseDto<WaterCommentDto> adminDeleteWaterComment(Long commentId,
+  public HttpApiResponse<WaterCommentDto> adminDeleteWaterComment(Long commentId,
                                                                   UserDetailsImpl userDetails) {
     Member member = userDetails.getMember();
     checkAdminByMemberType(member);
     WaterComment waterComment = waterCommentRepository.searchWaterCommentById(commentId);
     waterComment.getWaterChallenge().updateCurrentMl(-waterComment.getDrinkingMl());
     waterCommentRepository.delete(waterComment);
-    return new BaseResponseDto<>(WaterCommentDto.from(waterComment),
+    return new HttpApiResponse<>(WaterCommentDto.from(waterComment),
             "물마시기 댓글 삭제를 성공했습니다."
             , HttpStatus.OK);
   }

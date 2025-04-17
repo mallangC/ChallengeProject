@@ -1,6 +1,7 @@
 package com.zerobase.challengeproject.comment.controller;
 
-import com.zerobase.challengeproject.HttpApiPageResponse;
+import com.zerobase.challengeproject.HttpApiResponse;
+
 import com.zerobase.challengeproject.account.domain.dto.PageDto;
 import com.zerobase.challengeproject.comment.domain.dto.*;
 import com.zerobase.challengeproject.comment.service.CoteChallengeService;
@@ -29,7 +30,7 @@ public class AdminChallengeController {
    * @return 삭제된 인증 댓글 정보
    */
   @DeleteMapping("/cote/comment/{commentId}")
-  public ResponseEntity<HttpApiPageResponse<CoteCommentDto>> adminDeleteComment(
+  public ResponseEntity<HttpApiResponse<CoteCommentDto>> adminDeleteComment(
           @PathVariable Long commentId,
           @AuthenticationPrincipal UserDetailsImpl userDetails) {
     return ResponseEntity.ok(coteChallengeService.adminDeleteComment(commentId, userDetails));
@@ -43,7 +44,7 @@ public class AdminChallengeController {
    * @return 페이징이된 다이어트 챌린지 리스트
    */
   @GetMapping("/diet/{challengeId}")
-  public ResponseEntity<HttpApiPageResponse<PageDto<DietChallengeDto>>> getAllDietChallenge(
+  public ResponseEntity<HttpApiResponse<PageDto<DietChallengeDto>>> getAllDietChallenge(
           @RequestParam(defaultValue = "1") @Min(1) int page,
           @RequestParam(required = false, value = "pass") Boolean isPass,
           @PathVariable Long challengeId,
@@ -59,7 +60,8 @@ public class AdminChallengeController {
    * @return 삭제된 다이어트 댓글 정보
    */
   @DeleteMapping("/diet/comment/{commentId}")
-  public ResponseEntity<HttpApiPageResponse<DietCommentDto>> deleteComment(
+  public ResponseEntity<HttpApiResponse<DietCommentDto>> deleteComment(
+
           @PathVariable Long commentId,
           @AuthenticationPrincipal UserDetailsImpl userDetails) {
     return ResponseEntity.ok(dietChallengeService.adminDeleteDietComment(commentId, userDetails));
@@ -76,7 +78,7 @@ public class AdminChallengeController {
    * @return 페이징된 물마시기 챌린지
    */
   @GetMapping("/water/{challengeId}")
-  public ResponseEntity<HttpApiPageResponse<PageDto<WaterChallengeDto>>> getAllWaterChallenge(
+  public ResponseEntity<HttpApiResponse<PageDto<WaterChallengeDto>>> getAllWaterChallenge(
           @PathVariable Long challengeId,
           @RequestParam(defaultValue = "1") @Min(1) int page,
           @RequestParam(required = false, value = "pass") Boolean isPass,
@@ -93,7 +95,7 @@ public class AdminChallengeController {
    * @return 삭제된 물마시기 댓글 정보
    */
   @DeleteMapping("/water/comment/{commentId}")
-  public ResponseEntity<HttpApiPageResponse<WaterCommentDto>> deleteWaterComment(
+  public ResponseEntity<HttpApiResponse<WaterCommentDto>> deleteWaterComment(
           @PathVariable Long commentId,
           @AuthenticationPrincipal UserDetailsImpl userDetails) {
     return ResponseEntity.ok(waterChallengeService.adminDeleteWaterComment(commentId, userDetails));

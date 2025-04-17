@@ -11,15 +11,15 @@ import lombok.Setter;
 public class DepositBackDto {
 
     private Long challengeId;
-    private Long depositBack;
+    private Long depositBackAmount;
     private Long currentDeposit;
 
 
 
-    public void setDepositBackDto(Long challengeId, Long depositBack, Long currentDeposit) {
+    public void setDepositBackDto(Long challengeId, Long depositBackAmount, Long currentDeposit) {
         this.challengeId = challengeId;
-        this.depositBack = depositBack;
+        this.depositBackAmount = depositBackAmount;
         // 반환받은 보증금 + 현재계좌금액
-        this.currentDeposit = currentDeposit + depositBack;
+        this.currentDeposit = currentDeposit + depositBackAmount;
     }
 }

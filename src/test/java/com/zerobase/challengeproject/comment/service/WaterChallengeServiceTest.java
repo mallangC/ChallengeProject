@@ -1,6 +1,6 @@
 package com.zerobase.challengeproject.comment.service;
 
-import com.zerobase.challengeproject.BaseResponseDto;
+import com.zerobase.challengeproject.HttpApiResponse;
 import com.zerobase.challengeproject.account.domain.dto.PageDto;
 import com.zerobase.challengeproject.challenge.entity.Challenge;
 import com.zerobase.challengeproject.challenge.repository.ChallengeRepository;
@@ -73,7 +73,7 @@ class WaterChallengeServiceTest {
   Challenge challengeBase = Challenge.builder()
           .id(1L)
           .title("challengeTitle")
-          .img("challengeImg")
+          .imageUrl("challengeImg")
           .categoryType(CategoryType.WATER)
           .description("challengeDescription")
           .maxParticipant(10L)
@@ -113,7 +113,7 @@ class WaterChallengeServiceTest {
             .willReturn(Challenge.builder()
                     .id(1L)
                     .title("challengeTitle")
-                    .img("challengeImg")
+                    .imageUrl("challengeImg")
                     .categoryType(CategoryType.WATER)
                     .description("challengeDescription")
                     .maxParticipant(10L)
@@ -129,15 +129,15 @@ class WaterChallengeServiceTest {
             .goalMl(1000)
             .build();
     //when
-    BaseResponseDto<WaterChallengeDto> result =
+    HttpApiResponse<WaterChallengeDto> result =
             waterChallengeService.addWaterChallenge(form, userDetailsBase);
     //then
-    assertEquals(HttpStatus.OK, result.getStatus());
-    assertEquals("물마시기 챌린지 추가를 성공했습니다.", result.getMessage());
-    assertEquals(1L, result.getData().getChallengeId());
-    assertEquals("test", result.getData().getLoginId());
-    assertEquals(1000, result.getData().getGoalMl());
-    assertEquals(0, result.getData().getCurrentMl());
+    assertEquals(HttpStatus.OK, result.status());
+    assertEquals("물마시기 챌린지 추가를 성공했습니다.", result.message());
+    assertEquals(1L, result.data().getChallengeId());
+    assertEquals("test", result.data().getLoginId());
+    assertEquals(1000, result.data().getGoalMl());
+    assertEquals(0, result.data().getCurrentMl());
     verify(waterChallengeRepository, times(1)).save(any());
   }
 
@@ -149,7 +149,7 @@ class WaterChallengeServiceTest {
             .willReturn(Challenge.builder()
                     .id(1L)
                     .title("challengeTitle")
-                    .img("challengeImg")
+                    .imageUrl("challengeImg")
                     .categoryType(CategoryType.COTE)
                     .description("challengeDescription")
                     .maxParticipant(10L)
@@ -179,7 +179,7 @@ class WaterChallengeServiceTest {
             .willReturn(Challenge.builder()
                     .id(1L)
                     .title("challengeTitle")
-                    .img("challengeImg")
+                    .imageUrl("challengeImg")
                     .categoryType(CategoryType.WATER)
                     .description("challengeDescription")
                     .maxParticipant(10L)
@@ -209,15 +209,15 @@ class WaterChallengeServiceTest {
     given(waterChallengeRepository.searchWaterChallengeByChallengeIdAndLoginId(anyLong(), anyString()))
             .willReturn(waterChallengeBase);
     //when
-    BaseResponseDto<WaterChallengeDto> result =
+    HttpApiResponse<WaterChallengeDto> result =
             waterChallengeService.getWaterChallenge(1L, userDetailsBase);
     //then
-    assertEquals(HttpStatus.OK, result.getStatus());
-    assertEquals("오늘의 물마시기 챌린지 조회를 성공했습니다.", result.getMessage());
-    assertEquals(1L, result.getData().getChallengeId());
-    assertEquals("test", result.getData().getLoginId());
-    assertEquals(1000, result.getData().getGoalMl());
-    assertEquals(0, result.getData().getCurrentMl());
+    assertEquals(HttpStatus.OK, result.status());
+    assertEquals("오늘의 물마시기 챌린지 조회를 성공했습니다.", result.message());
+    assertEquals(1L, result.data().getChallengeId());
+    assertEquals("test", result.data().getLoginId());
+    assertEquals(1000, result.data().getGoalMl());
+    assertEquals(0, result.data().getCurrentMl());
   }
 
   @Test
@@ -231,15 +231,15 @@ class WaterChallengeServiceTest {
     given(waterChallengeRepository.searchAllWaterChallengeByChallengeId(anyInt(), anyLong(), anyBoolean()))
             .willReturn(new PageImpl<>(List.of(WaterChallengeDto.fromWithoutComment(waterChallengeBase)), pageable, 0));
     //when
-    BaseResponseDto<PageDto<WaterChallengeDto>> result =
+    HttpApiResponse<PageDto<WaterChallengeDto>> result =
             waterChallengeService.getAllWaterChallenge(1, 1L, true, userDetails);
     //then
-    assertEquals(HttpStatus.OK, result.getStatus());
-    assertEquals("물마시기 챌린지 전체 조회를 성공했습니다.", result.getMessage());
-    assertEquals(1L, result.getData().getContent().get(0).getChallengeId());
-    assertEquals("test", result.getData().getContent().get(0).getLoginId());
-    assertEquals(1000, result.getData().getContent().get(0).getGoalMl());
-    assertEquals(0, result.getData().getContent().get(0).getCurrentMl());
+    assertEquals(HttpStatus.OK, result.status());
+    assertEquals("물마시기 챌린지 전체 조회를 성공했습니다.", result.message());
+    assertEquals(1L, result.data().getContent().get(0).getChallengeId());
+    assertEquals("test", result.data().getContent().get(0).getLoginId());
+    assertEquals(1000, result.data().getContent().get(0).getGoalMl());
+    assertEquals(0, result.data().getContent().get(0).getCurrentMl());
   }
 
   @Test
@@ -264,15 +264,15 @@ class WaterChallengeServiceTest {
             .goalMl(1200)
             .build();
     //when
-    BaseResponseDto<WaterChallengeDto> result =
+    HttpApiResponse<WaterChallengeDto> result =
             waterChallengeService.updateWaterChallenge(form, userDetailsBase);
     //then
-    assertEquals(HttpStatus.OK, result.getStatus());
-    assertEquals("물마시기 챌린지 수정을 성공했습니다.", result.getMessage());
-    assertEquals(1L, result.getData().getChallengeId());
-    assertEquals("test", result.getData().getLoginId());
-    assertEquals(1200, result.getData().getGoalMl());
-    assertEquals(0, result.getData().getCurrentMl());
+    assertEquals(HttpStatus.OK, result.status());
+    assertEquals("물마시기 챌린지 수정을 성공했습니다.", result.message());
+    assertEquals(1L, result.data().getChallengeId());
+    assertEquals("test", result.data().getLoginId());
+    assertEquals(1200, result.data().getGoalMl());
+    assertEquals(0, result.data().getCurrentMl());
   }
 
   @Test
@@ -286,7 +286,7 @@ class WaterChallengeServiceTest {
                     .challenge(Challenge.builder()
                             .id(1L)
                             .title("challengeTitle")
-                            .img("challengeImg")
+                            .imageUrl("challengeImg")
                             .categoryType(CategoryType.WATER)
                             .description("challengeDescription")
                             .maxParticipant(10L)
@@ -324,15 +324,15 @@ class WaterChallengeServiceTest {
             .image("댓글추가 이미지주소")
             .build();
     //when
-    BaseResponseDto<WaterCommentDto> result =
+    HttpApiResponse<WaterCommentDto> result =
             waterChallengeService.addWaterComment(form, userDetailsBase);
     //then
-    assertEquals(HttpStatus.OK, result.getStatus());
-    assertEquals("물마시기 댓글 추가를 성공했습니다.", result.getMessage());
-    assertEquals(1L, result.getData().getChallengeId());
-    assertEquals(200, result.getData().getDrinkingMl());
-    assertEquals("댓글추가 이미지주소", result.getData().getImage());
-    assertEquals("test", result.getData().getLonginId());
+    assertEquals(HttpStatus.OK, result.status());
+    assertEquals("물마시기 댓글 추가를 성공했습니다.", result.message());
+    assertEquals(1L, result.data().getChallengeId());
+    assertEquals(200, result.data().getDrinkingMl());
+    assertEquals("댓글추가 이미지주소", result.data().getImage());
+    assertEquals("test", result.data().getLonginId());
     verify(waterCommentRepository, times(1)).save(any());
   }
 
@@ -343,15 +343,15 @@ class WaterChallengeServiceTest {
     given(waterCommentRepository.searchWaterCommentById(anyLong()))
             .willReturn(waterCommentBase);
     //when
-    BaseResponseDto<WaterCommentDto> result =
+    HttpApiResponse<WaterCommentDto> result =
             waterChallengeService.getWaterComment(1L);
     //then
-    assertEquals(HttpStatus.OK, result.getStatus());
-    assertEquals("물마시기 댓글 단건 조회를 성공했습니다.", result.getMessage());
-    assertEquals(1L, result.getData().getChallengeId());
-    assertEquals("test", result.getData().getLonginId());
-    assertEquals("댓글베이스 이미지주소", result.getData().getImage());
-    assertEquals(200, result.getData().getDrinkingMl());
+    assertEquals(HttpStatus.OK, result.status());
+    assertEquals("물마시기 댓글 단건 조회를 성공했습니다.", result.message());
+    assertEquals(1L, result.data().getChallengeId());
+    assertEquals("test", result.data().getLonginId());
+    assertEquals("댓글베이스 이미지주소", result.data().getImage());
+    assertEquals(200, result.data().getDrinkingMl());
   }
 
   @Test
@@ -366,15 +366,15 @@ class WaterChallengeServiceTest {
             .image("수정된 이미지주소")
             .build();
     //when
-    BaseResponseDto<WaterCommentDto> result =
+    HttpApiResponse<WaterCommentDto> result =
             waterChallengeService.updateWaterComment(form, userDetailsBase);
     //then
-    assertEquals(HttpStatus.OK, result.getStatus());
-    assertEquals("물마시기 댓글 수정을 성공했습니다.", result.getMessage());
-    assertEquals(1L, result.getData().getChallengeId());
-    assertEquals("test", result.getData().getLonginId());
-    assertEquals("수정된 이미지주소", result.getData().getImage());
-    assertEquals(200, result.getData().getDrinkingMl());
+    assertEquals(HttpStatus.OK, result.status());
+    assertEquals("물마시기 댓글 수정을 성공했습니다.", result.message());
+    assertEquals(1L, result.data().getChallengeId());
+    assertEquals("test", result.data().getLonginId());
+    assertEquals("수정된 이미지주소", result.data().getImage());
+    assertEquals(200, result.data().getDrinkingMl());
   }
 
   @Test
@@ -409,14 +409,14 @@ class WaterChallengeServiceTest {
             .memberType(MemberType.ADMIN)
             .build());
     //when
-    BaseResponseDto<WaterCommentDto> result = waterChallengeService.adminDeleteWaterComment(1L, userDetails);
+    HttpApiResponse<WaterCommentDto> result = waterChallengeService.adminDeleteWaterComment(1L, userDetails);
     //then
-    assertEquals(HttpStatus.OK, result.getStatus());
-    assertEquals("물마시기 댓글 삭제를 성공했습니다.", result.getMessage());
-    assertEquals(1L, result.getData().getChallengeId());
-    assertEquals("test", result.getData().getLonginId());
-    assertEquals("댓글베이스 이미지주소", result.getData().getImage());
-    assertEquals(200, result.getData().getDrinkingMl());
+    assertEquals(HttpStatus.OK, result.status());
+    assertEquals("물마시기 댓글 삭제를 성공했습니다.", result.message());
+    assertEquals(1L, result.data().getChallengeId());
+    assertEquals("test", result.data().getLonginId());
+    assertEquals("댓글베이스 이미지주소", result.data().getImage());
+    assertEquals(200, result.data().getDrinkingMl());
   }
 
   @Test

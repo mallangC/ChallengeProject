@@ -1,6 +1,7 @@
 package com.zerobase.challengeproject.account.controller;
 
-import com.zerobase.challengeproject.HttpApiPageResponse;
+import com.zerobase.challengeproject.HttpApiResponse;
+
 import com.zerobase.challengeproject.account.domain.dto.AccountDetailDto;
 import com.zerobase.challengeproject.account.domain.dto.PageDto;
 import com.zerobase.challengeproject.account.domain.dto.RefundDto;
@@ -39,7 +40,7 @@ public class AccountController {
    * 회원 계좌에 금액 충전
    */
   @PostMapping
-  public ResponseEntity<HttpApiPageResponse<AccountDetailDto>> addAmount(
+  public ResponseEntity<HttpApiResponse<AccountDetailDto>> addAmount(
           @Valid @RequestBody AccountAddForm form,
           @AuthenticationPrincipal UserDetailsImpl userDetails) {
     return ResponseEntity.ok(accountService.addAmount(form, userDetails));
@@ -49,7 +50,7 @@ public class AccountController {
    * 전체 계좌 내역 조회 (페이징)
    */
   @GetMapping
-  public ResponseEntity<HttpApiPageResponse<PageDto<AccountDetailDto>>> getAllAccountDetail(
+  public ResponseEntity<HttpApiResponse<PageDto<AccountDetailDto>>> getAllAccountDetail(
           @RequestParam @Min(1) int page,
           @AuthenticationPrincipal UserDetailsImpl userDetails) {
     return ResponseEntity.ok(accountService.getAllAccounts(page, userDetails));
@@ -60,7 +61,7 @@ public class AccountController {
    * 회원이 충전했던 금액을 환불 신청
    */
   @PostMapping("/refund")
-  public ResponseEntity<HttpApiPageResponse<RefundDto>> refundRequest(
+  public ResponseEntity<HttpApiResponse<RefundDto>> refundRequest(
           @RequestBody RefundAddForm form,
           @AuthenticationPrincipal UserDetailsImpl userDetails) {
     return ResponseEntity.ok(accountService.addRefund(form, userDetails));
@@ -71,7 +72,7 @@ public class AccountController {
    * 회원의 환불 신청 취소
    */
   @DeleteMapping("/refund")
-  public ResponseEntity<HttpApiPageResponse<RefundDto>> cancelRefundRequest(
+  public ResponseEntity<HttpApiResponse<RefundDto>> cancelRefundRequest(
           @RequestParam("id") Long refundId) {
     return ResponseEntity.ok(accountService.cancelRefund(refundId));
   }
@@ -80,7 +81,7 @@ public class AccountController {
    * 회원의 환불 신청 확인
    */
   @GetMapping("/refund")
-  public ResponseEntity<HttpApiPageResponse<PageDto<RefundDto>>> getAllRefund(
+  public ResponseEntity<HttpApiResponse<PageDto<RefundDto>>> getAllRefund(
           @RequestParam @Min(1) int page,
           @AuthenticationPrincipal UserDetailsImpl userDetails) {
     return ResponseEntity.ok(accountService.getAllMyRefund(page, userDetails));
@@ -93,7 +94,7 @@ public class AccountController {
 //  @PreAuthorize("hasRole('ROLE_ADMIN')")
   @Secured("ADMIN")
   @GetMapping("/refund/admin")
-  public ResponseEntity<HttpApiPageResponse<PageDto<RefundDto>>> getAllRefund(
+  public ResponseEntity<HttpApiResponse<PageDto<RefundDto>>> getAllRefund(
           @RequestParam @Min(1) int page,
           @RequestBody RefundSearchForm form) {
     return ResponseEntity.ok(accountService.getAllRefund(page, form));
@@ -105,7 +106,7 @@ public class AccountController {
    */
   @PreAuthorize("hasRole('ROLE_ADMIN')")
   @PatchMapping("/refund/admin")
-  public ResponseEntity<HttpApiPageResponse<RefundDto>> refundApproval(
+  public ResponseEntity<HttpApiResponse<RefundDto>> refundApproval(
           @RequestParam boolean approval,
           @RequestBody RefundUpdateForm form) {
     return ResponseEntity.ok(accountService.refundDecision(approval, form));

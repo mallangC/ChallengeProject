@@ -1,6 +1,7 @@
 package com.zerobase.challengeproject.comment.service;
 
-import com.zerobase.challengeproject.HttpApiPageResponse;
+import com.zerobase.challengeproject.HttpApiResponse;
+
 import com.zerobase.challengeproject.account.domain.dto.PageDto;
 import com.zerobase.challengeproject.challenge.entity.Challenge;
 import com.zerobase.challengeproject.challenge.repository.ChallengeRepository;
@@ -47,8 +48,8 @@ public class DietChallengeService {
    * @param userDetails 회원 정보
    * @return 다이어트 챌린지 정보
    */
-  public HttpApiPageResponse<DietChallengeDto> addDietChallenge(DietChallengeAddForm form,
-                                                                UserDetailsImpl userDetails) {
+  public HttpApiResponse<DietChallengeDto> addDietChallenge(DietChallengeAddForm form,
+                                                            UserDetailsImpl userDetails) {
     Member member = userDetails.getMember();
     Challenge challenge = challengeRepository.searchChallengeWithDietChallengeById(form.getChallengeId());
     if (challenge.getCategoryType() != CategoryType.DIET) {
@@ -72,7 +73,7 @@ public class DietChallengeService {
     dietChallengeRepository.save(dietChallenge);
     dietCommentRepository.save(dietComment);
 
-    return new HttpApiPageResponse<>(DietChallengeDto.from(dietChallenge),
+    return new HttpApiResponse<>(DietChallengeDto.from(dietChallenge),
             "다이어트 챌린지 추가를 성공했습니다.",
             HttpStatus.OK);
   }
@@ -86,12 +87,12 @@ public class DietChallengeService {
    * @param userDetails 유저 정보
    * @return 다이어트 챌린지 정보
    */
-  public HttpApiPageResponse<DietChallengeDto> getDietChallenge(Long challengeId,
-                                                                UserDetailsImpl userDetails) {
+  public HttpApiResponse<DietChallengeDto> getDietChallenge(Long challengeId,
+                                                            UserDetailsImpl userDetails) {
     DietChallenge dietChallenge =
             dietChallengeRepository.searchDietChallengeByChallengeIdAndLoginId(
                     challengeId, userDetails.getUsername());
-    return new HttpApiPageResponse<>(DietChallengeDto.from(dietChallenge),
+    return new HttpApiResponse<>(DietChallengeDto.from(dietChallenge),
             "다이어트 챌린지 단건 조회를 성공했습니다.",
             HttpStatus.OK);
   }
@@ -108,17 +109,18 @@ public class DietChallengeService {
    * @param userDetails 회원 정보
    * @return 페이징이된 다이어트 챌린지 리스트
    */
-  public HttpApiPageResponse<PageDto<DietChallengeDto>> getAllDietChallenge(int page,
-                                                                            Long challengeId,
-                                                                            Boolean isPass,
-                                                                            UserDetailsImpl userDetails) {
+  public HttpApiResponse<PageDto<DietChallengeDto>> getAllDietChallenge(int page,
+                                                                        Long challengeId,
+                                                                        Boolean isPass,
+                                                                        UserDetailsImpl userDetails) {
     Member member = userDetails.getMember();
     if (member.getMemberType() != MemberType.ADMIN) {
       throw new CustomException(ErrorCode.NOT_MEMBER_TYPE_ADMIN);
     }
     Page<DietChallengeDto> dietChallengeDtos =
             dietChallengeRepository.searchAllDietChallengeByChallengeId(page - 1, challengeId, isPass);
-    return new HttpApiPageResponse<>(PageDto.from(dietChallengeDtos),
+
+    return new HttpApiResponse<>(PageDto.from(dietChallengeDtos),
             "다이어트 챌린지 전체 조회를 성공했습니다.(" + page + "페이지)",
             HttpStatus.OK);
   }
@@ -132,8 +134,8 @@ public class DietChallengeService {
    * @return 수정된 다이어트 챌린지 정보
    */
   @Transactional
-  public HttpApiPageResponse<DietChallengeDto> updateDietChallenge(DietChallengeUpdateForm form,
-                                                                   UserDetailsImpl userDetails) {
+  public HttpApiResponse<DietChallengeDto> updateDietChallenge(DietChallengeUpdateForm form,
+                                                               UserDetailsImpl userDetails) {
     DietChallenge dietChallenge =
             dietChallengeRepository.searchDietChallengeByChallengeIdAndLoginId(
                     form.getChallengeId(), userDetails.getUsername());
@@ -141,7 +143,7 @@ public class DietChallengeService {
       throw new CustomException(ErrorCode.CANNOT_UPDATE_AFTER_START_CHALLENGE);
     }
     dietChallenge.update(form);
-    return new HttpApiPageResponse<>(DietChallengeDto.from(dietChallenge),
+    return new HttpApiResponse<>(DietChallengeDto.from(dietChallenge),
             "다이어트 챌린지 수정을 성공했습니다.",
             HttpStatus.OK);
   }
@@ -156,14 +158,14 @@ public class DietChallengeService {
    * @return 추가된 다이어트 댓글 정보
    */
   @Transactional
-  public HttpApiPageResponse<DietCommentDto> addDietComment(DietCommentAddForm form, UserDetailsImpl userDetails) {
+  public HttpApiResponse<DietCommentDto> addDietComment(DietCommentAddForm form, UserDetailsImpl userDetails) {
     Member member = userDetails.getMember();
     DietChallenge dietChallenge = dietChallengeRepository.
             searchDietChallengeByChallengeIdAndLoginId(form.getChallengeId(), member.getLoginId());
     DietComment dietComment = DietComment.from(form, dietChallenge, member);
     dietCommentRepository.save(dietComment);
     dietChallenge.updateWeight(form.getCurrentWeight());
-    return new HttpApiPageResponse<>(DietCommentDto.from(dietComment),
+    return new HttpApiResponse<>(DietCommentDto.from(dietComment),
             "다이어트 댓글 추가를 성공했습니다.",
             HttpStatus.OK);
   }
@@ -176,9 +178,9 @@ public class DietChallengeService {
    * @param commentId 댓글 아이디
    * @return 조회한 다이어트 댓글 정보
    */
-  public HttpApiPageResponse<DietCommentDto> getDietComment(Long commentId) {
+  public HttpApiResponse<DietCommentDto> getDietComment(Long commentId) {
     DietComment dietComment = dietCommentRepository.searchDietCommentById(commentId);
-    return new HttpApiPageResponse<>(DietCommentDto.from(dietComment),
+    return new HttpApiResponse<>(DietCommentDto.from(dietComment),
             "다이어트 댓글 조회를 성공했습니다.",
             HttpStatus.OK);
   }
@@ -193,14 +195,14 @@ public class DietChallengeService {
    * @return 수정한 다이어트 댓글 정보
    */
   @Transactional
-  public HttpApiPageResponse<DietCommentDto> updateDietComment(DietCommentUpdateForm form,
-                                                               UserDetailsImpl userDetails) {
+  public HttpApiResponse<DietCommentDto> updateDietComment(DietCommentUpdateForm form,
+                                                           UserDetailsImpl userDetails) {
     Member member = userDetails.getMember();
     DietComment dietComment = dietCommentRepository.searchDietCommentById(form.getCommentId());
     checkMemberOwnerOfComment(member, dietComment);
     dietComment.update(form);
     dietComment.getDietChallenge().updateWeight(form.getCurrentWeight());
-    return new HttpApiPageResponse<>(DietCommentDto.from(dietComment),
+    return new HttpApiResponse<>(DietCommentDto.from(dietComment),
             "다이어트 댓글 수정을 성공했습니다.",
             HttpStatus.OK);
   }
@@ -214,13 +216,13 @@ public class DietChallengeService {
    * @return 삭제된 다이어트 댓글 정보
    */
   @Transactional
-  public HttpApiPageResponse<DietCommentDto> deleteDietComment(Long commentId,
-                                                               UserDetailsImpl userDetails) {
+  public HttpApiResponse<DietCommentDto> deleteDietComment(Long commentId,
+                                                           UserDetailsImpl userDetails) {
     Member member = userDetails.getMember();
     DietComment dietComment = dietCommentRepository.searchDietCommentById(commentId);
     checkMemberOwnerOfComment(member, dietComment);
     dietCommentRepository.delete(dietComment);
-    return new HttpApiPageResponse<>(DietCommentDto.from(dietComment),
+    return new HttpApiResponse<>(DietCommentDto.from(dietComment),
             "다이어트 댓글 삭제를 성공했습니다.",
             HttpStatus.OK);
   }
@@ -234,15 +236,15 @@ public class DietChallengeService {
    * @return 삭제된 다이어트 댓글 정보
    */
   @Transactional
-  public HttpApiPageResponse<DietCommentDto> adminDeleteDietComment(Long commentId,
-                                                                    UserDetailsImpl userDetails) {
+  public HttpApiResponse<DietCommentDto> adminDeleteDietComment(Long commentId,
+                                                                UserDetailsImpl userDetails) {
     Member member = userDetails.getMember();
     DietComment dietComment = dietCommentRepository.searchDietCommentById(commentId);
     if (member.getMemberType() != MemberType.ADMIN) {
       throw new CustomException(ErrorCode.NOT_MEMBER_TYPE_ADMIN);
     }
     dietCommentRepository.delete(dietComment);
-    return new HttpApiPageResponse<>(DietCommentDto.from(dietComment),
+    return new HttpApiResponse<>(DietCommentDto.from(dietComment),
             "관리자 권한으로 다이어트 댓글 삭제를 성공했습니다.",
             HttpStatus.OK);
   }

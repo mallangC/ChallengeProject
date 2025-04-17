@@ -8,11 +8,11 @@ import org.springframework.http.HttpStatus;
 
 @Getter
 @Setter
-public class BaseResponseDto<T> {
+public class HttpApiResponse<T> {
     private T data;
     private String message;
     private HttpStatus status;
-    public BaseResponseDto(T data, String message, HttpStatus status) {
+    public HttpApiResponse(T data, String message, HttpStatus status) {
         this.data = data;
         this.message = message;
         this.status = status;

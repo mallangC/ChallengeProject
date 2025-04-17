@@ -6,16 +6,16 @@ import lombok.Setter;
 
 @Getter
 @Setter
-public class EnterChallengeDto {
+public class RegistrationChallengeDto {
     private Long challengeId;
     private String title;
-    private String category;
+    private String categoryType;
     private Long myDeposit;
 
-    public EnterChallengeDto(Challenge challenge, Long memberDeposit) {
+    public RegistrationChallengeDto(Challenge challenge, Long memberDeposit) {
         this.challengeId = challenge.getId();
         this.title = challenge.getTitle();
-        this.category = challenge.getCategoryType().toString();
+        this.categoryType = challenge.getCategoryType().toString();
         this.myDeposit = memberDeposit;
     }
 }

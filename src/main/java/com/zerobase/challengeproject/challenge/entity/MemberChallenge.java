@@ -27,7 +27,7 @@ public class MemberChallenge {
   @JoinColumn(name = "member_id", nullable = false)
   private Member member;
 
-  private LocalDateTime entered_at;
+  private LocalDateTime enteredAt;
 
   private Long memberDeposit;
 

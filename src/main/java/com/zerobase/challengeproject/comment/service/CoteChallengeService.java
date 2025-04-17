@@ -1,6 +1,7 @@
 package com.zerobase.challengeproject.comment.service;
 
-import com.zerobase.challengeproject.HttpApiPageResponse;
+import com.zerobase.challengeproject.HttpApiResponse;
+
 import com.zerobase.challengeproject.account.domain.dto.PageDto;
 import com.zerobase.challengeproject.challenge.entity.Challenge;
 import com.zerobase.challengeproject.challenge.repository.ChallengeRepository;
@@ -50,7 +51,7 @@ public class CoteChallengeService {
    * @param userDetails 회원 정보
    * @return 추가한 코테 챌린지 정보
    */
-  public HttpApiPageResponse<CoteChallengeDto> addCoteChallenge(
+  public HttpApiResponse<CoteChallengeDto> addCoteChallenge(
           CoteChallengeForm form,
           UserDetailsImpl userDetails) {
     Challenge challenge = challengeRepository.searchChallengeWithCoteChallengeById(form.getChallengeId());
@@ -73,7 +74,7 @@ public class CoteChallengeService {
     CoteChallenge coteChallenge = CoteChallenge.from(form, challenge);
     coteChallengeRepository.save(coteChallenge);
 
-    return new HttpApiPageResponse<>(
+    return new HttpApiResponse<>(
             CoteChallengeDto.from(coteChallenge),
             "코테 챌린지 생성을 성공했습니다.",
             HttpStatus.OK);
@@ -87,12 +88,11 @@ public class CoteChallengeService {
    * @param coteChallengeId 코테 챌린지 아이디
    * @return 댓글을 제외한 코테 챌린지의 정보
    */
-  public HttpApiPageResponse<CoteChallengeDto> getCoteChallenge(Long coteChallengeId) {
-
+  public HttpApiResponse<CoteChallengeDto> getCoteChallenge(Long coteChallengeId) {
     CoteChallenge coteChallenge = coteChallengeRepository.findById(coteChallengeId)
             .orElseThrow(() -> new CustomException(ErrorCode.NOT_FOUND_COTE_CHALLENGE));
 
-    return new HttpApiPageResponse<>(
+    return new HttpApiResponse<>(
             CoteChallengeDto.fromWithoutComments(coteChallenge),
             "코테 챌린지 단건 조회를 성공했습니다.",
             HttpStatus.OK);
@@ -106,11 +106,11 @@ public class CoteChallengeService {
    * @param challengeId 챌린지 아이디
    * @return 댓글을 제외한 모든 코테 챌린지의 정보
    */
-  public HttpApiPageResponse<PageDto<CoteChallengeDto>> getAllCoteChallenge(int page,
-                                                                            Long challengeId) {
+  public HttpApiResponse<PageDto<CoteChallengeDto>> getAllCoteChallenge(int page,
+                                                                        Long challengeId) {
     Page<CoteChallengeDto> coteChallenge =
             coteChallengeRepository.searchAllCoteChallengeByChallengeId(page - 1, challengeId);
-    return new HttpApiPageResponse<>(
+    return new HttpApiResponse<>(
             PageDto.from(coteChallenge),
             "코테 챌린지 전체 조회를 성공했습니다.(" + page + "페이지)",
             HttpStatus.OK);
@@ -127,14 +127,14 @@ public class CoteChallengeService {
    * @return 댓글을 제외한 수정된 코테 챌린지의 정보
    */
   @Transactional
-  public HttpApiPageResponse<CoteChallengeDto> updateCoteChallenge(
+  public HttpApiResponse<CoteChallengeDto> updateCoteChallenge(
           CoteChallengeUpdateForm form,
           UserDetailsImpl userDetails) {
     CoteChallenge coteChallenge = searchCoteChallengeByIdAndOwnerCheck(
             form.getCoteChallengeId(), userDetails.getUsername());
 
     coteChallenge.update(form);
-    return new HttpApiPageResponse<>(
+    return new HttpApiResponse<>(
             CoteChallengeDto.fromWithoutComments(coteChallenge),
             "코테 챌린지 수정을 성공했습니다.",
             HttpStatus.OK);
@@ -151,7 +151,7 @@ public class CoteChallengeService {
    * @return 삭제된 코테 챌린지의 정보
    */
   @Transactional
-  public HttpApiPageResponse<CoteChallengeDto> deleteCoteChallenge(
+  public HttpApiResponse<CoteChallengeDto> deleteCoteChallenge(
           Long coteChallengeId,
           UserDetailsImpl userDetails) {
     CoteChallenge coteChallenge = searchCoteChallengeByIdAndOwnerCheck(
@@ -162,7 +162,7 @@ public class CoteChallengeService {
     }
 
     coteChallengeRepository.delete(coteChallenge);
-    return new HttpApiPageResponse<>(
+    return new HttpApiResponse<>(
             CoteChallengeDto.from(coteChallenge),
             "코테 챌린지 삭제를 성공했습니다.",
             HttpStatus.OK);
@@ -179,7 +179,7 @@ public class CoteChallengeService {
    * @param userDetails username 사용
    * @return 인증 댓글 정보
    */
-  public HttpApiPageResponse<CoteCommentDto> addComment(CoteCommentForm form, UserDetailsImpl userDetails) {
+  public HttpApiResponse<CoteCommentDto> addComment(CoteCommentForm form, UserDetailsImpl userDetails) {
 
     Member member = memberRepository.searchByLoginId(userDetails.getUsername());
 
@@ -197,7 +197,7 @@ public class CoteChallengeService {
 
     CoteComment coteComment = CoteComment.from(form, member, coteChallenge);
     coteCommentRepository.save(coteComment);
-    return new HttpApiPageResponse<>(
+    return new HttpApiResponse<>(
             CoteCommentDto.from(coteComment),
             "인증 댓글 추가를 성공했습니다.",
             HttpStatus.OK);
@@ -211,9 +211,9 @@ public class CoteChallengeService {
    * @param commentId 댓글 아이디
    * @return 인증 댓글 정보
    */
-  public HttpApiPageResponse<CoteCommentDto> getComment(Long commentId) {
+  public HttpApiResponse<CoteCommentDto> getComment(Long commentId) {
     CoteComment coteComment = searchCoteCommentById(commentId);
-    return new HttpApiPageResponse<>(
+    return new HttpApiResponse<>(
             CoteCommentDto.from(coteComment),
             "인증 댓글 조회를 성공했습니다.",
             HttpStatus.OK);
@@ -230,11 +230,11 @@ public class CoteChallengeService {
    * @return 수정된 인증 댓글 정보
    */
   @Transactional
-  public HttpApiPageResponse<CoteCommentDto> updateComment(CoteCommentUpdateForm form,
-                                                           UserDetailsImpl userDetails) {
+  public HttpApiResponse<CoteCommentDto> updateComment(CoteCommentUpdateForm form,
+                                                       UserDetailsImpl userDetails) {
     CoteComment coteComment = searchCoteCommentById(form.getCommentId(), userDetails.getUsername());
     coteComment.update(form);
-    return new HttpApiPageResponse<>(
+    return new HttpApiResponse<>(
             CoteCommentDto.from(coteComment),
             "인증 댓글 수정을 성공했습니다.",
             HttpStatus.OK);
@@ -251,11 +251,11 @@ public class CoteChallengeService {
    * @return 삭제된 인증 댓글 정보
    */
   @Transactional
-  public HttpApiPageResponse<CoteCommentDto> deleteComment(Long commentId,
-                                                           UserDetailsImpl userDetails) {
+  public HttpApiResponse<CoteCommentDto> deleteComment(Long commentId,
+                                                       UserDetailsImpl userDetails) {
     CoteComment coteComment = searchCoteCommentById(commentId, userDetails.getUsername());
     coteCommentRepository.delete(coteComment);
-    return new HttpApiPageResponse<>(
+    return new HttpApiResponse<>(
             CoteCommentDto.from(coteComment),
             "인증 댓글 삭제를 성공했습니다.",
             HttpStatus.OK);
@@ -272,14 +272,14 @@ public class CoteChallengeService {
    * @return 삭제된 인증 댓글 정보
    */
   @Transactional
-  public HttpApiPageResponse<CoteCommentDto> adminDeleteComment(Long commentId,
-                                                                UserDetailsImpl userDetails) {
+  public HttpApiResponse<CoteCommentDto> adminDeleteComment(Long commentId,
+                                                            UserDetailsImpl userDetails) {
     CoteComment coteComment = searchCoteCommentById(commentId);
     if (userDetails.getMember().getMemberType() != MemberType.ADMIN) {
       throw new CustomException(ErrorCode.NOT_MEMBER_TYPE_ADMIN);
     }
     coteCommentRepository.delete(coteComment);
-    return new HttpApiPageResponse<>(
+    return new HttpApiResponse<>(
             CoteCommentDto.from(coteComment),
             "관리자 권한으로 인증 댓글 삭제를 성공했습니다.",
             HttpStatus.OK);

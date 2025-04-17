@@ -1,4 +1,4 @@
-package com.zerobase.challengeproject.challenge.domain.form;
+package com.zerobase.challengeproject.challenge.domain.request;
 
 import com.zerobase.challengeproject.exception.CustomException;
 import com.zerobase.challengeproject.exception.ErrorCode;
@@ -13,7 +13,7 @@ import java.time.LocalDateTime;
 @Getter
 @Setter
 @Builder
-public class UpdateChallengeForm {
+public class UpdateChallengeRequest {
 
     @Size(min = 3, max = 100, message = "제목은 3자 이상, 100자 이하로 입력해야 합니다.")
     private String title;
