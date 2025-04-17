@@ -20,7 +20,7 @@ public class WaterChallengeDto {
   public static WaterChallengeDto from(WaterChallenge waterChallenge) {
     return WaterChallengeDto.builder()
             .id(waterChallenge.getId())
-            .loginId(waterChallenge.getMember().getMemberId())
+            .loginId(waterChallenge.getMember().getLoginId())
             .challengeId(waterChallenge.getId())
             .goalMl(waterChallenge.getGoalMl())
             .currentMl(waterChallenge.getCurrentMl())
@@ -33,7 +33,7 @@ public class WaterChallengeDto {
   public static WaterChallengeDto fromWithoutComment(WaterChallenge waterChallenge) {
     return WaterChallengeDto.builder()
             .id(waterChallenge.getId())
-            .loginId(waterChallenge.getMember().getMemberId())
+            .loginId(waterChallenge.getMember().getLoginId())
             .challengeId(waterChallenge.getChallenge().getId())
             .goalMl(waterChallenge.getGoalMl())
             .currentMl(waterChallenge.getCurrentMl())

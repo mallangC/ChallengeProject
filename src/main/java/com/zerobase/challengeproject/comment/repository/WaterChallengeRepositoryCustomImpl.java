@@ -44,7 +44,7 @@ public class WaterChallengeRepositoryCustomImpl implements WaterChallengeReposit
             .join(waterChallenge.member, member).fetchJoin()
             .join(waterChallenge.challenge, challenge).fetchJoin()
             .where(waterChallenge.challenge.id.eq(challengeId)
-                    .and(waterChallenge.member.memberId.eq(loginId))
+                    .and(waterChallenge.member.loginId.eq(loginId))
                     .and(waterChallenge.createdAt.between(startOfDay, endOfDay)))
             .fetchOne();
     if (findWaterChallenge == null) {
