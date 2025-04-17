@@ -33,6 +33,11 @@ jobs:
           distribution: 'temurin'  # Adoptium에서 제공하는 JDK
           java-version: '17'
 
+      - name: Create application-test.yml
+        run: |
+          mkdir -p src/main/resources
+          echo "${{ secrets.APPLICATION_TEST_YML }}" > src/main/resources/application-test.yml
+
       - name: gradlew 실행 권한 추가
         run: chmod +x ./gradlew
 
