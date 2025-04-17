@@ -21,7 +21,6 @@ import org.springframework.web.bind.annotation.*;
 public class MemberLoginController {
 
     private final MemberLoginService memberLoginService;
-    private final JwtUtil jwtUtil;
 
     /**
      * 로그인한 유저가 로그 아웃을 시도할 때 사용하는 컨트롤러 메서드
@@ -33,14 +32,8 @@ public class MemberLoginController {
     public ResponseEntity<HttpApiResponse> logout(@RequestHeader("Authorization") String token,
                                                   @CookieValue(value = "refreshToken", required = false)
                                                   String refreshToken) {
-        token = token.substring(7);
-        if (refreshToken == null) {
-            throw new CustomException(ErrorCode.TOKEN_NOT_PROVIDED);
-        }
-        if (!jwtUtil.isTokenValid(refreshToken)) {
-            throw new CustomException(ErrorCode.TOKEN_IS_INVALID_OR_EXPIRED);
-        }
-        MemberLogoutDto dto = memberLoginService.logout(token);
+
+        MemberLogoutDto dto = memberLoginService.logout(token,refreshToken);
 
         return ResponseEntity.ok()
                 .header(HttpHeaders.SET_COOKIE, dto.getResponseCookie().toString())

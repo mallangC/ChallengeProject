@@ -12,19 +12,23 @@ import java.util.List;
 public class MemberDto {
   private String loginId;
   private String memberName;
-  private String nickName;
+  private String nickname;
   private String phoneNumber;
   private String email;
   private Long account;
   private List<AccountDetailDto> accountDetails;
 
   public static MemberDto from(Member member) {
-    return (member.getPhoneNumber())
+    return MemberDto.builder()
+            .loginId(member.getLoginId())
+            .memberName(member.getMemberName())
+            .nickname(member.getNickname())
+            .phoneNumber(member.getPhoneNumber())
             .email(member.getEmail())
-            .account(member.getAccount())
             .accountDetails(member.getAccountDetails().stream()
                     .map(AccountDetailDto::from)
                     .toList())
+            .account(member.getAccount())
             .build();
   }
 
@@ -32,7 +36,7 @@ public class MemberDto {
     return MemberDto.builder()
             .loginId(member.getLoginId())
             .memberName(member.getMemberName())
-            .nickName(member.getNickname())
+            .nickname(member.getNickname())
             .phoneNumber(member.getPhoneNumber())
             .email(member.getEmail())
             .account(member.getAccount())

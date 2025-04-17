@@ -1,7 +1,5 @@
 package com.zerobase.challengeproject.member.contoller;
 
-
-
 import com.zerobase.challengeproject.HttpApiResponse;
 import com.zerobase.challengeproject.exception.CustomException;
 import com.zerobase.challengeproject.exception.ErrorCode;
@@ -18,8 +16,6 @@ import org.springframework.http.ResponseCookie;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.web.bind.annotation.*;
-
-import java.util.Objects;
 
 @RestController
 @RequiredArgsConstructor
@@ -74,6 +70,6 @@ public class MemberSignupController {
         ResponseCookie cookie = memberService.unregister(userDetails.getUsername());
         return ResponseEntity.ok()
                 .header(HttpHeaders.SET_COOKIE,cookie.toString())
-                .body(new HttpApiPageResponse<>(null,"회원 탈퇴 성공했습니다.", HttpStatus.OK));
+                .body(new HttpApiResponse<>(null,"회원 탈퇴 성공했습니다.", HttpStatus.OK));
     }
 }

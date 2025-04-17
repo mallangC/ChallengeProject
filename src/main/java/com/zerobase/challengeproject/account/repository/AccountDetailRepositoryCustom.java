@@ -1,9 +1,8 @@
 package com.zerobase.challengeproject.account.repository;
 
-import com.zerobase.challengeproject.account.domain.dto.AccountDetailDto;
+import com.zerobase.challengeproject.account.entity.AccountDetail;
 import org.springframework.data.domain.Page;
 
 public interface AccountDetailRepositoryCustom {
-  Page<AccountDetailDto> searchAllAccountDetail(int page, String userId);
-
+  Page<AccountDetail> searchAllAccountDetail(int page, String loginId);
 }

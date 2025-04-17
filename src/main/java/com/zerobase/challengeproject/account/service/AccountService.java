@@ -1,14 +1,12 @@
 package com.zerobase.challengeproject.account.service;
 
 import com.zerobase.challengeproject.HttpApiResponse;
-
 import com.zerobase.challengeproject.account.domain.dto.AccountDetailDto;
-import com.zerobase.challengeproject.account.domain.dto.PageDto;
 import com.zerobase.challengeproject.account.domain.dto.RefundDto;
-import com.zerobase.challengeproject.account.domain.form.AccountAddForm;
-import com.zerobase.challengeproject.account.domain.form.RefundAddForm;
-import com.zerobase.challengeproject.account.domain.form.RefundSearchForm;
-import com.zerobase.challengeproject.account.domain.form.RefundUpdateForm;
+import com.zerobase.challengeproject.account.domain.request.AccountAddRequest;
+import com.zerobase.challengeproject.account.domain.request.RefundAddRequest;
+import com.zerobase.challengeproject.account.domain.request.RefundSearchRequest;
+import com.zerobase.challengeproject.account.domain.request.RefundUpdateRequest;
 import com.zerobase.challengeproject.account.entity.AccountDetail;
 import com.zerobase.challengeproject.account.entity.Refund;
 import com.zerobase.challengeproject.account.repository.AccountDetailRepository;
@@ -22,9 +20,11 @@ import com.zerobase.challengeproject.member.repository.MemberRepository;
 import com.zerobase.challengeproject.type.AccountType;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
-import org.springframework.http.HttpStatus;
+import org.springframework.data.domain.PageImpl;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+
+import java.util.List;
 
 @Service
 @RequiredArgsConstructor
@@ -35,7 +35,9 @@ public class AccountService {
   private final RefundRepository refundRepository;
 
   public MemberDto getMember(UserDetailsImpl userDetails) {
-    return MemberDto.fromWithoutAccountDetails(searchMember(userDetails.getUsername()));
+    return MemberDto.fromWithoutAccountDetails(
+            memberRepository.findByLoginId(userDetails.getUsername())
+                    .orElseThrow(() -> new CustomException(ErrorCode.NOT_FOUND_MEMBER)));
   }
 
   /**
@@ -53,28 +55,42 @@ public class AccountService {
             , HttpStatus.OK);
   }
 
-
   /**
    * 회원이 금액을 충전하기 위한 서비스 메서드
    * 충전 내역이 DB에 저장되고 회원 계좌에 금액이 충전
    *
-   * @param form 회원이 충전할 금액
+   * @param request 회원이 충전할 금액
+   * @param member  회원 객체
    * @return id, updateAt을 제외한 모든 충전내역
    */
   @Transactional
-  public HttpApiResponse<AccountDetailDto> addAmount(AccountAddForm form, UserDetailsImpl userDetails) {
-    String userId = userDetails.getUsername();
-    Member member = searchMember(userId);
-
-    Long amount = form.getChargeAmount();
+  public AccountDetailDto addAmount(AccountAddRequest request, Member member) {
+    Long amount = request.getChargeAmount();
     AccountDetail detail = AccountDetail.charge(member, amount);
     accountDetailRepository.save(detail);
-
     member.chargeAccount(amount);
-    return new HttpApiResponse<>(
-            AccountDetailDto.from(detail),
-            amount + "원 충전을 성공했습니다.",
-            HttpStatus.OK);
+    return AccountDetailDto.from(detail);
+  }
+
+  /**
+   * 회원이 계좌 내역을 조회하기 위한 서비스 메서드
+   * page를 사용하기 때문에 총 계좌내역 갯수를 알기 위한 쿼리가 따로 실행되어 쿼리가 두번 실행
+   * 내역을 찾을 수 없는 경우 빈 페이지로 반환
+   *
+   * @param page 찾은 계좌 내역 페이지
+   * @return 계좌 내역과 총 갯수, 총페이지, 현재 페이지, 한페이지에 표시되는 계좌내역의 갯수 정보
+   */
+  public Page<AccountDetailDto> getAllAccounts(int page, String loginId) {
+    Page<AccountDetail> accountDetails = accountDetailRepository.searchAllAccountDetail(page - 1, loginId);
+
+    List<AccountDetailDto> accountDetailDtos =
+            accountDetails.getContent().stream()
+                    .map(AccountDetailDto::from)
+                    .toList();
+
+    return new PageImpl<>(accountDetailDtos,
+            accountDetails.getPageable(),
+            accountDetails.getTotalElements());
   }
 
   /**
@@ -84,29 +100,37 @@ public class AccountService {
    * @param form 환불 신청할 내역id, 환불 사유
    * @return 환불 신청에 대한 정보 (id 제외)
    */
-  public HttpApiResponse<RefundDto> addRefund(RefundAddForm form, UserDetailsImpl userDetails) {
-    String userId = userDetails.getUsername();
+  public RefundDto addRefund(RefundAddRequest form, String loginId) {
     boolean isExist = refundRepository.existsByAccountDetail_Id(form.getAccountId());
     if (isExist) {
       throw new CustomException(ErrorCode.ALREADY_REFUND_REQUEST);
     }
-    Member member = memberRepository.searchByLoginIdAndAccountDetailId(userId, form.getAccountId());
+    Member member = memberRepository.searchByLoginIdAndAccountDetailId(loginId, form.getAccountId())
+            .orElseThrow(() -> new CustomException(ErrorCode.NOT_FOUND_ACCOUNT_DETAIL));
+
+    if (member.getAccountDetails().get(0).getAccountType() != AccountType.CHARGE) {
+      throw new CustomException(ErrorCode.NOT_CHARGE_DETAIL);
+    }
 
     Refund refund = Refund.from(form.getContent(), member);
     refundRepository.save(refund);
-
-    return new HttpApiResponse<>(RefundDto.from(refund),
-            "환불 신청을 성공했습니다.",
-            HttpStatus.OK);
+    return RefundDto.from(refund);
   }
 
-
-  public HttpApiResponse<PageDto<RefundDto>> getAllMyRefund(int page, UserDetailsImpl userDetails) {
-    String userId = userDetails.getUsername();
-    Page<RefundDto> paging = refundRepository.searchAllMyRefund(page - 1, userId);
-    return new HttpApiResponse<>(PageDto.from(paging)
-            , "회원의 환불신청 조회에 성공했습니다.(" + page + "페이지)"
-            , HttpStatus.OK);
+  /**
+   * 회원이 신청한 환불 신청내역을 모두 조회하는 서비스 메서드
+   * 회원을 찾을 수 없을 경우 예외 발생
+   *
+   * @param page    페이지 숫자
+   * @param loginId 회원 로그인 아이디
+   * @return 페이징된 환불 신청 내역
+   */
+  public Page<RefundDto> getAllRefund(int page, String loginId) {
+    Page<Refund> refunds = refundRepository.searchAllMyRefund(page - 1, loginId);
+    List<RefundDto> refundDtos = refunds.stream()
+            .map(RefundDto::from)
+            .toList();
+    return new PageImpl<>(refundDtos, refunds.getPageable(), refunds.getTotalElements());
   }
 
   /**
@@ -117,18 +141,17 @@ public class AccountService {
    * @return 취소하기 전 환불 신청 정보
    */
   @Transactional
-  public HttpApiResponse<RefundDto> cancelRefund(Long refundId) {
-    Refund refund = refundRepository.findById(refundId)
+  public RefundDto cancelRefund(Long refundId, String loginId) {
+    Refund refund = refundRepository.searchRefundByIdAndLoginId(refundId, loginId)
             .orElseThrow(() -> new CustomException(ErrorCode.NOT_FOUND_REFUND));
-
+    if (refund.getMember().getLoginId().equals(loginId)) {
+      throw new CustomException(ErrorCode.NOT_OWNER_OF_REFUND);
+    }
     if (refund.isDone()) {
       throw new CustomException(ErrorCode.ALREADY_DONE);
     }
-
     refundRepository.delete(refund);
-    return new HttpApiResponse<>(RefundDto.from(refund),
-            "환불 신청을 취소했습니다.",
-            HttpStatus.OK);
+    return RefundDto.from(refund);
   }
 
   /**
@@ -139,11 +162,14 @@ public class AccountService {
    * @param form 검색 기준이 되는 날짜(문자열 예- 2025-03-31 00), 두개의 boolean
    * @return paging된 검색 기준에 맞는 Refund 정보
    */
-  public HttpApiResponse<PageDto<RefundDto>> getAllRefund(int page, RefundSearchForm form) {
-    Page<RefundDto> paging = refundRepository.searchAllRefund(page - 1, form.getStartAtStr(), form.getDone(), form.getRefunded());
-    return new HttpApiResponse<>(PageDto.from(paging)
-            , "환불 신청 조회에 성공했습니다.(" + page + "페이지)"
-            , HttpStatus.OK);
+  public Page<RefundDto> getAllRefundForAdmin(int page, RefundSearchRequest form) {
+    Page<Refund> refunds = refundRepository.searchAllRefund(
+            page - 1, form.getStartAtStr(), form.getDone(), form.getRefunded());
+
+    List<RefundDto> refundDtos = refunds.stream()
+            .map(RefundDto::from)
+            .toList();
+    return new PageImpl<>(refundDtos, refunds.getPageable(), refunds.getTotalElements());
   }
 
 
@@ -163,33 +189,51 @@ public class AccountService {
    * @return updateAt을 제외한 모든 환불 내역
    */
   @Transactional
-  public HttpApiResponse<RefundDto> refundDecision(boolean approval, RefundUpdateForm form) {
-    Refund refund = refundRepository.searchRefundById(form.getRefundId());
+  public RefundDto refundDecision(boolean approval, RefundUpdateRequest form) {
+    Refund refund = refundRepository.searchRefundById(form.getRefundId())
+            .orElseThrow(() -> new CustomException(ErrorCode.ALREADY_REFUND_REQUEST));
+    verifyRefundDetail(refund);
     AccountDetail accountDetail = refund.getAccountDetail();
     if (accountDetail.getAccountType() != AccountType.CHARGE) {
       throw new CustomException(ErrorCode.NOT_CHARGE_DETAIL);
     }
     if (approval) {
       Member member = memberRepository.searchByLoginIdAndAccountDetailsToDate(
-              refund.getMember().getLoginId(),
-              accountDetail.getCreatedAt());
+                      refund.getMember().getLoginId(),
+                      accountDetail.getCreatedAt())
+              .orElseThrow(() -> new CustomException(ErrorCode.NOT_FOUND_MEMBER));
+      verifyAccountDetails(member);
+
       AccountDetail refundDetail = AccountDetail.refund(member, accountDetail.getAmount());
       accountDetailRepository.save(refundDetail);
       member.refundAccount(accountDetail, refund);
-      return new HttpApiResponse<>(RefundDto.from(refund),
-
-              "환불 승인을 성공했습니다.",
-              HttpStatus.OK);
+    } else {
+      refund.rejectRefund(form);
     }
-    refund.refundFalse(form);
-    return new HttpApiResponse<>(RefundDto.from(refund),
-
-            "환불 비승인을 성공했습니다.",
-            HttpStatus.OK);
+    return RefundDto.from(refund);
   }
 
-  private Member searchMember(String userId) {
-    return memberRepository.findByLoginId(userId)
-            .orElseThrow(() -> new CustomException(ErrorCode.NOT_FOUND_MEMBER));
+  private void verifyRefundDetail(Refund refund) {
+    if (refund.isRefunded()) {
+      throw new CustomException(ErrorCode.ALREADY_REFUNDED);
+    }
+    if (refund.isDone()) {
+      throw new CustomException(ErrorCode.ALREADY_DONE);
+    }
   }
+
+  private void verifyAccountDetails(Member member) {
+    List<AccountDetail> accountDetails = member.getAccountDetails();
+    if (accountDetails.isEmpty()) {
+      throw new CustomException(ErrorCode.ALREADY_REFUNDED);
+    }
+
+    long sum = accountDetails.stream()
+            .mapToLong(AccountDetail::getAmount)
+            .sum();
+    if (member.getAccount() < sum) {
+      throw new CustomException(ErrorCode.ALREADY_SPENT_MONEY);
+    }
+  }
+
 }

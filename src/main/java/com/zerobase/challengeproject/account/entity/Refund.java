@@ -1,6 +1,6 @@
 package com.zerobase.challengeproject.account.entity;
 
-import com.zerobase.challengeproject.account.domain.form.RefundUpdateForm;
+import com.zerobase.challengeproject.account.domain.request.RefundUpdateRequest;
 import com.zerobase.challengeproject.exception.CustomException;
 import com.zerobase.challengeproject.exception.ErrorCode;
 import com.zerobase.challengeproject.member.entity.Member;
@@ -32,7 +32,7 @@ public class Refund extends BaseEntity {
 
   public static Refund from(String content,
                             Member member
-                            ) {
+  ) {
     return Refund.builder()
             .accountDetail(member.getAccountDetails().get(0))
             .member(member)
@@ -40,8 +40,8 @@ public class Refund extends BaseEntity {
             .build();
   }
 
-  public void refundFalse(RefundUpdateForm form) {
-    if (isDone()){
+  public void rejectRefund(RefundUpdateRequest form) {
+    if (isDone()) {
       throw new CustomException(ErrorCode.ALREADY_DONE);
     }
     this.adminContent = form.getContent();
@@ -49,8 +49,8 @@ public class Refund extends BaseEntity {
     this.isDone = true;
   }
 
-  public void refundTrue() {
-    if (isDone() || isRefunded()){
+  public void approveRefund() {
+    if (isDone() || isRefunded()) {
       throw new CustomException(ErrorCode.ALREADY_DONE);
     }
     this.adminContent = "환불 완료";

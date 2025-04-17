@@ -2,9 +2,9 @@ package com.zerobase.challengeproject.comment.repository;
 
 import com.querydsl.jpa.impl.JPAQueryFactory;
 import com.zerobase.challengeproject.comment.entity.WaterComment;
-import com.zerobase.challengeproject.exception.CustomException;
-import com.zerobase.challengeproject.exception.ErrorCode;
 import lombok.RequiredArgsConstructor;
+
+import java.util.Optional;
 
 import static com.zerobase.challengeproject.challenge.entity.QChallenge.challenge;
 import static com.zerobase.challengeproject.comment.entity.QWaterChallenge.waterChallenge;
@@ -25,16 +25,13 @@ public class WaterCommentRepositoryCustomImpl implements WaterCommentRepositoryC
    * @return 물마시기 댓글 객체
    */
   @Override
-  public WaterComment searchWaterCommentById(Long commentId) {
+  public Optional<WaterComment> searchWaterCommentById(Long commentId) {
     WaterComment findWaterComment = queryFactory.selectFrom(waterComment)
             .join(waterComment.waterChallenge, waterChallenge).fetchJoin()
             .join(waterComment.waterChallenge.challenge, challenge).fetchJoin()
             .join(waterComment.member, member).fetchJoin()
             .where(waterComment.id.eq(commentId))
             .fetchOne();
-    if (findWaterComment == null) {
-      throw new CustomException(ErrorCode.NOT_FOUND_WATER_COMMENT);
-    }
-    return findWaterComment;
+    return Optional.ofNullable(findWaterComment);
   }
 }
