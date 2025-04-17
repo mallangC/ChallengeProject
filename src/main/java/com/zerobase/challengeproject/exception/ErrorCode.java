@@ -45,7 +45,6 @@ public enum ErrorCode {
   INVALID_DATE_RANGE(HttpStatus.BAD_REQUEST, "시작날짜는 종료날짜보다 먼저이어야 합니다."),
   FORBIDDEN_UPDATE_CHALLENGE(HttpStatus.BAD_REQUEST, "챌린지를 생성한 아이디와 다릅니다."),
   FORBIDDEN_DELETE_CHALLENGE(HttpStatus.BAD_REQUEST, "챌린지를 생성한 유저만 삭제가 가능합니다."),
-  INSUFFICIENT_DEPOSIT(HttpStatus.BAD_REQUEST, "보증금이 부족합니다."),
   CHALLENGE_ALREADY_ENDED(HttpStatus.BAD_REQUEST, "이미 종료된 챌린지입니다."),
   NOT_DEPOSIT_DETAIL(HttpStatus.BAD_REQUEST, "보증금 내역이 아닙니다."),
   NOT_ENOUGH_MONEY(HttpStatus.BAD_REQUEST, "계좌에 돈이 부족합니다."),

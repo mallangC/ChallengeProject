@@ -1,6 +1,11 @@
 package com.zerobase.challengeproject.member.contoller;
 
+
 import com.zerobase.challengeproject.HttpApiResponse;
+import com.zerobase.challengeproject.exception.CustomException;
+import com.zerobase.challengeproject.exception.ErrorCode;
+import com.zerobase.challengeproject.member.components.jwt.JwtUtil;
+
 import com.zerobase.challengeproject.member.domain.dto.MemberLogoutDto;
 import com.zerobase.challengeproject.member.domain.dto.RefreshTokenDto;
 import com.zerobase.challengeproject.member.service.MemberLoginService;
@@ -41,7 +46,11 @@ public class MemberLoginController {
      * @return AccessToken
      */
     @PostMapping("/token/refresh")
-    public ResponseEntity<HttpApiResponse> refreshAccessToken(@CookieValue(value = "refreshToken", required = false) String refreshToken  ) {
+    public ResponseEntity<HttpApiResponse> refreshAccessToken(
+            @CookieValue(value = "refreshToken", required = false) String refreshToken) {
+        if (refreshToken == null || !jwtUtil.isTokenValid(refreshToken)) {
+            throw new CustomException(ErrorCode.TOKEN_IS_INVALID_OR_EXPIRED);
+        }
         RefreshTokenDto dto = memberLoginService.refreshAccessToken(refreshToken);
 
         return ResponseEntity.ok()

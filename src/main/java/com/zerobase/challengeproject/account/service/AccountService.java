@@ -1,5 +1,6 @@
 package com.zerobase.challengeproject.account.service;
 
+import com.zerobase.challengeproject.HttpApiResponse;
 import com.zerobase.challengeproject.account.domain.dto.AccountDetailDto;
 import com.zerobase.challengeproject.account.domain.dto.RefundDto;
 import com.zerobase.challengeproject.account.domain.request.AccountAddRequest;
@@ -37,6 +38,21 @@ public class AccountService {
     return MemberDto.fromWithoutAccountDetails(
             memberRepository.findByLoginId(userDetails.getUsername())
                     .orElseThrow(() -> new CustomException(ErrorCode.NOT_FOUND_MEMBER)));
+  }
+
+  /**
+   * 회원이 계좌 내역을 조회하기 위한 서비스 메서드
+   * page를 사용하기 때문에 총 계좌내역 갯수를 알기 위한 쿼리가 따로 실행되어 쿼리가 두번 실행
+   * 내역을 찾을 수 없는 경우 빈 페이지로 반환
+   *
+   * @param page 찾은 계좌 내역 페이지
+   * @return 계좌 내역과 총 갯수, 총페이지, 현재 페이지, 한페이지에 표시되는 계좌내역의 갯수 정보
+   */
+  public HttpApiResponse<PageDto<AccountDetailDto>> getAllAccounts(int page, UserDetailsImpl userDetails) {
+    Page<AccountDetailDto> paging = accountDetailRepository.searchAllAccountDetail(page - 1, userDetails.getUsername());
+    return new HttpApiResponse<>(PageDto.from(paging)
+            , "계좌 내역 조회에 성공했습니다.(" + page + "페이지)"
+            , HttpStatus.OK);
   }
 
   /**
@@ -114,7 +130,6 @@ public class AccountService {
     List<RefundDto> refundDtos = refunds.stream()
             .map(RefundDto::from)
             .toList();
-
     return new PageImpl<>(refundDtos, refunds.getPageable(), refunds.getTotalElements());
   }
 
@@ -178,7 +193,6 @@ public class AccountService {
     Refund refund = refundRepository.searchRefundById(form.getRefundId())
             .orElseThrow(() -> new CustomException(ErrorCode.ALREADY_REFUND_REQUEST));
     verifyRefundDetail(refund);
-
     AccountDetail accountDetail = refund.getAccountDetail();
     if (accountDetail.getAccountType() != AccountType.CHARGE) {
       throw new CustomException(ErrorCode.NOT_CHARGE_DETAIL);

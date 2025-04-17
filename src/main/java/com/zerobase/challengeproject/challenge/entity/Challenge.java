@@ -1,7 +1,7 @@
 package com.zerobase.challengeproject.challenge.entity;
 
-import com.zerobase.challengeproject.challenge.domain.form.CreateChallengeForm;
-import com.zerobase.challengeproject.challenge.domain.form.UpdateChallengeForm;
+import com.zerobase.challengeproject.challenge.domain.request.CreateChallengeRequest;
+import com.zerobase.challengeproject.challenge.domain.request.UpdateChallengeRequest;
 import com.zerobase.challengeproject.comment.entity.CoteChallenge;
 import com.zerobase.challengeproject.comment.entity.DietChallenge;
 import com.zerobase.challengeproject.comment.entity.WaterChallenge;
@@ -36,7 +36,7 @@ public class Challenge {
   @Column(nullable = false)
   private String title;
 
-  private String img;
+  private String imageUrl;
 
   @Enumerated(EnumType.STRING)
   @Column(nullable = false)
@@ -71,46 +71,42 @@ public class Challenge {
   @OneToMany(mappedBy = "challenge", fetch = FetchType.LAZY, cascade = CascadeType.REMOVE, orphanRemoval = true)
   private List<CoteChallenge> coteChallenges;
   @OneToMany(mappedBy = "challenge", fetch = FetchType.LAZY, cascade = CascadeType.REMOVE, orphanRemoval = true)
-  List<WaterChallenge> waterChallenges;
+  private List<WaterChallenge> waterChallenges;
   @OneToMany(mappedBy = "challenge", fetch = FetchType.LAZY, cascade = CascadeType.REMOVE, orphanRemoval = true)
   private List<DietChallenge> dietChallenges;
 
-  private LocalDateTime createAt;
+  private LocalDateTime createdAt;
 
-  private LocalDateTime updateAt;
+  private LocalDateTime updatedAt;
 
-  public Challenge(CreateChallengeForm form, Member member) {
-    this.currentParticipant = 1L;
+  public Challenge(CreateChallengeRequest form, Member member) {
     this.title = form.getTitle();
     this.member = member;
     this.categoryType = form.getCategoryType();
-    this.img = form.getImg();
+    this.imageUrl = form.getImg();
     this.maxParticipant = form.getMaxParticipant();
+    this.currentParticipant = 1L;
     this.maxDeposit = form.getMaxDeposit();
-    this.standard = form.getStandard();
     this.minDeposit = form.getMinDeposit();
     this.description = form.getDescription();
     this.startDate = form.getStartDate();
     this.endDate = form.getEndDate();
-    this.createAt = LocalDateTime.now();
+    this.createdAt = LocalDateTime.now();
   }
 
-  public void update(UpdateChallengeForm form) {
+  public void update(UpdateChallengeRequest form) {
 
     if (form.getTitle() != null) this.setTitle(form.getTitle());
-    if (form.getCategoryType() != null)
-      this.setCategoryType(form.getCategoryType());
+    if (form.getCategoryType() != null) this.setCategoryType(form.getCategoryType());
     if (form.getStandard() != null) this.setStandard(form.getStandard());
-    if (form.getImg() != null) this.setImg(form.getImg());
-    if (form.getMaxParticipant() != null)
-      this.setMaxParticipant(form.getMaxParticipant());
-    if (form.getDescription() != null)
-      this.setDescription(form.getDescription());
+    if (form.getImg() != null) this.setImageUrl(form.getImg());
+    if (form.getMaxParticipant() != null) this.setMaxParticipant(form.getMaxParticipant());
+    if (form.getDescription() != null) this.setDescription(form.getDescription());
     if (form.getMinDeposit() != null) this.setMinDeposit(form.getMinDeposit());
     if (form.getMaxDeposit() != null) this.setMaxDeposit(form.getMaxDeposit());
     if (form.getStartDate() != null) this.setStartDate(form.getStartDate());
     if (form.getEndDate() != null) this.setEndDate(form.getEndDate());
-    this.updateAt = LocalDateTime.now();
+    this.updatedAt = LocalDateTime.now();
   }
 
   public void registration() {

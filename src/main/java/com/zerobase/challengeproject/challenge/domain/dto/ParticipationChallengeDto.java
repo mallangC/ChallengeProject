@@ -17,27 +17,27 @@ public class ParticipationChallengeDto {
     private CategoryType categoryType;
     private Long maxParticipant;
     private String description;
-    private Long min_deposit;
-    private Long max_deposit;
+    private Long minDeposit;
+    private Long maxDeposit;
     private String standard;
     private LocalDateTime startDate;
     private LocalDateTime endDate;
-    private LocalDateTime createAt;
-    private LocalDateTime updateAt;
+    private LocalDateTime createdAt;
+    private LocalDateTime updatedAt;
 
     public ParticipationChallengeDto(Challenge challenge) {
         this.id = challenge.getId();
-        this.updateAt = challenge.getUpdateAt();
-        this.createAt = challenge.getCreateAt();
+        this.updatedAt = challenge.getUpdatedAt();
+        this.createdAt = challenge.getCreatedAt();
         this.endDate = challenge.getEndDate();
         this.startDate = challenge.getStartDate();
         this.standard = challenge.getStandard();
-        this.max_deposit = challenge.getMaxDeposit();
-        this.min_deposit = challenge.getMinDeposit();
+        this.maxDeposit = challenge.getMaxDeposit();
+        this.minDeposit = challenge.getMinDeposit();
         this.description = challenge.getDescription();
         this.maxParticipant = challenge.getMaxParticipant();
         this.categoryType = challenge.getCategoryType();
-        this.img = challenge.getImg();
+        this.img = challenge.getImageUrl();
         this.title = challenge.getTitle();
     }
 }

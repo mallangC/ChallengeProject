@@ -1,5 +1,6 @@
 package com.zerobase.challengeproject.comment.service;
 
+import com.zerobase.challengeproject.HttpApiResponse;
 import com.zerobase.challengeproject.challenge.entity.Challenge;
 import com.zerobase.challengeproject.challenge.repository.ChallengeRepository;
 import com.zerobase.challengeproject.comment.domain.dto.DietChallengeDto;
@@ -78,8 +79,8 @@ public class DietChallengeService {
     DietChallenge dietChallenge = searchDietChallenge(challengeId, loginId);
     return DietChallengeDto.from(dietChallenge);
   }
-
-
+  
+  
   /**
    * 다이어트 챌린지 수정 서비스 메서드
    * (DB호출 2회) 호출 1, 업데이트 1
@@ -92,7 +93,6 @@ public class DietChallengeService {
   public DietChallengeDto updateDietChallenge(DietChallengeUpdateRequest form,
                                               String loginId) {
     DietChallenge dietChallenge = searchDietChallenge(form.getChallengeId(), loginId);
-
     if (dietChallenge.getChallenge().getStartDate().isBefore(LocalDateTime.now())) {
       throw new CustomException(ErrorCode.CANNOT_UPDATE_AFTER_START_CHALLENGE);
     }
@@ -201,7 +201,6 @@ public class DietChallengeService {
    * @param memberType 회원 권한
    * @return 삭제된 다이어트 댓글 정보
    */
-  @Transactional
   public DietCommentDto adminDeleteDietComment(Long commentId, MemberType memberType) {
     verifyMemberType(memberType);
     DietComment dietComment = seartchDietComment(commentId);

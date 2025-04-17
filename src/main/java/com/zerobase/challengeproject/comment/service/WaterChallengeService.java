@@ -119,6 +119,31 @@ public class WaterChallengeService {
     return WaterChallengeDto.fromWithoutComment(waterChallenge);
   }
 
+  /**
+   * (관리자) 물마시기 챌린지 전체 확인 서비스 메서드
+   * (DB호출 2회) 호출 2
+   *
+   * @param page        페이지 숫자
+   * @param challengeId 챌린지 아이디
+   * @param isPass      챌린지 성공 여부
+   * @param userDetails 회원 정보
+   * @return 페이징된 물마시기 챌린지
+   */
+  //물마시기 챌린지 전체 확인(관리자)(challengeId, userDetails) (DB호출 2회) 호출 2
+  public HttpApiResponse<PageDto<WaterChallengeDto>> getAllWaterChallenge(int page,
+                                                                          Long challengeId,
+                                                                          Boolean isPass,
+                                                                          UserDetailsImpl userDetails) {
+    Member member = userDetails.getMember();
+    checkAdminByMemberType(member);
+    Page<WaterChallengeDto> waterChallenges =
+            waterChallengeRepository.searchAllWaterChallengeByChallengeId(
+                    page - 1, challengeId, isPass);
+    return new HttpApiResponse<>(PageDto.from(waterChallenges),
+            "물마시기 챌린지 전체 조회를 성공했습니다."
+            , HttpStatus.OK);
+  }
+
 
   /**
    * 물마시기 챌린지 수정 서비스 메서드

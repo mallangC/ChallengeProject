@@ -18,21 +18,38 @@ public class AdminBlackListController {
 
   private final AdminBlacklistService adminBlacklistService;
 
-  /**
-   * 관리자가 회원을 블랙리스트로 등록하는 컨트롤러 메서드
-   *
-   * @param form 블랙리스트로 등록하려는 회원 로그인 아이디
-   * @return 블랙리스트 맴버 아이디
-   */
-  @PostMapping("/blacklist")
-  public ResponseEntity<HttpApiResponse> registerBlacklist(
-          @RequestBody BlackListRegisterForm form) {
-    return ResponseEntity.ok(
-            new HttpApiResponse(
-                    adminBlacklistService.registerBlacklist(form),
-                    form.getBlacklistUserLoginId() + "블랙리스트 등록 성공",
-                    HttpStatus.OK
-            )
-    );
-  }
+    /**
+     * 관리자가 회원을 블랙리스트로 등록하는 컨트롤러 메서드
+     *
+     * @param form 블랙리스트로 등록하려는 회원 로그인 아이디
+     * @return 블랙리스트 맴버 아이디
+     */
+    @PostMapping("/blacklist")
+    public ResponseEntity<HttpApiResponse> registerBlacklist(
+            @RequestBody BlackListRegisterForm form) {
+        return ResponseEntity.ok(
+                new HttpApiResponse(
+                        adminBlacklistService.registerBlacklist(form),
+                        form.getBlacklistUserLoginId() + "블랙리스트 등록 성공",
+                        HttpStatus.OK
+                )
+        );
+    }
+    /**
+     * 관리자가 회원을 블랙리스트로 해제하는 컨트롤러 메서드
+     * @param form 블랙리스트로 해제하려는 회원 로그인 아이디
+     * @return 블랙리스트가 헤제된 맴버 아이디
+     */
+    @PatchMapping("/blacklist")
+    public ResponseEntity<HttpApiPageResponse> unRegisterBlacklist(
+            @RequestBody BlackListRegisterForm form
+    ){
+        return ResponseEntity.ok(
+                new HttpApiPageResponse(
+                        adminBlacklistService.unRegisterBlacklist(form),
+                        form.getBlacklistUserLoginId() + "블랙리스트 해제 성공",
+                        HttpStatus.OK
+                )
+        );
+    }
 }
