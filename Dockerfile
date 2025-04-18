@@ -15,5 +15,4 @@ ARG JAR_FILE=build/libs/*.jar
 # 5단계: JAR 파일을 컨테이너에 복사
 COPY ${JAR_FILE} app.jar
 
-# 6단계: 애플리케이션 실행 (dockerize를 사용하여 MySQL 준비 상태까지 기다림)
-ENTRYPOINT ["dockerize", "-wait", "tcp://mysql:3306", "-timeout", "90s", "java", "-jar", "/app.jar"]
+
