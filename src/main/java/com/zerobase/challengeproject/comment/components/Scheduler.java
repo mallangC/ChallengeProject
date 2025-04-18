@@ -11,7 +11,7 @@ public class Scheduler {
 
   private final WaterChallengeService waterChallengeService;
 
-  @Scheduled(cron = "* * 0 * * *")
+  @Scheduled(cron = "0 0 0 * * *")
   public void addAllWaterChallenge(){
     waterChallengeService.addAllWaterChallenge();
   }
