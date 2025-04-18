@@ -8,8 +8,17 @@ spring:
     password: ${DB_PASSWORD}
     driver-class-name: com.mysql.cj.jdbc.Driver
 
+  flyway:
+    url: ${DB_URL}
+    user: ${DB_USERNAME}
+    password: ${DB_PASSWORD}
+    locations: classpath:db/migration
+    enabled: true
+    baseline-on-migrate: true
+    baseline-version: 0
+
   redis:
-    host: ${REDIS_HOST}
+    host: localhost
     port: 6379
 
   cache:
@@ -95,4 +104,4 @@ aws:
   access-key: ${S3_ACCESS_KEY}
   secret-key: ${S3_SECRET_KEY}
   region: ${S3_REGION}
-  cloudfrontPath: ${CLOUD_FROUNT_PATH}
+  cloudfrontPath: ${CLOUD_FRONT_PATH}
