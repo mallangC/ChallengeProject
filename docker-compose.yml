@@ -14,6 +14,11 @@ services:
       MAIL_USERNAME: ${MAIL_USERNAME}
       MAIL_PASSWORD: ${MAIL_PASSWORD}
       JWT_SECRET_KEY: ${JWT_SECRET_KEY}
+      S3_BUCKET: ${S3_BUCKET}
+      S3_ACCESS_KEY: ${S3_ACCESS_KEY}
+      S3_SECRET_KEY: ${S3_SECRET_KEY}
+      S3_REGION: ${S3_REGION}
+      CLOUD_FRONT_PATH: ${CLOUD_FRONT_PATH}
 
     depends_on:
       - redis
