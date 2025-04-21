@@ -2,7 +2,7 @@ version: '3.8'
 
 services:
   app:
-    image: myapp
+    image: ming3187/myapp
     ports:
       - "8080:8080"
     environment:
