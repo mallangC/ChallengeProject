@@ -30,7 +30,7 @@ jobs:
       S3_ACCESS_KEY: ${{ secrets.S3_ACCESS_KEY }}
       S3_SECRET_KEY: ${{ secrets.S3_SECRET_KEY }}
       S3_REGION: ${{ secrets.S3_REGION }}
-      CLOUD_FROUNT_PATH: ${{ secrets.CLOUD_FRONT_PATH }}
+      CLOUD_FRONT_PATH: ${{ secrets.CLOUD_FRONT_PATH }}
 
     steps:
       - name: Checkout code
@@ -145,7 +145,7 @@ jobs:
             S3_ACCESS_KEY=${{ secrets.S3_ACCESS_KEY }}
             S3_SECRET_KEY=${{ secrets.S3_SECRET_KEY }}
             S3_REGION=${{ secrets.S3_REGION }}
-            CLOUD_FROUNT_PATH=${{ secrets.CLOUD_FRONT_PATH }}
+            CLOUD_FRONT_PATH=${{ secrets.CLOUD_FRONT_PATH }}
             EOF
 
       - name: Deploy with docker-compose
