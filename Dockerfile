@@ -5,6 +5,9 @@ WORKDIR /app
 
 COPY . .
 
+# gradlew에 실행 권한 부여
+RUN chmod +x gradlew
+
 # JAR 빌드 (테스트는 실행하지 않음)
 RUN ./gradlew clean bootJar --no-daemon
 
@@ -25,5 +28,4 @@ COPY --from=builder /app/build/libs/*.jar app.jar
 
 # 실행 시 외부에서 프로파일 지정할 수 있도록
 ENTRYPOINT ["dockerize", "-wait", "tcp://db:3306", "-timeout", "60s", "java", "-jar", "app.jar"]
-
 
