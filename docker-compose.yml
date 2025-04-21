@@ -2,7 +2,7 @@ version: '3.8'
 
 services:
   app:
-    image: min3187/myapp
+    image: min3187/myapp:latest
     ports:
       - "8080:8080"
     environment:
@@ -28,9 +28,6 @@ services:
       - "6379:6379"
     networks:
       - app-network
-
-volumes:
-  mysql_data:
 
 networks:
   app-network:
