@@ -89,7 +89,7 @@ jobs:
   deploy:
     needs: docker_build_and_push  # test job이 먼저 실행된 후 실행
     runs-on: ubuntu-latest
-    if: github.ref == 'refs/heads/main'  # main 브랜치에 push 되었을 때만 실행
+#    if: github.ref == 'refs/heads/main'  # main 브랜치에 push 되었을 때만 실행
 
     steps:
       - name: Create .env file on EC2
