@@ -27,5 +27,5 @@ WORKDIR /app
 COPY --from=builder /app/build/libs/*.jar app.jar
 
 # 실행 시 외부에서 프로파일 지정할 수 있도록
-ENTRYPOINT ["dockerize", "-wait", "tcp:mychallenge2.cjwqcwey6bdw.ap-northeast-2.rds.amazonaws.com:3306", "-timeout", "120s", "java", "-jar", "app.jar"]
+ENTRYPOINT ["dockerize", "-wait", "tcp://mychallenge2.cjwqcwey6bdw.ap-northeast-2.rds.amazonaws.com:3306", "-timeout", "120s", "java", "-jar", "app.jar"]
 
