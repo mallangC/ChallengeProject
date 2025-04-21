@@ -92,6 +92,12 @@ jobs:
 #    if: github.ref == 'refs/heads/main'  # main 브랜치에 push 되었을 때만 실행
 
     steps:
+      - name: Checkout code
+        uses: actions/checkout@v3
+
+      - name: List files in the workspace
+        run: ls -l
+
       - name: Ensure deployment directory on EC2
         uses: appleboy/ssh-action@v1.0.0
         with:
@@ -100,9 +106,6 @@ jobs:
           key: ${{ secrets.SSH_KEY }}
           script: |
             mkdir -p ~/myapp-cd
-
-      - name: List files in the workspace
-        run: ls -l /github/workspace
 
       - name: Copy docker-compose.yml to EC2
         uses: appleboy/scp-action@v0.1.4
