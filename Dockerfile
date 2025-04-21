@@ -1,18 +1,29 @@
-# 1단계: 베이스 이미지 설정 (Ubuntu 기반 사용)
-FROM ubuntu:20.04
+# ✅ 1단계: Build stage
+FROM gradle:7.6.0-jdk17 AS builder
 
-# 2단계: JDK 설치
-RUN apt-get update && apt-get install -y openjdk-17-jdk wget curl
+WORKDIR /app
 
-# 3단계: dockerize 설치
-RUN wget https://github.com/jwilder/dockerize/releases/download/v0.6.1/dockerize-linux-amd64-v0.6.1.tar.gz \
-    && tar -xvzf dockerize-linux-amd64-v0.6.1.tar.gz \
-    && mv dockerize /usr/local/bin/
+COPY . .
 
-# 4단계: JAR 파일 경로 설정
-ARG JAR_FILE=build/libs/*.jar
+# JAR 빌드 (테스트는 실행하지 않음)
+RUN ./gradlew clean bootJar --no-daemon
 
-# 5단계: JAR 파일을 컨테이너에 복사
-COPY ${JAR_FILE} app.jar
+# ✅ 2단계: Runtime stage
+FROM openjdk:17-jdk-slim
+
+# dockerize 설치 (RDS 준비 대기용)
+RUN apt-get update && apt-get install -y wget curl \
+  && wget https://github.com/jwilder/dockerize/releases/download/v0.6.1/dockerize-linux-amd64-v0.6.1.tar.gz \
+  && tar -xvzf dockerize-linux-amd64-v0.6.1.tar.gz \
+  && mv dockerize /usr/local/bin/ \
+  && rm dockerize-linux-amd64-v0.6.1.tar.gz
+
+WORKDIR /app
+
+# 빌드된 JAR 복사
+COPY --from=builder /app/build/libs/*.jar app.jar
+
+# 실행 시 외부에서 프로파일 지정할 수 있도록
+ENTRYPOINT ["dockerize", "-wait", "tcp://db:3306", "-timeout", "60s", "java", "-jar", "app.jar"]
 
 
