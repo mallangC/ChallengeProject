@@ -2,8 +2,7 @@ version: '3.8'
 
 services:
   app:
-
-    image: min3187/challenge-final
+    build: .
     container_name: challenge-app
     ports:
       - "8080:8080"
@@ -17,18 +16,6 @@ services:
       MAIL_PASSWORD: ${MAIL_PASSWORD}
       JWT_SECRET_KEY: ${JWT_SECRET_KEY}
 
-      # ✅ OAuth 키들
-      GOOGLE_CLIENT_ID: your-google-client-id
-      GOOGLE_CLIENT_SECRET: your-google-client-secret
-      GOOGLE_REDIRECT_URI: http://your-domain.com/login/oauth2/code/google
-
-      KAKAO_CLIENT_ID: your-kakao-client-id
-      KAKAO_CLIENT_SECRET: your-kakao-client-secret
-      KAKAO_REDIRECT_URI: http://your-domain.com/login/oauth2/code/kakao
-
-      NAVER_CLIENT_ID: your-naver-client-id
-      NAVER_CLIENT_SECRET: your-naver-client-secret
-      NAVER_REDIRECT_URI: http://your-domain.com/login/oauth2/code/naver
     depends_on:
       - redis
     networks:
