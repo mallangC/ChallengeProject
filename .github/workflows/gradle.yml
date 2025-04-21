@@ -107,8 +107,9 @@ jobs:
           host: ${{ secrets.SSH_HOST }}
           username: ${{ secrets.SSH_USER }}
           key: ${{ secrets.SSH_KEY }}
-          source: "docker-compose.yml"
+          source: "./docker-compose.yml"
           target: "~/myapp-cd"
+          debug: true
 
       - name: Create .env file on EC2
         uses: appleboy/ssh-action@v1.0.0
