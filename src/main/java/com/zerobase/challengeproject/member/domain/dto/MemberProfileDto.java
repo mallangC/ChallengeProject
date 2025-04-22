@@ -12,6 +12,7 @@ public class MemberProfileDto {
     private String nickName;
     private String phoneNum;
     private String email;
+    private Long account;
 
     public MemberProfileDto (Member member) {
         this.loginId = member.getLoginId();
@@ -19,5 +20,6 @@ public class MemberProfileDto {
         this.nickName = member.getNickname();
         this.phoneNum = member.getPhoneNumber();
         this.email = member.getEmail();
+        this.account = member.getAccount();
     }
 }
