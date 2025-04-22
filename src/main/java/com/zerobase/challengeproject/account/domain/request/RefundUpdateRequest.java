@@ -11,6 +11,8 @@ import lombok.NoArgsConstructor;
 @NoArgsConstructor
 @AllArgsConstructor
 public class RefundUpdateRequest {
+  @NotBlank(message = "환불 승인 여부를 선택해주세요.")
+  private Boolean approval;
   @NotBlank(message = "환불 신청 아이디를 입력해주세요.")
   private Long refundId;
   private String content;

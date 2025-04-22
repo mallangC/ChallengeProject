@@ -26,7 +26,7 @@ public class CoteChallengeController {
 
 
   /**
-   * 날짜를 기준으로 코테 문제를 추가하는 컨트롤러 메서드
+   * 날짜 기준 코테 챌린지 추가 컨트롤러 메서드
    *
    * @param form        챌린지 아이디, 제목, 문제 링크, 날짜
    * @param userDetails 회원 정보
@@ -38,12 +38,12 @@ public class CoteChallengeController {
           @AuthenticationPrincipal UserDetailsImpl userDetails) {
     return ResponseEntity.ok(new HttpApiResponse<>(
             coteChallengeService.addCoteChallenge(form, userDetails.getUsername()),
-            "코테 챌린지 생성 성공",
+            "코테 챌린지 추가 성공",
             HttpStatus.OK));
   }
 
   /**
-   * 코테 챌린지를 단건 조회하는 컨트롤러 메서드
+   * 코테 챌린지 단건 조회 컨트롤러 메서드
    *
    * @param coteChallengeId 코테 챌린지 아이디
    * @return 댓글을 제외한 코테 챌린지의 정보
@@ -58,7 +58,7 @@ public class CoteChallengeController {
   }
 
   /**
-   * 코테 챌린지를 전체 조회하는 컨트롤러 메서드
+   * 코테 챌린지 전체 조회 컨트롤러 메서드
    *
    * @param page        페이지
    * @param challengeId 챌린지 아이디
@@ -70,12 +70,12 @@ public class CoteChallengeController {
           @RequestParam("id") Long challengeId) {
     return ResponseEntity.ok(PaginatedResponse.from(
             coteChallengeService.getAllCoteChallenge(page, challengeId),
-            "코테 챌린지 전체 조회 성공(" + page + "페이지)",
+            "코테 챌린지 전체 조회 성공",
             HttpStatus.OK));
   }
 
   /**
-   * 코테 챌린지를 수정하기 위한 컨트롤러 메서드
+   * 코테 챌린지 수정 컨트롤러 메서드
    *
    * @param form        수정할 코테 챌린지 아이디, 수정할 코테 문제, 수정할 코테 링크
    * @param userDetails 자신이 만든 챌린지 인지 확인을 위한 회원 정보
@@ -92,7 +92,7 @@ public class CoteChallengeController {
   }
 
   /**
-   * 코테 챌린지(문제) 삭제를 위한 컨트롤러 메서드
+   * 코테 챌린지 삭제 컨트롤러 메서드
    *
    * @param coteChallengeId 코테 챌린지 아이디
    * @param userDetails     자신이 만든 챌린지 인지 확인을 위한 회원 정보

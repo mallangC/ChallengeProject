@@ -3,8 +3,7 @@ package com.zerobase.challengeproject.comment.controller;
 import com.zerobase.challengeproject.HttpApiResponse;
 import com.zerobase.challengeproject.comment.domain.dto.DietChallengeDto;
 import com.zerobase.challengeproject.comment.domain.dto.DietCommentDto;
-import com.zerobase.challengeproject.comment.domain.request.DietChallengeAddRequest;
-import com.zerobase.challengeproject.comment.domain.request.DietChallengeUpdateRequest;
+import com.zerobase.challengeproject.comment.domain.request.DietChallengeRequest;
 import com.zerobase.challengeproject.comment.domain.request.DietCommentAddRequest;
 import com.zerobase.challengeproject.comment.domain.request.DietCommentUpdateRequest;
 import com.zerobase.challengeproject.comment.service.DietChallengeService;
@@ -32,11 +31,11 @@ public class DietChallengeController {
    */
   @PostMapping
   public ResponseEntity<HttpApiResponse<DietChallengeDto>> addDietChallenge(
-          @RequestBody @Valid DietChallengeAddRequest form,
+          @RequestBody @Valid DietChallengeRequest form,
           @AuthenticationPrincipal UserDetailsImpl userDetails) {
     return ResponseEntity.ok(new HttpApiResponse<>(
             dietChallengeService.addDietChallenge(form, userDetails.getMember()),
-            "다이어트 챌린지 추가를 성공했습니다.",
+            "다이어트 챌린지 추가 성공",
             HttpStatus.OK));
   }
 
@@ -53,7 +52,7 @@ public class DietChallengeController {
           @AuthenticationPrincipal UserDetailsImpl userDetails) {
     return ResponseEntity.ok(new HttpApiResponse<>(
             dietChallengeService.getDietChallenge(challengeId, userDetails.getUsername()),
-            "다이어트 챌린지 단건 조회를 성공했습니다.",
+            "다이어트 챌린지 단건 조회 성공",
             HttpStatus.OK));
   }
 
@@ -67,11 +66,11 @@ public class DietChallengeController {
    */
   @PatchMapping
   public ResponseEntity<HttpApiResponse<DietChallengeDto>> updateDietChallenge(
-          @RequestBody @Valid DietChallengeUpdateRequest form,
+          @RequestBody @Valid DietChallengeRequest form,
           @AuthenticationPrincipal UserDetailsImpl userDetails) {
     return ResponseEntity.ok(new HttpApiResponse<>(
             dietChallengeService.updateDietChallenge(form, userDetails.getUsername()),
-            "다이어트 챌린지 수정을 성공했습니다.",
+            "다이어트 챌린지 수정 성공",
             HttpStatus.OK));
   }
 
@@ -89,7 +88,7 @@ public class DietChallengeController {
           @AuthenticationPrincipal UserDetailsImpl userDetails) {
     return ResponseEntity.ok(new HttpApiResponse<>(
             dietChallengeService.addDietComment(form, userDetails.getMember()),
-            "다이어트 댓글 추가를 성공했습니다.",
+            "다이어트 댓글 추가 성공",
             HttpStatus.OK));
   }
 
@@ -104,7 +103,7 @@ public class DietChallengeController {
           @PathVariable Long commentId) {
     return ResponseEntity.ok(new HttpApiResponse<>(
             dietChallengeService.getDietComment(commentId),
-            "다이어트 댓글 조회를 성공했습니다.",
+            "다이어트 댓글 조회 성공",
             HttpStatus.OK));
   }
 
@@ -121,7 +120,7 @@ public class DietChallengeController {
           @AuthenticationPrincipal UserDetailsImpl userDetails) {
     return ResponseEntity.ok(new HttpApiResponse<>(
             dietChallengeService.updateDietComment(form, userDetails.getMember()),
-            "다이어트 댓글 수정을 성공했습니다.",
+            "다이어트 댓글 수정 성공",
             HttpStatus.OK));
   }
 
@@ -139,7 +138,7 @@ public class DietChallengeController {
           @AuthenticationPrincipal UserDetailsImpl userDetails) {
     return ResponseEntity.ok(new HttpApiResponse<>(
             dietChallengeService.deleteDietComment(commentId, userDetails.getMember()),
-            "다이어트 댓글 삭제를 성공했습니다.",
+            "다이어트 댓글 삭제 성공",
             HttpStatus.OK));
   }
 

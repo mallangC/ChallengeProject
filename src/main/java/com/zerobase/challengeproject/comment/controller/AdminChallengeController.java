@@ -36,7 +36,7 @@ public class AdminChallengeController {
     return ResponseEntity.ok(new HttpApiResponse<>(
             coteChallengeService.adminDeleteComment(commentId,
                     userDetails.getMember().getMemberType()),
-            "관리자 권한으로 인증 댓글 삭제를 성공했습니다.",
+            "관리자 코테 댓글 삭제 성공",
             HttpStatus.OK));
   }
 
@@ -56,7 +56,7 @@ public class AdminChallengeController {
     return ResponseEntity.ok(PaginatedResponse.from(
             dietChallengeService.getAllDietChallenge(page, challengeId, isPass,
                     userDetails.getMember().getMemberType()),
-            "다이어트 챌린지 전체 조회를 성공했습니다.(" + page + "페이지)",
+            "관리자 다이어트 챌린지 전체 조회 성공",
             HttpStatus.OK));
   }
 
@@ -74,7 +74,7 @@ public class AdminChallengeController {
     return ResponseEntity.ok(new HttpApiResponse<>(
             dietChallengeService.adminDeleteDietComment(commentId,
                     userDetails.getMember().getMemberType()),
-            "관리자 권한으로 다이어트 댓글 삭제를 성공했습니다.",
+            "관리자 다이어트 댓글 삭제 성공",
             HttpStatus.OK));
   }
 
@@ -98,7 +98,7 @@ public class AdminChallengeController {
             waterChallengeService
                     .getAllWaterChallenge(page, challengeId, isPass,
                             userDetails.getMember().getMemberType()),
-            "물마시기 챌린지 전체 조회를 성공했습니다.",
+            "관리자 물마시기 챌린지 전체 조회 성공",
             HttpStatus.OK));
   }
 
@@ -117,7 +117,7 @@ public class AdminChallengeController {
     return ResponseEntity.ok(new HttpApiResponse<>(
             waterChallengeService.adminDeleteWaterComment(commentId,
                     userDetails.getMember().getMemberType()),
-            "물마시기 댓글 삭제를 성공했습니다.",
+            "관리자 물마시기 댓글 삭제 성공",
             HttpStatus.OK));
   }
 

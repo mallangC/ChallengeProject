@@ -1,6 +1,5 @@
 package com.zerobase.challengeproject.comment.service;
 
-import com.zerobase.challengeproject.HttpApiResponse;
 import com.zerobase.challengeproject.challenge.entity.Challenge;
 import com.zerobase.challengeproject.challenge.repository.ChallengeRepository;
 import com.zerobase.challengeproject.comment.domain.dto.CoteChallengeDto;
@@ -47,9 +46,7 @@ public class CoteChallengeService {
    * @param loginId 로그인 아이디
    * @return 추가한 코테 챌린지 정보
    */
-  public CoteChallengeDto addCoteChallenge(
-          CoteChallengeRequest form,
-          String loginId) {
+  public CoteChallengeDto addCoteChallenge(CoteChallengeRequest form, String loginId) {
     Challenge challenge = challengeRepository.
             searchChallengeWithCoteChallengeById(form.getChallengeId())
             .orElseThrow(() -> new CustomException(ErrorCode.NOT_FOUND_CHALLENGE));

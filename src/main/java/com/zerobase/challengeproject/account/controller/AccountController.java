@@ -10,7 +10,6 @@ import com.zerobase.challengeproject.account.domain.request.RefundSearchRequest;
 import com.zerobase.challengeproject.account.domain.request.RefundUpdateRequest;
 import com.zerobase.challengeproject.account.service.AccountService;
 import com.zerobase.challengeproject.member.components.jwt.UserDetailsImpl;
-import com.zerobase.challengeproject.member.domain.dto.MemberDto;
 import com.zerobase.challengeproject.member.entity.Member;
 import jakarta.validation.Valid;
 import jakarta.validation.constraints.Min;
@@ -28,14 +27,6 @@ import org.springframework.web.bind.annotation.*;
 public class AccountController {
 
   private final AccountService accountService;
-
-  /**
-   * 회원 조회(계좌 확인을 위해 구현)
-   */
-  @GetMapping("/member")
-  public ResponseEntity<MemberDto> getAccountDetail(@AuthenticationPrincipal UserDetailsImpl userDetails) {
-    return ResponseEntity.ok(accountService.getMember(userDetails));
-  }
 
   /**
    * 회원 계좌에 금액 충전
@@ -62,7 +53,7 @@ public class AccountController {
             accountService.getAllAccounts(page, userDetails.getUsername());
     return ResponseEntity.ok(PaginatedResponse.from(
             accountDetailList,
-            "계좌 내역 조회 성공(" + page + "페이지)",
+            "계좌 내역 조회 성공",
             HttpStatus.OK));
   }
 
@@ -80,6 +71,7 @@ public class AccountController {
             HttpStatus.OK));
   }
 
+
   /**
    * 회원의 환불 신청 확인
    */
@@ -89,7 +81,7 @@ public class AccountController {
           @AuthenticationPrincipal UserDetailsImpl userDetails) {
     return ResponseEntity.ok(PaginatedResponse.from(
             accountService.getAllRefund(page, userDetails.getUsername()),
-            "회원 환불신청 조회 성공(" + page + "페이지)",
+            "회원 환불 신청 조회 성공",
             HttpStatus.OK));
   }
 
@@ -103,7 +95,7 @@ public class AccountController {
           @AuthenticationPrincipal UserDetailsImpl userDetails) {
     return ResponseEntity.ok(new HttpApiResponse<>(
             accountService.cancelRefund(refundId, userDetails.getUsername()),
-            "환불 신청을 취소했습니다.",
+            "환불 신청 취소",
             HttpStatus.OK));
   }
 
@@ -118,7 +110,7 @@ public class AccountController {
           @RequestBody RefundSearchRequest form) {
     return ResponseEntity.ok(PaginatedResponse.from(
             accountService.getAllRefundForAdmin(page, form),
-            "환불 신청 조회에 성공했습니다.(" + page + "페이지)",
+            "관리자 환불 신청 조회 성공",
             HttpStatus.OK));
   }
 
@@ -129,19 +121,12 @@ public class AccountController {
   @Secured("ADMIN")
   @PatchMapping("/refund/admin")
   public ResponseEntity<HttpApiResponse<RefundDto>> refundApprovalForAdmin(
-          @RequestParam boolean approval,
           @RequestBody RefundUpdateRequest form) {
-    if (approval) {
-      return ResponseEntity.ok(new HttpApiResponse<>(
-              accountService.refundDecision(true, form),
-              "환불 승인 성공",
-              HttpStatus.OK));
-    } else {
-      return ResponseEntity.ok(new HttpApiResponse<>(
-              accountService.refundDecision(false, form),
-              "환불 비승인 성공",
-              HttpStatus.OK));
-    }
+    String message = form.getApproval() ? "관리자 환불 승인 성공" : "관리자 환불 비승인 성공";
+    return ResponseEntity.ok(new HttpApiResponse<>(
+            accountService.refundDecision(form),
+            message,
+            HttpStatus.OK));
   }
 
 

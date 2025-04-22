@@ -12,8 +12,6 @@ import com.zerobase.challengeproject.account.repository.AccountDetailRepository;
 import com.zerobase.challengeproject.account.repository.RefundRepository;
 import com.zerobase.challengeproject.exception.CustomException;
 import com.zerobase.challengeproject.exception.ErrorCode;
-import com.zerobase.challengeproject.member.components.jwt.UserDetailsImpl;
-import com.zerobase.challengeproject.member.domain.dto.MemberDto;
 import com.zerobase.challengeproject.member.entity.Member;
 import com.zerobase.challengeproject.member.repository.MemberRepository;
 import com.zerobase.challengeproject.type.AccountType;
@@ -32,12 +30,6 @@ public class AccountService {
   private final MemberRepository memberRepository;
   private final AccountDetailRepository accountDetailRepository;
   private final RefundRepository refundRepository;
-
-  public MemberDto getMember(UserDetailsImpl userDetails) {
-    return MemberDto.fromWithoutAccountDetails(
-            memberRepository.findByLoginId(userDetails.getUsername())
-                    .orElseThrow(() -> new CustomException(ErrorCode.NOT_FOUND_MEMBER)));
-  }
 
   /**
    * 회원이 금액을 충전하기 위한 서비스 메서드
@@ -148,7 +140,7 @@ public class AccountService {
    */
   public Page<RefundDto> getAllRefundForAdmin(int page, RefundSearchRequest form) {
     Page<Refund> refunds = refundRepository.searchAllRefund(
-            page - 1, form.getStartAtStr(), form.getDone(), form.getRefunded());
+            page - 1, form.getStartAt(), form.getDone(), form.getRefunded());
 
     List<RefundDto> refundDtos = refunds.stream()
             .map(RefundDto::from)
@@ -168,12 +160,11 @@ public class AccountService {
    * 비승인시
    * Refund에 isDone = true, adminContent에 form에 있는 content로 변경
    *
-   * @param approval 승인/ 비승인 확인
-   * @param form     환불 신청한 아이디,
+   * @param form 환불 승인 여부 ,환불 신청 아이디, 환불 승인/비승인 사유
    * @return updateAt을 제외한 모든 환불 내역
    */
   @Transactional
-  public RefundDto refundDecision(boolean approval, RefundUpdateRequest form) {
+  public RefundDto refundDecision(RefundUpdateRequest form) {
     Refund refund = refundRepository.searchRefundById(form.getRefundId())
             .orElseThrow(() -> new CustomException(ErrorCode.ALREADY_REFUND_REQUEST));
     verifyRefundDetail(refund);
@@ -181,7 +172,7 @@ public class AccountService {
     if (accountDetail.getAccountType() != AccountType.CHARGE) {
       throw new CustomException(ErrorCode.NOT_CHARGE_DETAIL);
     }
-    if (approval) {
+    if (form.getApproval()) {
       Member member = memberRepository.searchByLoginIdAndAccountDetailsToDate(
                       refund.getMember().getLoginId(),
                       accountDetail.getCreatedAt())

@@ -14,7 +14,7 @@ public class CoteChallengeDto {
   private Long id;
   private Long challengeId;
   private String title;
-  private String question;
+  private String questionUrl;
   private LocalDateTime startAt;
   private List<CoteCommentDto> comments;
 
@@ -23,7 +23,7 @@ public class CoteChallengeDto {
             .id(coteChallenge.getId())
             .challengeId(coteChallenge.getId())
             .title(coteChallenge.getTitle())
-            .question(coteChallenge.getQuestion())
+            .questionUrl(coteChallenge.getQuestionUrl())
             .startAt(coteChallenge.getStartAt())
             .comments(coteChallenge.getComments().stream()
                     .map(CoteCommentDto::from)
@@ -36,7 +36,7 @@ public class CoteChallengeDto {
             .id(coteChallenge.getId())
             .challengeId(coteChallenge.getId())
             .title(coteChallenge.getTitle())
-            .question(coteChallenge.getQuestion())
+            .questionUrl(coteChallenge.getQuestionUrl())
             .startAt(coteChallenge.getStartAt())
             .comments(new ArrayList<>())
             .build();

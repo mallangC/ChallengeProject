@@ -54,7 +54,6 @@ spring:
             scope:
               - email
               - profile
-
           kakao:
             client-id: ${KAKAO_CLIENT_ID}
             client-secret: ${KAKAO_CLIENT_SECRET}

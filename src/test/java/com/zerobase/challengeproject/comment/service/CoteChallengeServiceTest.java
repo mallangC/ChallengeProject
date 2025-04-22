@@ -94,7 +94,7 @@ class CoteChallengeServiceTest {
           .id(1L)
           .challenge(challengeBase)
           .title(faker.lorem().sentence(5))
-          .question(faker.internet().url())
+          .questionUrl(faker.internet().url())
           .startAt(startAt)
           .comments(List.of(CoteComment.builder()
                   .id(1L)
@@ -139,7 +139,7 @@ class CoteChallengeServiceTest {
     CoteChallengeRequest form = CoteChallengeRequest.builder()
             .challengeId(1L)
             .title(faker.name().username())
-            .question(faker.name().username())
+            .questionUrl(faker.name().username())
             .startAt(startAt.plusDays(1))
             .build();
     //when
@@ -148,7 +148,7 @@ class CoteChallengeServiceTest {
     //then
     assertEquals(startAt.plusDays(1).toLocalDate(), result.getStartAt().toLocalDate());
     assertEquals(form.getTitle(), result.getTitle());
-    assertEquals(form.getQuestion(), result.getQuestion());
+    assertEquals(form.getQuestionUrl(), result.getQuestionUrl());
     verify(coteChallengeRepository, times(1)).save(any());
   }
 
@@ -162,7 +162,7 @@ class CoteChallengeServiceTest {
     CoteChallengeRequest form = CoteChallengeRequest.builder()
             .challengeId(1L)
             .title(faker.lorem().sentence(5))
-            .question(faker.internet().url())
+            .questionUrl(faker.internet().url())
             .startAt(startAt)
             .build();
     //when
@@ -200,7 +200,7 @@ class CoteChallengeServiceTest {
     CoteChallengeRequest form = CoteChallengeRequest.builder()
             .challengeId(1L)
             .title(faker.lorem().sentence(5))
-            .question(faker.internet().url())
+            .questionUrl(faker.internet().url())
             .startAt(startAt)
             .build();
     //when
@@ -237,7 +237,7 @@ class CoteChallengeServiceTest {
     CoteChallengeRequest form = CoteChallengeRequest.builder()
             .challengeId(1L)
             .title(faker.lorem().sentence(5))
-            .question(faker.internet().url())
+            .questionUrl(faker.internet().url())
             .startAt(LocalDateTime.now().plusMonths(2))
             .build();
     //when
@@ -274,7 +274,7 @@ class CoteChallengeServiceTest {
     CoteChallengeRequest form = CoteChallengeRequest.builder()
             .challengeId(1L)
             .title(faker.lorem().sentence(5))
-            .question(faker.internet().url())
+            .questionUrl(faker.internet().url())
             .startAt(startAt)
             .build();
     //when
@@ -299,7 +299,7 @@ class CoteChallengeServiceTest {
     assertEquals(1L, result.getChallengeId());
     assertEquals(1L, result.getId());
     assertEquals(coteChallengeBase.getTitle(), result.getTitle());
-    assertEquals(coteChallengeBase.getQuestion(), result.getQuestion());
+    assertEquals(coteChallengeBase.getQuestionUrl(), result.getQuestionUrl());
   }
 
   @Test
@@ -326,7 +326,7 @@ class CoteChallengeServiceTest {
     CoteChallengeUpdateRequest form = CoteChallengeUpdateRequest.builder()
             .coteChallengeId(1L)
             .title(faker.name().username())
-            .question(faker.name().username())
+            .questionUrl(faker.name().username())
             .build();
     //when
     CoteChallengeDto result =
@@ -334,7 +334,7 @@ class CoteChallengeServiceTest {
     //then
     assertEquals(1L, result.getChallengeId());
     assertEquals(form.getTitle(), result.getTitle());
-    assertEquals(form.getQuestion(), result.getQuestion());
+    assertEquals(form.getQuestionUrl(), result.getQuestionUrl());
   }
 
   @Test
@@ -345,7 +345,7 @@ class CoteChallengeServiceTest {
             .willReturn(Optional.ofNullable(CoteChallenge.builder()
                     .id(1L)
                     .title(faker.name().username())
-                    .question(faker.name().username())
+                    .questionUrl(faker.name().username())
                     .startAt(startAt)
                     .challenge(badChallenge)
                     .build()));
@@ -353,7 +353,7 @@ class CoteChallengeServiceTest {
     CoteChallengeUpdateRequest form = CoteChallengeUpdateRequest.builder()
             .coteChallengeId(1L)
             .title(faker.name().username())
-            .question(faker.name().username())
+            .questionUrl(faker.name().username())
             .build();
     //when
 
@@ -372,7 +372,7 @@ class CoteChallengeServiceTest {
             .id(1L)
             .challenge(challengeBase)
             .title(faker.name().username())
-            .question(faker.name().username())
+            .questionUrl(faker.name().username())
             .startAt(startAt)
             .comments(new ArrayList<>())
             .build();
@@ -388,7 +388,7 @@ class CoteChallengeServiceTest {
     assertEquals(1L, result.getId());
     assertEquals(1L, result.getChallengeId());
     assertEquals(cote.getTitle(), result.getTitle());
-    assertEquals(cote.getQuestion(), result.getQuestion());
+    assertEquals(cote.getQuestionUrl(), result.getQuestionUrl());
     assertEquals(startAt, result.getStartAt());
   }
 
@@ -420,7 +420,7 @@ class CoteChallengeServiceTest {
                             .coteChallenges(new ArrayList<>())
                             .build())
                     .title(faker.name().username())
-                    .question(faker.name().username())
+                    .questionUrl(faker.name().username())
                     .startAt(startAt)
                     .comments(new ArrayList<>())
                     .build()));
@@ -453,7 +453,7 @@ class CoteChallengeServiceTest {
             .id(1L)
             .challenge(challengeBase)
             .title(faker.name().username())
-            .question(faker.name().username())
+            .questionUrl(faker.name().username())
             .startAt(startAt.plusMonths(1).minusDays(20))
             .comments(new ArrayList<>())
             .build();
@@ -496,7 +496,7 @@ class CoteChallengeServiceTest {
             .id(1L)
             .challenge(challengeBase)
             .title(faker.name().username())
-            .question(faker.name().username())
+            .questionUrl(faker.name().username())
             .startAt(startAt.plusMonths(1).minusDays(20))
             .comments(new ArrayList<>())
             .build();

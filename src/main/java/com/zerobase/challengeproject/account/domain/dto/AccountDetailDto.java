@@ -14,23 +14,25 @@ import java.time.LocalDateTime;
 @AllArgsConstructor
 @Builder
 public class AccountDetailDto {
-  private String memberId;
+  private Long id;
+  private String loginId;
   private AccountType accountType;
   private boolean isRefunded;
   private Long preAmount;
   private Long curAmount;
   private Long amount;
-  private LocalDateTime chargeDate;
+  private LocalDateTime createdAt;
 
   public static AccountDetailDto from(AccountDetail detail) {
     return AccountDetailDto.builder()
-            .memberId(detail.getMember().getLoginId())
+            .id(detail.getId())
+            .loginId(detail.getMember().getLoginId())
             .isRefunded(detail.isRefunded())
-            .preAmount(detail.getPreAmount())
-            .curAmount(detail.getCurAmount())
+            .preAmount(detail.getPreviousAmount())
+            .curAmount(detail.getCurrentAmount())
             .amount(detail.getAmount())
             .accountType(detail.getAccountType())
-            .chargeDate(detail.getCreatedAt())
+            .createdAt(detail.getCreatedAt())
             .build();
   }
 }

@@ -52,4 +52,8 @@ public class DietComment extends BaseEntity {
     this.content = form.getContent();
   }
 
+  public void updateImageUrl(String imageUrl) {
+    this.imageUrl = imageUrl;
+  }
+
 }

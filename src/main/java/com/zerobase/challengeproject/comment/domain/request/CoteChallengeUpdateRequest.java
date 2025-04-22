@@ -17,5 +17,5 @@ public class CoteChallengeUpdateRequest {
   @NotBlank(message = "코테 문제의 제목 입력해주세요")
   private String title;
   @NotBlank(message = "코테 문제의 링크를 입력해주세요")
-  private String question;
+  private String questionUrl;
 }

@@ -1,6 +1,5 @@
 package com.zerobase.challengeproject.account.entity;
 
-import com.zerobase.challengeproject.challenge.entity.MemberChallenge;
 import com.zerobase.challengeproject.member.entity.Member;
 import com.zerobase.challengeproject.type.AccountType;
 import jakarta.persistence.*;
@@ -22,9 +21,9 @@ public class AccountDetail extends BaseEntity {
   @JoinColumn(name = "member_id")
   private Member member;
   @Column(nullable = false)
-  private Long preAmount; //이전 금액
+  private Long previousAmount; //이전 금액
   @Column(nullable = false)
-  private Long curAmount; //충전, 환불 이후 금액
+  private Long currentAmount; //충전, 환불 이후 금액
   @Column(nullable = false)
   private Long amount; //충전, 환불한 금액
   @Column(nullable = false)
@@ -36,8 +35,8 @@ public class AccountDetail extends BaseEntity {
   public static AccountDetail charge(Member member, Long amount){
     return AccountDetail.builder()
             .member(member)
-            .preAmount(member.getAccount())
-            .curAmount(member.getAccount() + amount)
+            .previousAmount(member.getAccount())
+            .currentAmount(member.getAccount() + amount)
             .amount(amount)
             .accountType(AccountType.CHARGE)
             .isRefunded(false)
@@ -47,8 +46,8 @@ public class AccountDetail extends BaseEntity {
   public static AccountDetail refund(Member member, Long amount){
     return AccountDetail.builder()
             .member(member)
-            .preAmount(member.getAccount())
-            .curAmount(member.getAccount() - amount)
+            .previousAmount(member.getAccount())
+            .currentAmount(member.getAccount() - amount)
             .amount(amount)
             .accountType(AccountType.REFUND)
             .isRefunded(false)
@@ -58,8 +57,8 @@ public class AccountDetail extends BaseEntity {
   public static AccountDetail deposit(Member member, Long amount){
     return AccountDetail.builder()
             .member(member)
-            .preAmount(member.getAccount())
-            .curAmount(member.getAccount() - amount)
+            .previousAmount(member.getAccount())
+            .currentAmount(member.getAccount() - amount)
             .amount(amount)
             .accountType(AccountType.DEPOSIT)
             .isRefunded(false)
@@ -69,15 +68,15 @@ public class AccountDetail extends BaseEntity {
   public static AccountDetail depositBack(Member member, Long amount){
     return AccountDetail.builder()
             .member(member)
-            .preAmount(member.getAccount())
-            .curAmount(member.getAccount() + amount)
+            .previousAmount(member.getAccount())
+            .currentAmount(member.getAccount() + amount)
             .amount(amount)
             .accountType(AccountType.DEPOSIT_BACK)
             .isRefunded(false)
             .build();
   }
 
-  public void refundTrue(){
+  public void isRefundedTrue(){
     this.isRefunded = true;
   }
 
