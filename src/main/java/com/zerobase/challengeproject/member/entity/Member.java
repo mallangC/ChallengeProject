@@ -133,7 +133,7 @@ public class Member {
         } else if (detail.isRefunded()) {
             throw new CustomException(ErrorCode.ALREADY_REFUNDED);
         }
-        detail.refundTrue();
+        detail.isRefundedTrue();
         refund.approveRefund();
         this.account -= detail.getAmount();
     }

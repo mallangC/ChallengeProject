@@ -1,6 +1,5 @@
 package com.zerobase.challengeproject.comment.service;
 
-import com.zerobase.challengeproject.HttpApiResponse;
 import com.zerobase.challengeproject.challenge.entity.Challenge;
 import com.zerobase.challengeproject.challenge.repository.ChallengeRepository;
 import com.zerobase.challengeproject.comment.domain.dto.CoteChallengeDto;

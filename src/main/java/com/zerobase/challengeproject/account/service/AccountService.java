@@ -160,8 +160,7 @@ public class AccountService {
    * 비승인시
    * Refund에 isDone = true, adminContent에 form에 있는 content로 변경
    *
-   * @param approval 승인/ 비승인 확인
-   * @param form     환불 신청한 아이디,
+   * @param form 환불 승인 여부 ,환불 신청 아이디, 환불 승인/비승인 사유
    * @return updateAt을 제외한 모든 환불 내역
    */
   @Transactional

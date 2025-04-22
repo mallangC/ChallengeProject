@@ -150,8 +150,8 @@ class AccountServiceTest {
                     .id(1L)
                     .accountType(AccountType.CHARGE)
                     .isRefunded(false)
-                    .preAmount(5000L)
-                    .curAmount(5000L)
+                    .previousAmount(5000L)
+                    .currentAmount(5000L)
                     .build())
             .memberContent("환불 사유")
             .adminContent(null)
@@ -263,12 +263,13 @@ class AccountServiceTest {
             .willReturn(Optional.ofNullable(memberSearch));
 
     RefundUpdateRequest refundUpdateRequest = RefundUpdateRequest.builder()
+            .approval(true)
             .refundId(1L)
             .content("환불 완료")
             .build();
 
     //when
-    RefundDto result = accountService.refundDecision(true, refundUpdateRequest);
+    RefundDto result = accountService.refundDecision( refundUpdateRequest);
 
     //then
     assertEquals(1L, result.getId());
@@ -295,12 +296,13 @@ class AccountServiceTest {
                     .build()));
 
     RefundUpdateRequest refundUpdateRequest = RefundUpdateRequest.builder()
+            .approval(false)
             .refundId(1L)
             .content("이미 사용한 금액은 환불할 수 없습니다.")
             .build();
 
     //when
-    RefundDto result = accountService.refundDecision(false, refundUpdateRequest);
+    RefundDto result = accountService.refundDecision(refundUpdateRequest);
 
     //then
     assertEquals(1L, result.getId());
@@ -331,13 +333,14 @@ class AccountServiceTest {
                     .build()));
 
     RefundUpdateRequest refundUpdateRequest = RefundUpdateRequest.builder()
+            .approval(false)
             .refundId(1L)
             .content("이미 사용한 금액은 환불할 수 없습니다.")
             .build();
 
     //when
     CustomException exception = assertThrows(CustomException.class, () ->
-            accountService.refundDecision(false, refundUpdateRequest));
+            accountService.refundDecision(refundUpdateRequest));
 
     //then
     assertEquals(NOT_CHARGE_DETAIL, exception.getErrorCode());

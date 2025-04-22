@@ -236,7 +236,20 @@ class DietChallengeServiceTest {
   void updateDietChallenge() {
     //given
     given(dietChallengeRepository.searchDietChallengeByChallengeIdAndLoginId(anyLong(), anyString()))
-            .willReturn(Optional.ofNullable(dietChallengeBase));
+            .willReturn(Optional.ofNullable(DietChallenge.builder()
+                    .id(1L)
+                    .member(memberBase)
+                    .challenge(challengeBase)
+                    .goalWeight(67.3f)
+                    .currentWeight(50.2f)
+                    .comments(List.of(DietComment.builder()
+                            .id(1L)
+                            .dietChallenge(dietChallengeBase)
+                            .imageUrl(faker.internet().url())
+                            .member(memberBase)
+                            .content("참여 인증")
+                            .build()))
+                    .build()));
 
     DietChallengeRequest form = DietChallengeRequest.builder()
             .challengeId(1L)
