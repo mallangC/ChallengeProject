@@ -69,7 +69,7 @@ public class MemberSignupService {
         String subject = "ZerobaseChallenge에 가입해 주셔서 감사합니다";
         String text = "<p>ZerobaseChallenge 사이트 가입을 축하드립니다.</p>" +
                 "<p>아래 링크를 클릭하셔서 가입을 완료하세요.</p>"
-                + "<div><a href='http://localhost:8080/api/member/email-auth?id="
+                + "<div><a href='http://3.38.222.5:8080/api/member/email-auth?id="
                 + emailAuthKey +
                 "'>클릭하여 이메일 인증 완료 하기</a></div>";
         mailComponents.send(email, subject, text);

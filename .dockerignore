@@ -1,0 +1,17 @@
+# Gradle build files
+.gradle/
+build/
+
+# Git 관련 파일
+.git/
+.gitmodules
+
+# Node.js (혹시 frontend 작업 시)
+node_modules/
+
+# IDE 설정 (IntelliJ, VSCode 등)
+.idea/
+.vscode/
+
+# 기타 환경 파일
+*.log

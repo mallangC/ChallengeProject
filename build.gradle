@@ -100,3 +100,8 @@ tasks.named('test') {
     jvmArgs "-Xshare:off"
 }
 
+jar {
+    archiveBaseName.set("app")
+    archiveVersion.set("")
+    archiveClassifier.set("")
+}
