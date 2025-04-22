@@ -140,7 +140,7 @@ public class AccountService {
    */
   public Page<RefundDto> getAllRefundForAdmin(int page, RefundSearchRequest form) {
     Page<Refund> refunds = refundRepository.searchAllRefund(
-            page - 1, form.getStartAtStr(), form.getDone(), form.getRefunded());
+            page - 1, form.getStartAt(), form.getDone(), form.getRefunded());
 
     List<RefundDto> refundDtos = refunds.stream()
             .map(RefundDto::from)
@@ -165,7 +165,7 @@ public class AccountService {
    * @return updateAt을 제외한 모든 환불 내역
    */
   @Transactional
-  public RefundDto refundDecision(boolean approval, RefundUpdateRequest form) {
+  public RefundDto refundDecision(RefundUpdateRequest form) {
     Refund refund = refundRepository.searchRefundById(form.getRefundId())
             .orElseThrow(() -> new CustomException(ErrorCode.ALREADY_REFUND_REQUEST));
     verifyRefundDetail(refund);
@@ -173,7 +173,7 @@ public class AccountService {
     if (accountDetail.getAccountType() != AccountType.CHARGE) {
       throw new CustomException(ErrorCode.NOT_CHARGE_DETAIL);
     }
-    if (approval) {
+    if (form.getApproval()) {
       Member member = memberRepository.searchByLoginIdAndAccountDetailsToDate(
                       refund.getMember().getLoginId(),
                       accountDetail.getCreatedAt())

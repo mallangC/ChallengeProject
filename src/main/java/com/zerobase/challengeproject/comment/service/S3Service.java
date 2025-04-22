@@ -51,12 +51,12 @@ public class S3Service {
     return cloudfrontPath + newFileName;
   }
 
-  public void deleteFile(String fileName) {
+  public void deleteFile(String imageUrl) {
     //클라우드 프론트 주소를 제외하고 UUID+파일이름 가져오기
-    String newFileName = fileName.substring(38);
+    String fileName = imageUrl.substring(38);
     DeleteObjectRequest deleteObjectRequest = DeleteObjectRequest.builder()
             .bucket(bucketName)
-            .key(keyPrefix + newFileName)
+            .key(keyPrefix + fileName)
             .build();
     s3Client.deleteObject(deleteObjectRequest);
   }

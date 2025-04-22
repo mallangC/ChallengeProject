@@ -130,7 +130,7 @@ public class WaterChallengeController {
    * @param userDetails 회원 정보
    * @return 삭제된 물마시기 댓글 정보
    */
-  @DeleteMapping("/{commentId}")
+  @DeleteMapping("/comment/{commentId}")
   public ResponseEntity<HttpApiResponse<WaterCommentDto>> deleteWaterComment(
           @PathVariable Long commentId,
           @AuthenticationPrincipal UserDetailsImpl userDetails) {

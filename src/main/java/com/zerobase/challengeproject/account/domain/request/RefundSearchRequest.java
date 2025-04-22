@@ -12,7 +12,7 @@ import java.time.LocalDateTime;
 @NoArgsConstructor
 @AllArgsConstructor
 public class RefundSearchRequest {
-  private LocalDateTime startAtStr;
+  private LocalDateTime startAt;
   private Boolean done;
   private Boolean refunded;
 }

@@ -1,12 +1,10 @@
 package com.zerobase.challengeproject.comment.service;
 
-import com.zerobase.challengeproject.HttpApiResponse;
 import com.zerobase.challengeproject.challenge.entity.Challenge;
 import com.zerobase.challengeproject.challenge.repository.ChallengeRepository;
 import com.zerobase.challengeproject.comment.domain.dto.DietChallengeDto;
 import com.zerobase.challengeproject.comment.domain.dto.DietCommentDto;
-import com.zerobase.challengeproject.comment.domain.request.DietChallengeAddRequest;
-import com.zerobase.challengeproject.comment.domain.request.DietChallengeUpdateRequest;
+import com.zerobase.challengeproject.comment.domain.request.DietChallengeRequest;
 import com.zerobase.challengeproject.comment.domain.request.DietCommentAddRequest;
 import com.zerobase.challengeproject.comment.domain.request.DietCommentUpdateRequest;
 import com.zerobase.challengeproject.comment.entity.DietChallenge;
@@ -46,7 +44,7 @@ public class DietChallengeService {
    * @param member 회원 객체
    * @return 다이어트 챌린지 정보
    */
-  public DietChallengeDto addDietChallenge(DietChallengeAddRequest form,
+  public DietChallengeDto addDietChallenge(DietChallengeRequest form,
                                            Member member) {
     Challenge challenge = challengeRepository.searchChallengeWithDietChallengeById(form.getChallengeId())
             .orElseThrow(() -> new CustomException(ErrorCode.NOT_FOUND_CHALLENGE));
@@ -90,13 +88,14 @@ public class DietChallengeService {
    * @return 수정된 다이어트 챌린지 정보
    */
   @Transactional
-  public DietChallengeDto updateDietChallenge(DietChallengeUpdateRequest form,
+  public DietChallengeDto updateDietChallenge(DietChallengeRequest form,
                                               String loginId) {
     DietChallenge dietChallenge = searchDietChallenge(form.getChallengeId(), loginId);
     if (dietChallenge.getChallenge().getStartDate().isBefore(LocalDateTime.now())) {
       throw new CustomException(ErrorCode.CANNOT_UPDATE_AFTER_START_CHALLENGE);
     }
     dietChallenge.update(form);
+    dietChallenge.getComments().get(0).updateImageUrl(form.getImageUrl());
     return DietChallengeDto.from(dietChallenge);
   }
 

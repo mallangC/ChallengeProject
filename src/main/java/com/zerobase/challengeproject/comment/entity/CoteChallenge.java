@@ -28,7 +28,7 @@ public class CoteChallenge {
   @Column(nullable = false)
   private String title;
   @Column(nullable = false)
-  private String question;
+  private String questionUrl;
   @Column(nullable = false)
   private LocalDateTime startAt;
   @OneToMany(mappedBy = "coteChallenge", fetch = FetchType.LAZY)
@@ -38,7 +38,7 @@ public class CoteChallenge {
     return CoteChallenge.builder()
             .challenge(challenge)
             .title(form.getTitle())
-            .question(form.getQuestion())
+            .questionUrl(form.getQuestionUrl())
             .startAt(form.getStartAt())
             .comments(new ArrayList<>())
             .build();
@@ -46,7 +46,7 @@ public class CoteChallenge {
 
   public void update(CoteChallengeUpdateRequest form) {
     this.title = form.getTitle();
-    this.question = form.getQuestion();
+    this.questionUrl = form.getQuestionUrl();
   }
 
 }

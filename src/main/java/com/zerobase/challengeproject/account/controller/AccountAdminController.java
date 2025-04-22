@@ -41,11 +41,10 @@ public class AccountAdminController {
   @PreAuthorize("hasRole('ROLE_ADMIN')")
   @PatchMapping("/refund")
   public ResponseEntity<HttpApiResponse<RefundDto>> refundApproval(
-          @RequestParam boolean approval,
           @RequestBody RefundUpdateRequest form) {
-    String decision = approval ? "승인" : "비승인";
+    String decision = form.getApproval() ? "승인" : "비승인";
     return ResponseEntity.ok(new HttpApiResponse<>(
-            accountService.refundDecision(approval, form),
+            accountService.refundDecision(form),
             "환불 " + decision + " 성공",
             HttpStatus.OK));
   }

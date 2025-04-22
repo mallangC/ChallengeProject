@@ -19,7 +19,7 @@ public class CoteChallengeRequest {
   @NotBlank(message = "코테 문제의 제목 입력해주세요")
   private String title;
   @NotBlank(message = "코테 문제의 링크를 입력해주세요")
-  private String question;
+  private String questionUrl;
   @NotNull(message = "문제가 시작되는 날짜를 입력해주세요")
   private LocalDateTime startAt;
 }

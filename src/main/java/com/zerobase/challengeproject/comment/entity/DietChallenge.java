@@ -2,8 +2,7 @@ package com.zerobase.challengeproject.comment.entity;
 
 import com.zerobase.challengeproject.account.entity.BaseEntity;
 import com.zerobase.challengeproject.challenge.entity.Challenge;
-import com.zerobase.challengeproject.comment.domain.request.DietChallengeAddRequest;
-import com.zerobase.challengeproject.comment.domain.request.DietChallengeUpdateRequest;
+import com.zerobase.challengeproject.comment.domain.request.DietChallengeRequest;
 import com.zerobase.challengeproject.exception.CustomException;
 import com.zerobase.challengeproject.exception.ErrorCode;
 import com.zerobase.challengeproject.member.entity.Member;
@@ -35,7 +34,7 @@ public class DietChallenge extends BaseEntity {
   @OneToMany(mappedBy = "dietChallenge", cascade = CascadeType.ALL, fetch = FetchType.LAZY)
   private List<DietComment> comments;
 
-  public static DietChallenge from(DietChallengeAddRequest form, Member member, Challenge challenge) {
+  public static DietChallenge from(DietChallengeRequest form, Member member, Challenge challenge) {
     if (form.getCurrentWeight() - form.getGoalWeight() < 5) {
       throw new CustomException(ErrorCode.DIFFERENCE_MORE_THEN_5KG);
     }
@@ -48,7 +47,7 @@ public class DietChallenge extends BaseEntity {
             .build();
   }
 
-  public void update(DietChallengeUpdateRequest form) {
+  public void update(DietChallengeRequest form) {
     if (form.getCurrentWeight() - form.getGoalWeight() < 5) {
       throw new CustomException(ErrorCode.DIFFERENCE_MORE_THEN_5KG);
     }

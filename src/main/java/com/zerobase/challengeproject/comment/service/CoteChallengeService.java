@@ -47,9 +47,7 @@ public class CoteChallengeService {
    * @param loginId 로그인 아이디
    * @return 추가한 코테 챌린지 정보
    */
-  public CoteChallengeDto addCoteChallenge(
-          CoteChallengeRequest form,
-          String loginId) {
+  public CoteChallengeDto addCoteChallenge(CoteChallengeRequest form, String loginId) {
     Challenge challenge = challengeRepository.
             searchChallengeWithCoteChallengeById(form.getChallengeId())
             .orElseThrow(() -> new CustomException(ErrorCode.NOT_FOUND_CHALLENGE));

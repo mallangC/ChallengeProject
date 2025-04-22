@@ -1,7 +1,9 @@
 package com.zerobase.challengeproject.comment.controller;
 
+import com.zerobase.challengeproject.HttpApiResponse;
 import com.zerobase.challengeproject.comment.service.S3Service;
 import lombok.RequiredArgsConstructor;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.PostMapping;
@@ -18,13 +20,20 @@ public class S3Controller {
   private final S3Service s3Service;
 
   @PostMapping
-  public ResponseEntity<String> uploadImage(MultipartFile file) throws IOException {
-    return ResponseEntity.ok(s3Service.uploadFile(file));
+  public ResponseEntity<HttpApiResponse<String>> uploadImage(MultipartFile imageFile) throws IOException {
+    return ResponseEntity.ok(new HttpApiResponse<>(
+            s3Service.uploadFile(imageFile),
+            "이미지 저장 성공",
+            HttpStatus.OK));
   }
 
   @DeleteMapping
-  public ResponseEntity<String> deleteImage(String imagePath) {
-    s3Service.deleteFile(imagePath);
-    return ResponseEntity.ok("삭제 완료");
+  public ResponseEntity<HttpApiResponse<String>> deleteImage(String imageUrl) {
+    s3Service.deleteFile(imageUrl);
+    String fileName = imageUrl.substring(38);
+    return ResponseEntity.ok(new HttpApiResponse<>(
+            fileName,
+            "파일 삭제 성공",
+            HttpStatus.OK));
   }
 }

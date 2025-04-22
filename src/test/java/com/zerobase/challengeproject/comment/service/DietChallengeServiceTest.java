@@ -5,8 +5,7 @@ import com.zerobase.challengeproject.challenge.entity.Challenge;
 import com.zerobase.challengeproject.challenge.repository.ChallengeRepository;
 import com.zerobase.challengeproject.comment.domain.dto.DietChallengeDto;
 import com.zerobase.challengeproject.comment.domain.dto.DietCommentDto;
-import com.zerobase.challengeproject.comment.domain.request.DietChallengeAddRequest;
-import com.zerobase.challengeproject.comment.domain.request.DietChallengeUpdateRequest;
+import com.zerobase.challengeproject.comment.domain.request.DietChallengeRequest;
 import com.zerobase.challengeproject.comment.domain.request.DietCommentAddRequest;
 import com.zerobase.challengeproject.comment.domain.request.DietCommentUpdateRequest;
 import com.zerobase.challengeproject.comment.entity.DietChallenge;
@@ -127,7 +126,7 @@ class DietChallengeServiceTest {
     given(challengeRepository.searchChallengeWithDietChallengeById(anyLong()))
             .willReturn(Optional.ofNullable(challengeBase));
 
-    DietChallengeAddRequest form = DietChallengeAddRequest.builder()
+    DietChallengeRequest form = DietChallengeRequest.builder()
             .challengeId(1L)
             .imageUrl(faker.internet().url())
             .currentWeight(65.2f)
@@ -165,7 +164,7 @@ class DietChallengeServiceTest {
                     .dietChallenges(new ArrayList<>())
                     .build()));
 
-    DietChallengeAddRequest form = DietChallengeAddRequest.builder()
+    DietChallengeRequest form = DietChallengeRequest.builder()
             .challengeId(1L)
             .imageUrl(faker.internet().url())
             .currentWeight(65.2f)
@@ -201,7 +200,7 @@ class DietChallengeServiceTest {
                     .dietChallenges(List.of(dietChallengeBase))
                     .build()));
 
-    DietChallengeAddRequest form = DietChallengeAddRequest.builder()
+    DietChallengeRequest form = DietChallengeRequest.builder()
             .challengeId(1L)
             .imageUrl(faker.internet().url())
             .currentWeight(65.2f)
@@ -239,10 +238,11 @@ class DietChallengeServiceTest {
     given(dietChallengeRepository.searchDietChallengeByChallengeIdAndLoginId(anyLong(), anyString()))
             .willReturn(Optional.ofNullable(dietChallengeBase));
 
-    DietChallengeUpdateRequest form = DietChallengeUpdateRequest.builder()
+    DietChallengeRequest form = DietChallengeRequest.builder()
             .challengeId(1L)
             .currentWeight(67.2f)
             .goalWeight(57.7f)
+            .imageUrl(faker.internet().url())
             .build();
     //when
     DietChallengeDto result =
@@ -286,10 +286,11 @@ class DietChallengeServiceTest {
     given(dietChallengeRepository.searchDietChallengeByChallengeIdAndLoginId(anyLong(), anyString()))
             .willReturn(Optional.ofNullable(dietChallenge));
 
-    DietChallengeUpdateRequest form = DietChallengeUpdateRequest.builder()
+    DietChallengeRequest form = DietChallengeRequest.builder()
             .challengeId(1L)
             .currentWeight(67.2f)
             .goalWeight(57.7f)
+            .imageUrl(faker.internet().url())
             .build();
     //when
     CustomException exception = assertThrows(CustomException.class, () ->
