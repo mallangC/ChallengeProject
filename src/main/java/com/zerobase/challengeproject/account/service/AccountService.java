@@ -12,8 +12,6 @@ import com.zerobase.challengeproject.account.repository.AccountDetailRepository;
 import com.zerobase.challengeproject.account.repository.RefundRepository;
 import com.zerobase.challengeproject.exception.CustomException;
 import com.zerobase.challengeproject.exception.ErrorCode;
-import com.zerobase.challengeproject.member.components.jwt.UserDetailsImpl;
-import com.zerobase.challengeproject.member.domain.dto.MemberDto;
 import com.zerobase.challengeproject.member.entity.Member;
 import com.zerobase.challengeproject.member.repository.MemberRepository;
 import com.zerobase.challengeproject.type.AccountType;
@@ -32,12 +30,6 @@ public class AccountService {
   private final MemberRepository memberRepository;
   private final AccountDetailRepository accountDetailRepository;
   private final RefundRepository refundRepository;
-
-  public MemberDto getMember(UserDetailsImpl userDetails) {
-    return MemberDto.fromWithoutAccountDetails(
-            memberRepository.findByLoginId(userDetails.getUsername())
-                    .orElseThrow(() -> new CustomException(ErrorCode.NOT_FOUND_MEMBER)));
-  }
 
   /**
    * 회원이 금액을 충전하기 위한 서비스 메서드

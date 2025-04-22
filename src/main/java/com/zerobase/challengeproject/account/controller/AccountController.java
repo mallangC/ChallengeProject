@@ -10,7 +10,6 @@ import com.zerobase.challengeproject.account.domain.request.RefundSearchRequest;
 import com.zerobase.challengeproject.account.domain.request.RefundUpdateRequest;
 import com.zerobase.challengeproject.account.service.AccountService;
 import com.zerobase.challengeproject.member.components.jwt.UserDetailsImpl;
-import com.zerobase.challengeproject.member.domain.dto.MemberDto;
 import com.zerobase.challengeproject.member.entity.Member;
 import jakarta.validation.Valid;
 import jakarta.validation.constraints.Min;
@@ -28,14 +27,6 @@ import org.springframework.web.bind.annotation.*;
 public class AccountController {
 
   private final AccountService accountService;
-
-  /**
-   * 회원 조회(계좌 확인을 위해 구현)
-   */
-  @GetMapping("/member")
-  public ResponseEntity<MemberDto> getAccountDetail(@AuthenticationPrincipal UserDetailsImpl userDetails) {
-    return ResponseEntity.ok(accountService.getMember(userDetails));
-  }
 
   /**
    * 회원 계좌에 금액 충전
