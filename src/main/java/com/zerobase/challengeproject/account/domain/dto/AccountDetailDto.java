@@ -14,7 +14,7 @@ import java.time.LocalDateTime;
 @AllArgsConstructor
 @Builder
 public class AccountDetailDto {
-  private String memberId;
+  private String loginId;
   private AccountType accountType;
   private boolean isRefunded;
   private Long preAmount;
@@ -24,7 +24,7 @@ public class AccountDetailDto {
 
   public static AccountDetailDto from(AccountDetail detail) {
     return AccountDetailDto.builder()
-            .memberId(detail.getMember().getLoginId())
+            .loginId(detail.getMember().getLoginId())
             .isRefunded(detail.isRefunded())
             .preAmount(detail.getPreAmount())
             .curAmount(detail.getCurAmount())
