@@ -10,6 +10,7 @@ import java.util.List;
 @Repository
 public interface WaterChallengeRepository extends JpaRepository<WaterChallenge, Long> , WaterChallengeRepositoryCustom{
     WaterChallenge findByChallengeId(Long challengeId);
-
+    List<WaterChallenge> findAllByChallengeId(Long challengeId);
     List<WaterChallenge> findAllByChallengeIdAndMember(Long challengeId, Member member);
+
 }

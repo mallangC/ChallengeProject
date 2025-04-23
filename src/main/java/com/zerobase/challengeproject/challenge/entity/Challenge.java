@@ -85,6 +85,7 @@ public class Challenge {
     this.categoryType = form.getCategoryType();
     this.imageUrl = form.getImg();
     this.maxParticipant = form.getMaxParticipant();
+    this.standard = form.getStandard();
     this.currentParticipant = 1L;
     this.maxDeposit = form.getMaxDeposit();
     this.minDeposit = form.getMinDeposit();

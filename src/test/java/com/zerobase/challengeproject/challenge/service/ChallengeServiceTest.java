@@ -15,10 +15,7 @@ import com.zerobase.challengeproject.comment.entity.CoteChallenge;
 import com.zerobase.challengeproject.comment.entity.CoteComment;
 import com.zerobase.challengeproject.comment.entity.DietChallenge;
 import com.zerobase.challengeproject.comment.entity.WaterChallenge;
-import com.zerobase.challengeproject.comment.repository.CoteChallengeRepository;
-import com.zerobase.challengeproject.comment.repository.CoteCommentRepository;
-import com.zerobase.challengeproject.comment.repository.DietChallengeRepository;
-import com.zerobase.challengeproject.comment.repository.WaterChallengeRepository;
+import com.zerobase.challengeproject.comment.repository.*;
 import com.zerobase.challengeproject.exception.CustomException;
 import com.zerobase.challengeproject.exception.ErrorCode;
 import com.zerobase.challengeproject.member.components.jwt.UserDetailsImpl;
@@ -43,6 +40,7 @@ import org.springframework.security.core.context.SecurityContext;
 import org.springframework.security.core.context.SecurityContextHolder;
 
 import java.time.LocalDateTime;
+import java.util.Collections;
 import java.util.List;
 import java.util.Optional;
 
@@ -61,6 +59,9 @@ public class ChallengeServiceTest {
 
     @Mock
     private AccountDetailRepository accountDetailRepository;
+
+    @Mock
+    private DietCommentRepository dietCommentRepository;
 
     @Mock
     private MemberRepository memberRepository;
@@ -218,8 +219,10 @@ public class ChallengeServiceTest {
     void getChallengeDetail() {
         // Given
         Challenge challenge = createChallenge(challengeId, "챌린지 제목");
-        given(challengeRepository.findById(challengeId)).willReturn(Optional.of(challenge));
 
+        given(challengeRepository.findById(challengeId)).willReturn(Optional.of(challenge));
+        given(dietCommentRepository.findAllByDietChallengeIdIn(anyList()))
+                .willReturn(Collections.emptyList());
         // When
         GetChallengeDto challengeDto = challengeService.getChallengeDetail(challengeId);
 
@@ -303,7 +306,7 @@ public class ChallengeServiceTest {
         given(challengeRepository.findById(challengeId)).willReturn(Optional.of(existingChallenge));
 
         // When
-        GetChallengeDto response = challengeService.updateChallenge(challengeId, updateChallengeRequest);
+        GetChallengeDto response = challengeService.updateChallenge(challengeId, updateChallengeRequest, member.getId());
 
         // Then
         assertThat(response.getTitle()).isEqualTo(updateChallengeRequest.getTitle());
@@ -322,7 +325,7 @@ public class ChallengeServiceTest {
         updateChallengeRequest.setMaxDeposit(5000L);
 
         // When & Then
-        assertThatThrownBy(() -> challengeService.updateChallenge(challengeId, updateChallengeRequest))
+        assertThatThrownBy(() -> challengeService.updateChallenge(challengeId, updateChallengeRequest, member.getId()))
                 .isInstanceOf(CustomException.class)
                 .hasMessage(ErrorCode.INVALID_DEPOSIT_AMOUNT.getMessage());
     }
@@ -336,7 +339,7 @@ public class ChallengeServiceTest {
         updateChallengeRequest.setMaxParticipant(0L);
 
         // When & Then
-        assertThatThrownBy(() -> challengeService.updateChallenge(challengeId, updateChallengeRequest))
+        assertThatThrownBy(() -> challengeService.updateChallenge(challengeId, updateChallengeRequest, member.getId()))
                 .isInstanceOf(CustomException.class)
                 .hasMessage(ErrorCode.INVALID_PARTICIPANT_NUMBER.getMessage());
     }
@@ -351,7 +354,7 @@ public class ChallengeServiceTest {
         updateChallengeRequest.setEndDate(LocalDateTime.now().minusDays(20));
 
         // When & Then
-        assertThatThrownBy(() -> challengeService.updateChallenge(challengeId, updateChallengeRequest))
+        assertThatThrownBy(() -> challengeService.updateChallenge(challengeId, updateChallengeRequest, member.getId()))
                 .isInstanceOf(CustomException.class)
                 .hasMessage(ErrorCode.INVALID_DATE_RANGE.getMessage());
     }
@@ -363,7 +366,7 @@ public class ChallengeServiceTest {
         given(challengeRepository.findById(challengeId)).willReturn(Optional.empty());
 
         // When & Then
-        assertThatThrownBy(() -> challengeService.updateChallenge(challengeId, updateChallengeRequest))
+        assertThatThrownBy(() -> challengeService.updateChallenge(challengeId, updateChallengeRequest, member.getId()))
                 .isInstanceOf(CustomException.class)
                 .hasMessage(ErrorCode.NOT_FOUND_CHALLENGE.getMessage());
     }

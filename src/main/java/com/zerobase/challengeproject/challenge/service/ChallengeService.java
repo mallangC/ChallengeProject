@@ -14,14 +14,11 @@ import com.zerobase.challengeproject.challenge.entity.Challenge;
 import com.zerobase.challengeproject.challenge.entity.MemberChallenge;
 import com.zerobase.challengeproject.challenge.repository.ChallengeRepository;
 import com.zerobase.challengeproject.challenge.repository.MemberChallengeRepository;
-import com.zerobase.challengeproject.comment.entity.CoteChallenge;
-import com.zerobase.challengeproject.comment.entity.CoteComment;
-import com.zerobase.challengeproject.comment.entity.DietChallenge;
-import com.zerobase.challengeproject.comment.entity.WaterChallenge;
-import com.zerobase.challengeproject.comment.repository.CoteChallengeRepository;
-import com.zerobase.challengeproject.comment.repository.CoteCommentRepository;
-import com.zerobase.challengeproject.comment.repository.DietChallengeRepository;
-import com.zerobase.challengeproject.comment.repository.WaterChallengeRepository;
+import com.zerobase.challengeproject.comment.domain.dto.CoteCommentDto;
+import com.zerobase.challengeproject.comment.domain.dto.DietCommentDto;
+import com.zerobase.challengeproject.comment.domain.dto.WaterCommentDto;
+import com.zerobase.challengeproject.comment.entity.*;
+import com.zerobase.challengeproject.comment.repository.*;
 import com.zerobase.challengeproject.exception.CustomException;
 import com.zerobase.challengeproject.exception.ErrorCode;
 import com.zerobase.challengeproject.member.components.jwt.UserDetailsImpl;
@@ -54,7 +51,9 @@ public class ChallengeService {
   private final CoteChallengeRepository coteChallengeRepository;
   private final CoteCommentRepository coteCommentRepository;
   private final DietChallengeRepository dietChallengeRepository;
+  private final DietCommentRepository dietCommentRepository;
   private final WaterChallengeRepository waterChallengeRepository;
+  private final WaterCommentRepository waterCommentRepository;
 
     /**
      * 전체 챌린지조회
@@ -76,8 +75,47 @@ public class ChallengeService {
         Challenge challenge = challengeRepository.findById(challengeId)
                 .orElseThrow(() -> new CustomException(ErrorCode.NOT_FOUND_CHALLENGE));
 
-        return new GetChallengeDto(challenge);
+        CategoryType categoryType = challenge.getCategoryType();
+
+        GetChallengeDto getChallengeDto = new GetChallengeDto(challenge);
+
+        if (categoryType.equals(CategoryType.COTE)) {
+            List<CoteChallenge> coteChallenges = coteChallengeRepository.findAllByChallengeId(challengeId);
+            List<Long> coteChallengeIds = coteChallenges.stream()
+                    .map(CoteChallenge::getId)
+                    .toList();
+            List<CoteComment> coteComments = coteCommentRepository.findAllByCoteChallengeIdIn(coteChallengeIds);
+            List<CoteCommentDto> commentDtos = coteComments.stream()
+                    .map(CoteCommentDto::from)
+                    .toList();
+            getChallengeDto.setCoteComments(commentDtos);
+
+        } else if (categoryType.equals(CategoryType.WATER)) {
+            List<WaterChallenge> waterChallenges = waterChallengeRepository.findAllByChallengeId(challengeId);
+            List<Long> waterChallengeIds = waterChallenges.stream()
+                    .map(WaterChallenge::getId)
+                    .toList();
+            List<WaterComment> waterComments = waterCommentRepository.findAllByWaterChallengeIdIn(waterChallengeIds);
+            List<WaterCommentDto> commentDtos = waterComments.stream()
+                    .map(WaterCommentDto::from)
+                    .toList();
+            getChallengeDto.setWaterComments(commentDtos);
+
+        } else if (categoryType.equals(CategoryType.DIET)) {
+            List<DietChallenge> dietChallenges = dietChallengeRepository.findAllByChallengeId(challengeId);
+            List<Long> dietChallengeIds = dietChallenges.stream()
+                    .map(DietChallenge::getId)
+                    .toList();
+            List<DietComment> dietComments = dietCommentRepository.findAllByDietChallengeIdIn(dietChallengeIds);
+            List<DietCommentDto> commentDtos = dietComments.stream()
+                    .map(DietCommentDto::from)
+                    .toList();
+            getChallengeDto.setDietComments(commentDtos);
+        }
+
+        return getChallengeDto;
     }
+
 
     /**
      * 사용자가 만든 챌린지 조회
@@ -177,7 +215,6 @@ public class ChallengeService {
     public GetChallengeDto createChallenge(CreateChallengeRequest form, Long memberId) {
         Member member = memberRepository.findById(memberId)
                 .orElseThrow(() -> new CustomException(ErrorCode.NOT_FOUND_MEMBER));
-
         form.validate();
 
         Challenge challenge = new Challenge(form, member);
@@ -203,14 +240,13 @@ public class ChallengeService {
     /**
      * 챌린지 수정
      */
-    public GetChallengeDto updateChallenge(Long challengeId, UpdateChallengeRequest form) {
-        Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
-        UserDetailsImpl userDetails = (UserDetailsImpl) authentication.getPrincipal();
+    public GetChallengeDto updateChallenge(Long challengeId, UpdateChallengeRequest form, Long memberId) {
+
 
         Challenge challenge = challengeRepository.findById(challengeId)
                 .orElseThrow(() -> new CustomException(ErrorCode.NOT_FOUND_CHALLENGE));
 
-        if (!challenge.getMember().getId().equals(userDetails.getMember().getId())) {
+        if (!challenge.getMember().getId().equals(memberId)) {
             throw new CustomException(ErrorCode.FORBIDDEN_UPDATE_CHALLENGE);
         }
 
