@@ -14,9 +14,7 @@ import com.zerobase.challengeproject.challenge.entity.Challenge;
 import com.zerobase.challengeproject.challenge.entity.MemberChallenge;
 import com.zerobase.challengeproject.challenge.repository.ChallengeRepository;
 import com.zerobase.challengeproject.challenge.repository.MemberChallengeRepository;
-import com.zerobase.challengeproject.comment.domain.dto.CoteCommentDto;
-import com.zerobase.challengeproject.comment.domain.dto.DietCommentDto;
-import com.zerobase.challengeproject.comment.domain.dto.WaterCommentDto;
+import com.zerobase.challengeproject.comment.domain.dto.*;
 import com.zerobase.challengeproject.comment.entity.*;
 import com.zerobase.challengeproject.comment.repository.*;
 import com.zerobase.challengeproject.exception.CustomException;
@@ -81,37 +79,26 @@ public class ChallengeService {
 
         if (categoryType.equals(CategoryType.COTE)) {
             List<CoteChallenge> coteChallenges = coteChallengeRepository.findAllByChallengeId(challengeId);
-            List<Long> coteChallengeIds = coteChallenges.stream()
-                    .map(CoteChallenge::getId)
+            List<CoteChallengeDto> challengeDtos = coteChallenges.stream()
+                    .map(CoteChallengeDto::from)
                     .toList();
-            List<CoteComment> coteComments = coteCommentRepository.findAllByCoteChallengeIdIn(coteChallengeIds);
-            List<CoteCommentDto> commentDtos = coteComments.stream()
-                    .map(CoteCommentDto::from)
-                    .toList();
-            getChallengeDto.setCoteComments(commentDtos);
+            getChallengeDto.setCoteChallenges(challengeDtos);
 
         } else if (categoryType.equals(CategoryType.WATER)) {
             List<WaterChallenge> waterChallenges = waterChallengeRepository.findAllByChallengeId(challengeId);
-            List<Long> waterChallengeIds = waterChallenges.stream()
-                    .map(WaterChallenge::getId)
+            List<WaterChallengeDto> challengeDtos = waterChallenges.stream()
+                    .map(WaterChallengeDto::from)
                     .toList();
-            List<WaterComment> waterComments = waterCommentRepository.findAllByWaterChallengeIdIn(waterChallengeIds);
-            List<WaterCommentDto> commentDtos = waterComments.stream()
-                    .map(WaterCommentDto::from)
-                    .toList();
-            getChallengeDto.setWaterComments(commentDtos);
+            getChallengeDto.setWaterChallenges(challengeDtos);
 
         } else if (categoryType.equals(CategoryType.DIET)) {
             List<DietChallenge> dietChallenges = dietChallengeRepository.findAllByChallengeId(challengeId);
-            List<Long> dietChallengeIds = dietChallenges.stream()
-                    .map(DietChallenge::getId)
+            List<DietChallengeDto> challengeDtos = dietChallenges.stream()
+                    .map(DietChallengeDto::from)
                     .toList();
-            List<DietComment> dietComments = dietCommentRepository.findAllByDietChallengeIdIn(dietChallengeIds);
-            List<DietCommentDto> commentDtos = dietComments.stream()
-                    .map(DietCommentDto::from)
-                    .toList();
-            getChallengeDto.setDietComments(commentDtos);
+            getChallengeDto.setDietChallenges(challengeDtos);
         }
+
 
         return getChallengeDto;
     }

@@ -1,14 +1,13 @@
 package com.zerobase.challengeproject.challenge.domain.dto;
 
 import com.zerobase.challengeproject.challenge.entity.Challenge;
-import com.zerobase.challengeproject.comment.domain.dto.CoteCommentDto;
-import com.zerobase.challengeproject.comment.domain.dto.DietCommentDto;
-import com.zerobase.challengeproject.comment.domain.dto.WaterCommentDto;
+import com.zerobase.challengeproject.comment.domain.dto.*;
 import com.zerobase.challengeproject.type.CategoryType;
 import lombok.Getter;
 import lombok.Setter;
 
 import java.time.LocalDateTime;
+import java.util.ArrayList;
 import java.util.List;
 
 
@@ -26,9 +25,9 @@ public class GetChallengeDto {
     private Long minDeposit;
     private Long maxDeposit;
     private String standard;
-    private List<CoteCommentDto> coteComments;
-    private List<DietCommentDto> dietComments;
-    private List<WaterCommentDto> waterComments;
+    private List<CoteChallengeDto> coteChallenges;
+    private List<DietChallengeDto> dietChallenges;
+    private List<WaterChallengeDto> waterChallenges;
     private LocalDateTime startDate;
     private LocalDateTime endDate;
     private LocalDateTime createdAt;
@@ -50,6 +49,7 @@ public class GetChallengeDto {
         this.categoryType = challenge.getCategoryType();
         this.imgUrl = challenge.getImageUrl();
         this.title = challenge.getTitle();
+
 
     }
 

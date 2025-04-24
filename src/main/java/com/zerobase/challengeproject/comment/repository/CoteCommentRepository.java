@@ -12,5 +12,5 @@ public interface CoteCommentRepository extends JpaRepository<CoteComment, Long>,
 
 
     List<CoteComment> findAllByCoteChallengeIdInAndMemberId(List<Long> coteChallengeIds, Long memberId);
-    List<CoteComment> findAllByCoteChallengeIdIn(List<Long> coteChallengeIds); // ✅ 올바름
+    List<CoteComment> findAllByCoteChallengeIdIn(List<Long> coteChallengeIds);
 }
