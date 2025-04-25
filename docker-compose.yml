@@ -7,10 +7,10 @@ services:
       - "8080:8080"
     environment:
       DB_URL: ${DB_URL}
-      DB_USERNAME: ${DB_USERNAME}  # RDS 사용자 이름
-      DB_PASSWORD: ${DB_PASSWORD} # RDS 비밀번호
-      REDIS_HOST: redis  # 도커 내에서 Redis 사용
-      REDIS_PORT: 6379  # Redis 포트
+      DB_USERNAME: ${DB_USERNAME}
+      DB_PASSWORD: ${DB_PASSWORD}
+      REDIS_HOST: redis
+      REDIS_PORT: 6379
       MAIL_USERNAME: ${MAIL_USERNAME}
       MAIL_PASSWORD: ${MAIL_PASSWORD}
       JWT_SECRET_KEY: ${JWT_SECRET_KEY}

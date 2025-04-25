@@ -14,14 +14,9 @@ import com.zerobase.challengeproject.challenge.entity.Challenge;
 import com.zerobase.challengeproject.challenge.entity.MemberChallenge;
 import com.zerobase.challengeproject.challenge.repository.ChallengeRepository;
 import com.zerobase.challengeproject.challenge.repository.MemberChallengeRepository;
-import com.zerobase.challengeproject.comment.entity.CoteChallenge;
-import com.zerobase.challengeproject.comment.entity.CoteComment;
-import com.zerobase.challengeproject.comment.entity.DietChallenge;
-import com.zerobase.challengeproject.comment.entity.WaterChallenge;
-import com.zerobase.challengeproject.comment.repository.CoteChallengeRepository;
-import com.zerobase.challengeproject.comment.repository.CoteCommentRepository;
-import com.zerobase.challengeproject.comment.repository.DietChallengeRepository;
-import com.zerobase.challengeproject.comment.repository.WaterChallengeRepository;
+import com.zerobase.challengeproject.comment.domain.dto.*;
+import com.zerobase.challengeproject.comment.entity.*;
+import com.zerobase.challengeproject.comment.repository.*;
 import com.zerobase.challengeproject.exception.CustomException;
 import com.zerobase.challengeproject.exception.ErrorCode;
 import com.zerobase.challengeproject.member.components.jwt.UserDetailsImpl;
@@ -54,7 +49,9 @@ public class ChallengeService {
   private final CoteChallengeRepository coteChallengeRepository;
   private final CoteCommentRepository coteCommentRepository;
   private final DietChallengeRepository dietChallengeRepository;
+  private final DietCommentRepository dietCommentRepository;
   private final WaterChallengeRepository waterChallengeRepository;
+  private final WaterCommentRepository waterCommentRepository;
 
     /**
      * 전체 챌린지조회
@@ -76,8 +73,36 @@ public class ChallengeService {
         Challenge challenge = challengeRepository.findById(challengeId)
                 .orElseThrow(() -> new CustomException(ErrorCode.NOT_FOUND_CHALLENGE));
 
-        return new GetChallengeDto(challenge);
+        CategoryType categoryType = challenge.getCategoryType();
+
+        GetChallengeDto getChallengeDto = new GetChallengeDto(challenge);
+
+        if (categoryType.equals(CategoryType.COTE)) {
+            List<CoteChallenge> coteChallenges = coteChallengeRepository.findAllByChallengeId(challengeId);
+            List<CoteChallengeDto> challengeDtos = coteChallenges.stream()
+                    .map(CoteChallengeDto::from)
+                    .toList();
+            getChallengeDto.setCoteChallenges(challengeDtos);
+
+        } else if (categoryType.equals(CategoryType.WATER)) {
+            List<WaterChallenge> waterChallenges = waterChallengeRepository.findAllByChallengeId(challengeId);
+            List<WaterChallengeDto> challengeDtos = waterChallenges.stream()
+                    .map(WaterChallengeDto::from)
+                    .toList();
+            getChallengeDto.setWaterChallenges(challengeDtos);
+
+        } else if (categoryType.equals(CategoryType.DIET)) {
+            List<DietChallenge> dietChallenges = dietChallengeRepository.findAllByChallengeId(challengeId);
+            List<DietChallengeDto> challengeDtos = dietChallenges.stream()
+                    .map(DietChallengeDto::from)
+                    .toList();
+            getChallengeDto.setDietChallenges(challengeDtos);
+        }
+
+
+        return getChallengeDto;
     }
+
 
     /**
      * 사용자가 만든 챌린지 조회
@@ -90,8 +115,6 @@ public class ChallengeService {
         }
         return userChallenges.map(GetChallengeDto::new);
     }
-
-
 
     /**
      * 사용자가 참여중인 챌린지 조회
@@ -163,7 +186,6 @@ public class ChallengeService {
                     .orElseThrow(() -> new CustomException(ErrorCode.NOT_FOUND_DIET_CHALLENGE));
             dietChallengeRepository.delete(dietChallenge);
         }
-
         Long refundAmount = memberChallenge.getMemberDeposit();
         AccountDetail refundRecord = AccountDetail.depositBack(member, refundAmount);
 
@@ -180,7 +202,6 @@ public class ChallengeService {
     public GetChallengeDto createChallenge(CreateChallengeRequest form, Long memberId) {
         Member member = memberRepository.findById(memberId)
                 .orElseThrow(() -> new CustomException(ErrorCode.NOT_FOUND_MEMBER));
-
         form.validate();
 
         Challenge challenge = new Challenge(form, member);
@@ -206,15 +227,13 @@ public class ChallengeService {
     /**
      * 챌린지 수정
      */
-    public GetChallengeDto updateChallenge(Long challengeId, UpdateChallengeRequest form) {
-        Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
-        UserDetailsImpl userDetails = (UserDetailsImpl) authentication.getPrincipal();  // 현재 로그인된 유저 정보
+    public GetChallengeDto updateChallenge(Long challengeId, UpdateChallengeRequest form, Long memberId) {
+
 
         Challenge challenge = challengeRepository.findById(challengeId)
                 .orElseThrow(() -> new CustomException(ErrorCode.NOT_FOUND_CHALLENGE));
 
-
-        if (!challenge.getMember().getId().equals(userDetails.getMember().getId())) {
+        if (!challenge.getMember().getId().equals(memberId)) {
             throw new CustomException(ErrorCode.FORBIDDEN_UPDATE_CHALLENGE);
         }
 

@@ -132,7 +132,8 @@ public class ChallengeController {
             @Valid @RequestBody UpdateChallengeRequest form,
             @AuthenticationPrincipal UserDetailsImpl userDetails) {
 
-        GetChallengeDto updatedChallenge = challengeService.updateChallenge(challengeId, form);
+        Long memberId = userDetails.getMember().getId();
+        GetChallengeDto updatedChallenge = challengeService.updateChallenge(challengeId, form, memberId);
         return ResponseEntity.ok(new HttpApiResponse<>(updatedChallenge, "챌린지 수정 성공", HttpStatus.OK)
         );
     }
