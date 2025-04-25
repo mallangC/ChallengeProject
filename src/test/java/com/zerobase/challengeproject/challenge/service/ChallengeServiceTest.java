@@ -221,8 +221,6 @@ public class ChallengeServiceTest {
         Challenge challenge = createChallenge(challengeId, "챌린지 제목");
 
         given(challengeRepository.findById(challengeId)).willReturn(Optional.of(challenge));
-        given(dietCommentRepository.findAllByDietChallengeIdIn(anyList()))
-                .willReturn(Collections.emptyList());
         // When
         GetChallengeDto challengeDto = challengeService.getChallengeDetail(challengeId);
 
